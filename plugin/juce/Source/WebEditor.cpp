@@ -76,13 +76,83 @@ BC2000DLWebEditor::BC2000DLWebEditor (BC2000DLProcessor& p)
 {
     setSize (kEditorW, kEditorH);
     setOpaque (true);
+    setResizable (true, true);
+    setResizeLimits (960, 600, 1920, 1200);
+    if (auto* constrainer = getConstrainer())
+        constrainer->setFixedAspectRatio ((double) kEditorW / (double) kEditorH);
     addAndMakeVisible (webView);
 
     // Ladda embeddad index — resourceProvider serverar från virtuellt root
     webView.goToURL (juce::WebBrowserComponent::getResourceProviderRoot()
                       + "beoflux.html");
 
+    // Live host-automation -> UI sync
+    static const std::vector<juce::String> kListenedParams = {
+        "speed", "tape_formula",
+        "mic_gain", "mic_gain_r",
+        "phono_gain", "phono_gain_r",
+        "radio_gain", "radio_gain_r",
+        "saturation_drive", "saturation_drive_r",
+        "echo_amount", "echo_amount_r",
+        "treble_db", "bass_db", "balance",
+        "bias_amount", "wow_flutter",
+        "echo_enabled", "bypass_tape", "synchroplay",
+        "multiplay_gen",
+        "rec_arm_1", "rec_arm_2", "track_1", "track_2",
+        "monitor_mode", "pause",
+        "speaker_ext", "speaker_int", "speaker_mute",
+        "sos_enabled", "pa_enabled",
+        "mic_loz", "phono_mode", "radio_mode"
+    };
+    for (const auto& id : kListenedParams)
+        processor.apvts.addParameterListener (id, this);
+
     startTimerHz (30);
+}
+
+BC2000DLWebEditor::~BC2000DLWebEditor()
+{
+    static const std::vector<juce::String> kListenedParams = {
+        "speed", "tape_formula",
+        "mic_gain", "mic_gain_r",
+        "phono_gain", "phono_gain_r",
+        "radio_gain", "radio_gain_r",
+        "saturation_drive", "saturation_drive_r",
+        "echo_amount", "echo_amount_r",
+        "treble_db", "bass_db", "balance",
+        "bias_amount", "wow_flutter",
+        "echo_enabled", "bypass_tape", "synchroplay",
+        "multiplay_gen",
+        "rec_arm_1", "rec_arm_2", "track_1", "track_2",
+        "monitor_mode", "pause",
+        "speaker_ext", "speaker_int", "speaker_mute",
+        "sos_enabled", "pa_enabled",
+        "mic_loz", "phono_mode", "radio_mode"
+    };
+    for (const auto& id : kListenedParams)
+        processor.apvts.removeParameterListener (id, this);
+}
+
+void BC2000DLWebEditor::parameterChanged (const juce::String& parameterID, float newValue)
+{
+    // Convert real-world value -> 0..1 normalized for JS
+    if (auto* prm = processor.apvts.getParameter (parameterID))
+    {
+        const float v01 = prm->getValue();
+        // Marshal to JS thread-safely
+        juce::MessageManager::callAsync ([this, parameterID, v01]() {
+            pushOneParamToJS (parameterID, v01);
+        });
+    }
+    juce::ignoreUnused (newValue);
+}
+
+void BC2000DLWebEditor::pushOneParamToJS (const juce::String& id, float value01)
+{
+    juce::DynamicObject::Ptr o = new juce::DynamicObject();
+    o->setProperty ("id",    id);
+    o->setProperty ("value", (double) value01);
+    webView.emitEventIfBrowserIsVisible ("paramSync", juce::var (o.get()));
 }
 
 void BC2000DLWebEditor::resized()

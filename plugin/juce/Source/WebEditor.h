@@ -14,20 +14,23 @@
 #include "PluginProcessor.h"
 
 class BC2000DLWebEditor : public juce::AudioProcessorEditor,
-                          private juce::Timer
+                          private juce::Timer,
+                          private juce::AudioProcessorValueTreeState::Listener
 {
 public:
     explicit BC2000DLWebEditor (BC2000DLProcessor& p);
-    ~BC2000DLWebEditor() override = default;
+    ~BC2000DLWebEditor() override;
 
     void resized() override;
 
 private:
     void timerCallback() override;
+    void parameterChanged (const juce::String& parameterID, float newValue) override;
     void onParamChangeFromJS (const juce::var& payload);
     void onPresetChangeFromJS (const juce::var& payload);
     void pushFullStateToJS();
     void pushPresetListToJS();
+    void pushOneParamToJS (const juce::String& id, float value01);
 
     BC2000DLProcessor& processor;
     juce::WebBrowserComponent webView;
