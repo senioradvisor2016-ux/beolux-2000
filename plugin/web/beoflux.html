@@ -161,8 +161,8 @@
   /* ============== UPPER CLUSTER (reels + transport + VU) ============== */
   .upper {
     display: grid;
-    grid-template-columns: 140px 1fr 140px;
-    gap: 8px;
+    grid-template-columns: 172px 1fr 140px;
+    gap: 10px;
     align-items: start;
   }
 
@@ -886,24 +886,32 @@
   }
   .knob .indicator {
     position: absolute;
-    top: 4px; left: 50%;
-    width: 2px; height: 14px;
-    background: #1a0a05;
-    transform-origin: 50% 28px;
+    top: 3px; left: 50%;
+    width: 3px; height: 12px;
+    background: linear-gradient(180deg, #d8a23a 0%, #8a5a18 60%, #1a0a05 100%);
+    transform-origin: 50% 19px;
     transform: translateX(-50%) rotate(0deg);
-    border-radius: 1px;
-    box-shadow: 0 0 0 0.5px rgba(255,200,140,0.2);
+    border-radius: 1.5px;
+    box-shadow: 0 0 2px rgba(216,162,58,0.5), 0 0 0 0.5px rgba(0,0,0,0.4);
+    z-index: 2;
+  }
+  /* TREBLE/BASS: 44px knobs — pivot is deeper (knob radius 22 vs 17 for small) */
+  .knob-cluster .knob-row:first-child .knob .indicator {
+    transform-origin: 50% 22px;
+    height: 13px;
   }
   .knob .symbol {
     position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
-    color: #1a1612;
-    font-size: 16px;
+    color: rgba(26,22,18,0.45);
+    font-size: 14px;
     font-weight: 700;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.25);
     pointer-events: none;
+    padding-top: 4px;  /* nudge clef down so it doesn't collide with indicator */
+    z-index: 1;
   }
   .knob-label {
     font-size: 8px;
@@ -1349,8 +1357,9 @@
     height: 34px;
   }
   .knob-cluster .knob-row:nth-child(n+2) .knob .indicator {
-    height: 7px;
-    transform-origin: 50% 13px;
+    height: 8px;
+    width: 2.5px;
+    transform-origin: 50% 17px;
   }
 </style>
 </head>
@@ -1526,10 +1535,10 @@
       <div class="needle" id="vu-l"><div class="shaft"></div><div class="weight"></div></div>
       <div class="pivot"></div>
     </div>
-    <div class="vu-label">L · CH1</div>
+    <div class="vu-label">INPUT · L</div>
   </div>
   <div class="glass"></div>
-  <div class="tip">Recording-level meter L</div>
+  <div class="tip">Input level — Left (sums Mic + Phono + Radio L)</div>
 </div>
           <div class="vu-meter" data-tip>
   <div class="bezel"></div>
@@ -1565,10 +1574,10 @@
       <div class="needle" id="vu-r"><div class="shaft"></div><div class="weight"></div></div>
       <div class="pivot"></div>
     </div>
-    <div class="vu-label">R · CH2</div>
+    <div class="vu-label">INPUT · R</div>
   </div>
   <div class="glass"></div>
-  <div class="tip">Recording-level meter R</div>
+  <div class="tip">Input level — Right (sums Mic + Phono + Radio R)</div>
 </div>
           <div class="vu-meter" data-tip>
   <div class="bezel"></div>
@@ -1604,7 +1613,7 @@
       <div class="needle" id="vu-out"><div class="shaft"></div><div class="weight"></div></div>
       <div class="pivot"></div>
     </div>
-    <div class="vu-label">OUTPUT</div>
+    <div class="vu-label">MASTER · OUT</div>
   </div>
   <div class="glass"></div>
   <div class="tip">Output level meter</div>
