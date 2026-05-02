@@ -2,7 +2,6 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "WebEditor.h"
 
 namespace
 {
@@ -289,8 +288,6 @@ void BC2000DLProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
 juce::AudioProcessorEditor* BC2000DLProcessor::createEditor()
 {
-    // Native JUCE-editor med Beocord 2000 DL-inspirerad layout.
-    // För HTML/JS-WebView-versionen: byt till BC2000DLWebEditor.
     return new BC2000DLEditor (*this);
 }
 
