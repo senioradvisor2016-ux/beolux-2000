@@ -743,6 +743,80 @@
   }
 
   /* ============== METER BRIDGE (VU meters horizontal) ============== */
+  /* ===== PRESET BAR (above VU meters) ===== */
+  .preset-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 10px 16px;
+    margin: 8px 0 6px 0;
+    background: linear-gradient(180deg, #1a1612 0%, #0f0d0b 100%);
+    border-radius: 6px;
+    box-shadow:
+      0 0 0 1px #2a2620 inset,
+      0 0 0 2px #0a0807,
+      0 4px 8px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .preset-bar-label {
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+  }
+  .preset-bar-btn {
+    width: 36px; height: 28px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #3a3228 0%, #1f1c17 100%);
+    color: var(--amber-glow);
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow:
+      0 0 0 1px #4a4035 inset,
+      0 1px 0 rgba(255,200,140,0.1) inset,
+      0 2px 4px rgba(0,0,0,0.5);
+    user-select: none;
+    transition: filter 0.1s, transform 0.05s;
+    position: relative;
+  }
+  .preset-bar-btn:hover { filter: brightness(1.18); }
+  .preset-bar-btn:active { transform: translateY(1px); filter: brightness(0.9); }
+  .preset-bar-name {
+    flex: 0 1 380px;
+    min-width: 280px;
+    text-align: center;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--amber-glow);
+    text-transform: uppercase;
+    padding: 6px 14px;
+    background: linear-gradient(180deg, #0a0907 0%, #14110e 100%);
+    border-radius: 4px;
+    box-shadow:
+      0 0 0 1px #2a2620 inset,
+      0 0 0 2px #000 inset,
+      0 1px 2px rgba(0,0,0,0.8) inset;
+    text-shadow: 0 0 8px rgba(232,185,74,0.45), 0 1px 0 rgba(0,0,0,0.6);
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+  .preset-bar-meta {
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.18em;
+    min-width: 50px;
+    text-align: right;
+  }
+
   .meter-bridge {
     display: flex;
     align-items: center;
@@ -1499,6 +1573,15 @@
         </div>
       </div>
 
+      <!-- ===== PRESET BAR (above VU meters) ===== -->
+      <div class="preset-bar">
+        <span class="preset-bar-label">PRESET</span>
+        <button class="preset-bar-btn" id="preset-prev" data-tip>◀<span class="tip">Previous preset</span></button>
+        <span class="preset-bar-name" id="preset-name" data-tip>FACTORY<span class="tip">Click to browse all 36 factory presets</span></span>
+        <button class="preset-bar-btn" id="preset-next" data-tip>▶<span class="tip">Next preset</span></button>
+        <div class="preset-bar-meta" id="preset-counter">1 / 36</div>
+      </div>
+
       <!-- ===== METER BRIDGE + CONTROL STRIP ===== -->
       <div class="meter-bridge">
         <div class="vu-stack-h">
@@ -1635,13 +1718,6 @@
           <button class="strip-btn mode" data-mode-group="formula" data-mode-val="AGFA">AGFA</button>
           <button class="strip-btn mode on" data-mode-group="formula" data-mode-val="BASF">BASF</button>
           <button class="strip-btn mode" data-mode-group="formula" data-mode-val="SCOTCH">SCOTCH</button>
-        </div>
-        <div class="strip-divider"></div>
-        <div class="strip-group">
-          <span class="strip-label">PRESET</span>
-          <button class="strip-btn" id="preset-prev">◀</button>
-          <span class="strip-preset-name" id="preset-name">FACTORY</span>
-          <button class="strip-btn" id="preset-next">▶</button>
         </div>
         <div class="strip-divider"></div>
         <div class="strip-group">
@@ -2530,15 +2606,23 @@ initKeys();
     }
   });
 
-  /* --- Preset wiring: ◀ FACTORY ▶ buttons --- */
+  /* --- Preset wiring: ◀ name ▶ + counter --- */
+  function _updatePresetUI(idx, names) {
+    const nameEl = document.getElementById('preset-name');
+    const metaEl = document.getElementById('preset-counter');
+    if (nameEl && names && names[idx]) {
+      // Strip leading "NN · " ordering prefix for display
+      nameEl.textContent = String(names[idx]).replace(/^\d+\s*[·.\-]\s*/, '');
+    }
+    if (metaEl && names) metaEl.textContent = (idx + 1) + ' / ' + names.length;
+  }
   // Listen for preset list + current program from C++
   window.__JUCE__.backend.addEventListener("presetSync", function(p) {
     if (!p || !Array.isArray(p.names)) return;
     const cur = Math.max(0, Math.min(p.names.length - 1, p.index | 0));
-    const nameEl = document.getElementById('preset-name');
-    if (nameEl) nameEl.textContent = p.names[cur];
     window.__BEOFLUX_PRESETS__ = p.names;
     window.__BEOFLUX_PRESET_IDX__ = cur;
+    _updatePresetUI(cur, p.names);
   });
   // Hook the < / > buttons
   const _presetCycle = function(delta) {
@@ -2547,8 +2631,7 @@ initKeys();
     if (i < 0) i = names.length - 1;
     if (i >= names.length) i = 0;
     window.__BEOFLUX_PRESET_IDX__ = i;
-    const nameEl = document.getElementById('preset-name');
-    if (nameEl) nameEl.textContent = names[i];
+    _updatePresetUI(i, names);
     window.__JUCE__.backend.emitEvent("presetChange", { index: i });
   };
   const prevBtn = document.getElementById('preset-prev');
