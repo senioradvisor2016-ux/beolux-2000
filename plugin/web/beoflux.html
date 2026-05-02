@@ -571,59 +571,92 @@
     display: grid;
     gap: 4px;
   }
+  /* Premium VU meter — multi-layered chrome bezel + glass + paper */
   .vu-meter {
-    background: linear-gradient(180deg, #2a2620 0%, #1a1612 100%);
-    border-radius: 4px;
-    padding: 14px 2px 2px 2px;  /* extra top space for label above scale */
+    /* Outer chrome ring (the screw-on bezel) */
+    background:
+      linear-gradient(135deg, #d8d4c8 0%, #888278 30%, #4a4438 55%, #2a2620 80%, #6e6a62 100%);
+    border-radius: 6px;
+    padding: 16px 4px 4px 4px;
     box-shadow:
-      0 0 0 1px #3a3228,
-      0 0 0 2px #0a0807,
-      0 2px 6px rgba(0,0,0,0.6);
-    height: 64px;
+      /* outer dark frame */
+      0 0 0 1px #0a0807,
+      /* subtle pop highlight upper edge */
+      0 1px 0 rgba(255,255,255,0.18) inset,
+      /* sharp inner shadow ring */
+      0 0 0 2px rgba(0,0,0,0.45) inset,
+      /* drop shadow grounding the meter on the panel */
+      0 3px 7px rgba(0,0,0,0.65),
+      0 1px 2px rgba(0,0,0,0.5);
+    height: 68px;
     position: relative;
     overflow: hidden;
   }
-  /* Chrome bezel */
+  /* Inner chrome ring (between bezel and glass) — adds the layered jewel-look */
   .vu-meter .bezel {
     position: absolute;
-    inset: 0;
+    inset: 3px;
     border-radius: 4px;
-    border: 1.5px solid;
-    border-color: #6e6a62 #4a4438 #3a3228 #6e6a62;
+    background: linear-gradient(135deg, #2a2620 0%, #14110e 50%, #2a2620 100%);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.12) inset,
+      0 0 0 2px rgba(0,0,0,0.85) inset,
+      0 2px 4px rgba(0,0,0,0.7) inset;
     pointer-events: none;
     z-index: 4;
   }
-  /* Cream meter face */
+  /* Cream paper meter face — warmer, more depth, subtle paper grain */
   .vu-meter .face {
     position: relative;
     width: 100%;
     height: 100%;
     background:
-      radial-gradient(ellipse 120% 160% at 50% 120%, #f5f0dc 0%, #e8dfc4 40%, #d8c9a0 80%, #c4b488 100%);
+      /* subtle paper grain via radial overlay */
+      radial-gradient(ellipse 35% 70% at 30% 25%, rgba(255,250,225,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 70% at 70% 75%, rgba(190,160,110,0.20) 0%, transparent 60%),
+      /* main cream paper with vignette */
+      radial-gradient(ellipse 130% 180% at 50% 130%, #faf2dc 0%, #efe2c0 35%, #d8c9a0 75%, #b09a72 100%);
     border-radius: 3px;
     overflow: hidden;
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.6) inset,
+      0 -1px 1px rgba(0,0,0,0.4) inset;
   }
-  /* Glass highlight */
+  /* Glass cover — convex specular highlight in upper-left */
   .vu-meter .glass {
     position: absolute;
-    inset: 0;
+    inset: 5px;
     background:
-      linear-gradient(160deg,
-        rgba(255,255,255,0.45) 0%,
-        rgba(255,255,255,0.15) 15%,
-        rgba(255,255,255,0) 40%,
-        rgba(0,0,0,0.03) 100%);
+      /* convex specular sweep */
+      linear-gradient(155deg,
+        rgba(255,255,255,0.55) 0%,
+        rgba(255,255,255,0.22) 12%,
+        rgba(255,255,255,0.04) 28%,
+        rgba(255,255,255,0) 50%,
+        rgba(0,0,0,0.04) 80%,
+        rgba(0,0,0,0.10) 100%),
+      /* secondary highlight at lower-right (curved glass) */
+      radial-gradient(ellipse 30% 25% at 85% 90%, rgba(255,255,255,0.18) 0%, transparent 60%);
     border-radius: 3px;
     pointer-events: none;
     z-index: 3;
   }
-  /* Glass edge refraction */
+  /* Bright top edge of glass meniscus */
+  .vu-meter .glass::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 5%; right: 5%;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,0) 100%);
+    box-shadow: 0 0 2px rgba(255,255,255,0.5);
+  }
+  /* Subtle bottom shadow inside glass */
   .vu-meter .glass::after {
     content: "";
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.6) 70%, rgba(255,255,255,0) 100%);
+    bottom: 0; left: 0; right: 0;
+    height: 8px;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.18) 100%);
   }
   .vu-meter .scale {
     position: relative;
