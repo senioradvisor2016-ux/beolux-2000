@@ -106,6 +106,8 @@ juce_add_binary_data(BC2000DL_Assets SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/../web/beoflux.html
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/knob_chrome_filmstrip.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/fader_thumb_chrome.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/walnut_bezel.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/matte_panel.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/reel_left.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/reel_right.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/chassis_alu.png

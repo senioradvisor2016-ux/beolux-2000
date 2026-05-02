@@ -74,9 +74,12 @@
     height: auto;
     position: relative;
     transform-origin: top center;
+    /* Blender Cycles PBR walnut bezel with baked grain + key-light */
     background:
-      /* outer wood bezel */
+      url('walnut_bezel.png'),
       linear-gradient(180deg, #3a1d0e 0%, #2a1408 50%, #1c0d05 100%);
+    background-size: 100% auto;
+    background-repeat: repeat;
     border-radius: 12px;
     box-shadow:
       0 30px 60px -15px rgba(0,0,0,0.7),
@@ -106,7 +109,9 @@
     mix-blend-mode: soft-light;
   }
 
-  /* wood grain overlay */
+  /* Subtle wood-grain overlay — softened to let the Blender PBR walnut
+     texture (set on .deck) show through. Adds a hint of additional
+     directional grain for depth. */
   .deck::before {
     content: "";
     position: absolute;
@@ -115,22 +120,16 @@
     background:
       repeating-linear-gradient(
         92deg,
-        rgba(40,18,6,0.35) 0px,
+        rgba(40,18,6,0.10) 0px,
         rgba(70,38,16,0.0) 2px,
         rgba(40,18,6,0.0) 9px,
-        rgba(20,10,4,0.5) 11px,
+        rgba(20,10,4,0.15) 11px,
         rgba(60,30,12,0.0) 22px
-      ),
-      repeating-linear-gradient(
-        91deg,
-        rgba(20,8,2,0.0) 0px,
-        rgba(20,8,2,0.0) 60px,
-        rgba(20,8,2,0.25) 62px,
-        rgba(80,40,16,0.0) 90px
-      ),
-      linear-gradient(180deg, #5e2e16 0%, #3a1808 100%);
+      );
     pointer-events: none;
     z-index: 0;
+    mix-blend-mode: multiply;
+    opacity: 0.4;
   }
 
   /* TEAC top brand strip */
@@ -2031,7 +2030,7 @@
         <div class="brand-mid">
           <div class="b">BEOFLUX</div>
           <div class="s">2000 · DELUXE</div>
-          <div style="font-family: ui-monospace, monospace; font-size: 8px; letter-spacing: 0.18em; color: var(--ink-faint); margin-top: 2px;">v29.5 · BC2000DL · 3D-LIGHTING</div>
+          <div style="font-family: ui-monospace, monospace; font-size: 8px; letter-spacing: 0.18em; color: var(--ink-faint); margin-top: 2px;">v29.6 · BC2000DL · FULL-3D-PBR</div>
         </div>
 
         <div class="connector-row" style="justify-content:flex-end;">
