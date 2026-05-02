@@ -25,7 +25,9 @@ public:
 private:
     void timerCallback() override;
     void onParamChangeFromJS (const juce::var& payload);
+    void onPresetChangeFromJS (const juce::var& payload);
     void pushFullStateToJS();
+    void pushPresetListToJS();
 
     BC2000DLProcessor& processor;
     juce::WebBrowserComponent webView;

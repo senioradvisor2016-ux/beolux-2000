@@ -68,7 +68,11 @@ BC2000DLWebEditor::BC2000DLWebEditor (BC2000DLProcessor& p)
         .withEventListener ("paramChange",
             [this] (const juce::var& v) { onParamChangeFromJS (v); })
         .withEventListener ("requestSync",
-            [this] (const juce::var&) { pushFullStateToJS(); }))
+            [this] (const juce::var&) { pushFullStateToJS(); })
+        .withEventListener ("requestPresets",
+            [this] (const juce::var&) { pushPresetListToJS(); })
+        .withEventListener ("presetChange",
+            [this] (const juce::var& v) { onPresetChangeFromJS (v); }))
 {
     setSize (kEditorW, kEditorH);
     setOpaque (true);
@@ -99,6 +103,28 @@ void BC2000DLWebEditor::onParamChangeFromJS (const juce::var& payload)
                                        static_cast<float> ((double) valueVar));
     if (auto* prm = processor.apvts.getParameter (paramId))
         prm->setValueNotifyingHost (value01);
+}
+
+void BC2000DLWebEditor::pushPresetListToJS()
+{
+    juce::Array<juce::var> names;
+    const int n = processor.getNumPrograms();
+    for (int i = 0; i < n; ++i)
+        names.add (processor.getProgramName (i));
+
+    juce::DynamicObject::Ptr o = new juce::DynamicObject();
+    o->setProperty ("names", juce::var (names));
+    o->setProperty ("index", processor.getCurrentProgram());
+    webView.emitEventIfBrowserIsVisible ("presetSync", juce::var (o.get()));
+}
+
+void BC2000DLWebEditor::onPresetChangeFromJS (const juce::var& payload)
+{
+    if (! payload.isObject()) return;
+    const int idx = (int) payload.getProperty ("index", juce::var (0));
+    processor.setCurrentProgram (idx);
+    // Push synced parameter values back so HTML reflects new preset
+    pushFullStateToJS();
 }
 
 void BC2000DLWebEditor::pushFullStateToJS()

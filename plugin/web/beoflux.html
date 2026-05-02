@@ -2399,8 +2399,35 @@ initKeys();
     }
   });
 
+  /* --- Preset wiring: ◀ FACTORY ▶ buttons --- */
+  // Listen for preset list + current program from C++
+  window.__JUCE__.backend.addEventListener("presetSync", function(p) {
+    if (!p || !Array.isArray(p.names)) return;
+    const cur = Math.max(0, Math.min(p.names.length - 1, p.index | 0));
+    const nameEl = document.getElementById('preset-name');
+    if (nameEl) nameEl.textContent = p.names[cur];
+    window.__BEOFLUX_PRESETS__ = p.names;
+    window.__BEOFLUX_PRESET_IDX__ = cur;
+  });
+  // Hook the < / > buttons
+  const _presetCycle = function(delta) {
+    const names = window.__BEOFLUX_PRESETS__ || ['FACTORY'];
+    let i = (window.__BEOFLUX_PRESET_IDX__ | 0) + delta;
+    if (i < 0) i = names.length - 1;
+    if (i >= names.length) i = 0;
+    window.__BEOFLUX_PRESET_IDX__ = i;
+    const nameEl = document.getElementById('preset-name');
+    if (nameEl) nameEl.textContent = names[i];
+    window.__JUCE__.backend.emitEvent("presetChange", { index: i });
+  };
+  const prevBtn = document.getElementById('preset-prev');
+  const nextBtn = document.getElementById('preset-next');
+  if (prevBtn) prevBtn.addEventListener('click', () => _presetCycle(-1));
+  if (nextBtn) nextBtn.addEventListener('click', () => _presetCycle(+1));
+
   /* --- Request initial parameter snapshot from host --- */
   window.__JUCE__.backend.emitEvent("requestSync", {});
+  window.__JUCE__.backend.emitEvent("requestPresets", {});
 
   console.log('[BEOFLUX] JUCE bridge active');
 })();

@@ -293,6 +293,94 @@ juce::AudioProcessorEditor* BC2000DLProcessor::createEditor()
     return new BC2000DLWebEditor (*this);
 }
 
+// ============================================================================
+//  Factory presets — values are 0..1 normalized (passed to setValueNotifyingHost)
+// ============================================================================
+namespace {
+struct PresetEntry { const char* id; float value01; };
+struct Preset { const char* name; std::vector<PresetEntry> values; };
+
+const std::vector<Preset>& factoryPresets()
+{
+    static const std::vector<Preset> P = {
+        { "FACTORY", {
+            {"speed", 0.5f}, {"tape_formula", 0.5f},
+            {"mic_gain", 0.5f}, {"mic_gain_r", 0.5f},
+            {"phono_gain", 0.5f}, {"phono_gain_r", 0.5f},
+            {"radio_gain", 0.5f}, {"radio_gain_r", 0.5f},
+            {"saturation_drive", 0.5f}, {"saturation_drive_r", 0.5f},
+            {"echo_amount", 0.0f}, {"echo_amount_r", 0.0f},
+            {"treble_db", 0.5f}, {"bass_db", 0.5f}, {"balance", 0.5f},
+            {"bias_amount", 0.5f}, {"wow_flutter", 0.0f},
+            {"echo_enabled", 0.0f}, {"bypass_tape", 0.0f},
+        }},
+        { "TAPE WARM", {
+            {"speed", 0.5f}, {"tape_formula", 0.0f},
+            {"mic_gain", 0.6f}, {"mic_gain_r", 0.6f},
+            {"saturation_drive", 0.65f}, {"saturation_drive_r", 0.65f},
+            {"treble_db", 0.4f}, {"bass_db", 0.65f}, {"balance", 0.5f},
+            {"bias_amount", 0.55f}, {"wow_flutter", 0.15f},
+            {"echo_enabled", 0.0f}, {"bypass_tape", 0.0f},
+        }},
+        { "RADIO BRIGHT", {
+            {"speed", 1.0f}, {"tape_formula", 1.0f},
+            {"radio_gain", 0.7f}, {"radio_gain_r", 0.7f},
+            {"saturation_drive", 0.4f}, {"saturation_drive_r", 0.4f},
+            {"treble_db", 0.7f}, {"bass_db", 0.45f}, {"balance", 0.5f},
+            {"bias_amount", 0.5f}, {"wow_flutter", 0.0f},
+            {"echo_enabled", 0.0f}, {"bypass_tape", 0.0f},
+        }},
+        { "ECHO MAGIC", {
+            {"speed", 0.5f}, {"tape_formula", 0.5f},
+            {"mic_gain", 0.55f}, {"mic_gain_r", 0.55f},
+            {"saturation_drive", 0.45f}, {"saturation_drive_r", 0.45f},
+            {"echo_amount", 0.55f}, {"echo_amount_r", 0.55f},
+            {"treble_db", 0.5f}, {"bass_db", 0.55f}, {"balance", 0.5f},
+            {"bias_amount", 0.5f}, {"wow_flutter", 0.2f},
+            {"echo_enabled", 1.0f}, {"bypass_tape", 0.0f},
+        }},
+        { "SATURATED", {
+            {"speed", 0.0f}, {"tape_formula", 0.0f},
+            {"mic_gain", 0.7f}, {"mic_gain_r", 0.7f},
+            {"saturation_drive", 0.85f}, {"saturation_drive_r", 0.85f},
+            {"treble_db", 0.45f}, {"bass_db", 0.6f}, {"balance", 0.5f},
+            {"bias_amount", 0.65f}, {"wow_flutter", 0.3f},
+            {"echo_enabled", 0.0f}, {"bypass_tape", 0.0f},
+        }},
+        { "CLEAN", {
+            {"speed", 1.0f}, {"tape_formula", 1.0f},
+            {"mic_gain", 0.5f}, {"mic_gain_r", 0.5f},
+            {"saturation_drive", 0.25f}, {"saturation_drive_r", 0.25f},
+            {"echo_amount", 0.0f}, {"echo_amount_r", 0.0f},
+            {"treble_db", 0.5f}, {"bass_db", 0.5f}, {"balance", 0.5f},
+            {"bias_amount", 0.5f}, {"wow_flutter", 0.0f},
+            {"echo_enabled", 0.0f}, {"bypass_tape", 0.0f},
+        }},
+    };
+    return P;
+}
+} // anon namespace
+
+int BC2000DLProcessor::getNumPrograms() { return (int) factoryPresets().size(); }
+int BC2000DLProcessor::getCurrentProgram() { return currentProgramIndex; }
+
+const juce::String BC2000DLProcessor::getProgramName (int index)
+{
+    const auto& P = factoryPresets();
+    if (index < 0 || index >= (int) P.size()) return {};
+    return juce::String (P[(size_t) index].name);
+}
+
+void BC2000DLProcessor::setCurrentProgram (int index)
+{
+    const auto& P = factoryPresets();
+    if (index < 0 || index >= (int) P.size()) return;
+    currentProgramIndex = index;
+    for (const auto& kv : P[(size_t) index].values)
+        if (auto* prm = apvts.getParameter (kv.id))
+            prm->setValueNotifyingHost (juce::jlimit (0.0f, 1.0f, kv.value01));
+}
+
 void BC2000DLProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     auto state = apvts.copyState();
