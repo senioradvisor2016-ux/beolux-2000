@@ -48,6 +48,8 @@ target_sources(BC2000DL PRIVATE
     Source/PluginProcessor.h
     Source/PluginEditor.cpp
     Source/PluginEditor.h
+    Source/WebEditor.cpp
+    Source/WebEditor.h
     Source/dsp/Constants.h
     Source/dsp/Ge2N2613Stage.h
     Source/dsp/Ge2N2613Stage.cpp
@@ -98,9 +100,10 @@ target_compile_definitions(BC2000DL PRIVATE
     JUCE_DISPLAY_SPLASH_SCREEN=0
 )
 
-# Konsoliderad binary_data: photoreal-assets (CC-BY YJ_).
+# Konsoliderad binary_data: BEOFLUX HTML + photoreal-assets.
 # Ett enda target → en BinaryData.h, inga include-konflikter.
 juce_add_binary_data(BC2000DL_Assets SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/../web/beoflux.html
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/reel_left.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/reel_right.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/chassis_alu.png

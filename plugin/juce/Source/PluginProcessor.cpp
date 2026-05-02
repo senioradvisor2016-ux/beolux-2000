@@ -2,6 +2,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "WebEditor.h"
 
 namespace
 {
@@ -288,7 +289,8 @@ void BC2000DLProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
 juce::AudioProcessorEditor* BC2000DLProcessor::createEditor()
 {
-    return new BC2000DLEditor (*this);
+    // v29 BEOFLUX 2000DL — TEAC-platform WebView UI
+    return new BC2000DLWebEditor (*this);
 }
 
 void BC2000DLProcessor::getStateInformation (juce::MemoryBlock& destData)
