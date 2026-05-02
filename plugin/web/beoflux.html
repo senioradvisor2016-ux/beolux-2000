@@ -42,7 +42,21 @@
     font-family: "Helvetica Neue", "Inter", -apple-system, system-ui, sans-serif;
     color: var(--ink);
     overflow: hidden;
+    /* Prevent text-drag-selection across the whole UI (this is a plugin,
+       not a document — Cmd+A / drag-select would only confuse the user). */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    /* Disable iOS-style tap highlight */
+    -webkit-tap-highlight-color: transparent;
   }
+  /* Allow selection only inside text inputs / textareas (none currently exist). */
+  input, textarea { -webkit-user-select: text; user-select: text; }
+  /* Disable native image-drag (avoid ghost-drag from any element). */
+  img, svg, canvas { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+  svg.scale, canvas#tape-canvas { pointer-events: none; }
 
   /* Outer stage centers the deck */
   .stage {
@@ -772,6 +786,17 @@
   }
 
   /* ============== METER BRIDGE (VU meters horizontal) ============== */
+  /* ===== PRESET LOADING PULSE ===== */
+  .deck.preset-loading .fader .thumb,
+  .deck.preset-loading .knob .indicator,
+  .deck.preset-loading .knob {
+    transition: bottom 0.3s ease, transform 0.3s ease, filter 0.3s ease !important;
+  }
+  .deck.preset-loading .preset-bar-name {
+    filter: brightness(1.4);
+    transition: filter 0.18s;
+  }
+
   /* ===== PRESET BAR (above VU meters) ===== */
   .preset-bar {
     display: flex;
@@ -2593,9 +2618,23 @@ initKeys();
     }
   }, 100);
 
+  // Track whether user has diverged from current preset (shows asterisk).
+  let _presetEdited = false;
+  function _markEdited() {
+    if (_presetEdited) return;
+    _presetEdited = true;
+    const nameEl = document.getElementById('preset-name');
+    if (nameEl && !nameEl.textContent.endsWith(' *'))
+      nameEl.textContent = nameEl.textContent + ' *';
+  }
+  function _clearEdited() {
+    _presetEdited = false;
+  }
+
   function emit(id, normalized01) {
     if (!id || suppressEmit) return;
     window.__JUCE__.backend.emitEvent("paramChange", { id: id, value: normalized01 });
+    _markEdited();
   }
 
   /* --- Wrap setters to emit paramChange events --- */
@@ -2637,16 +2676,20 @@ initKeys();
       const id = payload.id;
       const v01 = Math.max(0, Math.min(1, Number(payload.value)));
       const v100 = v01 * 100;
-      // Reverse-lookup fader/rotary/toggle/mode
-      for (const [bId, pId] of Object.entries(FADER_MAP))   if (pId === id) { _setFader(bId, v100); return; }
-      for (const [bId, pId] of Object.entries(ROTARY_MAP))  if (pId === id) { _setRotary(bId, v100); return; }
-      for (const [bId, pId] of Object.entries(TOGGLE_MAP))  if (pId === id) { _setToggle(bId, v01 > 0.5); return; }
+      // Update ALL matching controls (a single APVTS param may drive
+      // multiple UI elements — e.g. SAT knob + DRIVE-L fader both write
+      // to saturation_drive). We must keep them visually in sync.
+      for (const [bId, pId] of Object.entries(FADER_MAP))
+        if (pId === id) _setFader(bId, v100);
+      for (const [bId, pId] of Object.entries(ROTARY_MAP))
+        if (pId === id) _setRotary(bId, v100);
+      for (const [bId, pId] of Object.entries(TOGGLE_MAP))
+        if (pId === id) _setToggle(bId, v01 > 0.5);
       for (const [grp, m] of Object.entries(MODE_MAP)) {
         if (m.id !== id) continue;
         const keys = Object.keys(m.vals);
         const idx = Math.round(v01 * (keys.length - 1));
         _setMode(grp, keys[idx]);
-        return;
       }
     } finally { suppressEmit = false; }
   });
@@ -2671,14 +2714,19 @@ initKeys();
     const nameEl = document.getElementById('preset-name');
     const metaEl = document.getElementById('preset-counter');
     if (nameEl && names && names[idx]) {
-      // Strip leading "NN " or "NN <anything-not-letter> " prefix robustly
-      // (handles middot, hyphen, en-dash, em-dash, encoding artifacts).
       let display = String(names[idx]);
       const m = display.match(/^\d+\s*([^\w\s]+)?\s*(.+)$/);
       if (m && m[2]) display = m[2];
       nameEl.textContent = display;
+      _clearEdited();
     }
     if (metaEl && names) metaEl.textContent = (idx + 1) + ' / ' + names.length;
+    // Brief "loading" pulse on the deck so user sees the preset apply
+    const deck = document.getElementById('deck');
+    if (deck) {
+      deck.classList.add('preset-loading');
+      setTimeout(() => deck.classList.remove('preset-loading'), 350);
+    }
   }
   // Listen for preset list + current program from C++
   window.__JUCE__.backend.addEventListener("presetSync", function(p) {
@@ -2768,10 +2816,11 @@ initKeys();
     });
   });
 
-  /* --- Right-click context menu --- */
+  /* --- Right-click context menu (custom) + suppress browser default everywhere else --- */
   let _ctxMenu = null;
   function _hideCtx() { if (_ctxMenu) { _ctxMenu.remove(); _ctxMenu = null; } }
   document.addEventListener('click', _hideCtx);
+  // Always suppress the browser's native context menu — pluginet är inte ett dokument.
   document.addEventListener('contextmenu', (e) => {
     let n = e.target;
     while (n && n !== document.body) {
