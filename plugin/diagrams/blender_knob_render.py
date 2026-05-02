@@ -150,12 +150,14 @@ add_area('Rim',  ( 0.0,  0.0, 3.5), 30, 1.0,
          (0, 0, 0),
          (1.0, 1.0, 1.0))
 
-# --- World (transparent) ---
-scene.world = bpy.data.worlds.new('Empty')
+# --- World: bright neutral environment so chrome has something to reflect.
+# (Without this, mirror-finish metal renders pitch black where direct lights
+# don't hit. We keep film_transparent=True so output PNG alpha is preserved.) ---
+scene.world = bpy.data.worlds.new('Studio')
 scene.world.use_nodes = True
 bg = scene.world.node_tree.nodes['Background']
-bg.inputs['Color'].default_value = (0, 0, 0, 0)
-bg.inputs['Strength'].default_value = 0.0
+bg.inputs['Color'].default_value = (0.85, 0.85, 0.88, 1.0)  # cool neutral grey
+bg.inputs['Strength'].default_value = 1.6
 
 # --- Render frames ---
 os.makedirs(OUT_FRAMES, exist_ok=True)
