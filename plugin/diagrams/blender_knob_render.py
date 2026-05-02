@@ -76,18 +76,23 @@ sub = knob.modifiers.new('Subdiv', 'SUBSURF')
 sub.levels = 2
 sub.render_levels = 3
 
-# Pointer notch (small slot cut on top)
-bpy.ops.mesh.primitive_cube_add(size=0.04, location=(0, 0.30, 0.10))
+# Pointer notch — additive dark indicator on top of the dome (visible from above).
+# Replaces the previous boolean cut which was barely visible at small render sizes.
+bpy.ops.mesh.primitive_cube_add(size=0.05, location=(0, 0.32, 0.085))
 notch = bpy.context.object
-notch.name = 'NotchCutter'
-notch.scale = (0.6, 4.5, 1.5)
-boolmod = knob.modifiers.new('NotchBool', 'BOOLEAN')
-boolmod.object = notch
-boolmod.operation = 'DIFFERENCE'
-notch.hide_viewport = True
-notch.hide_render = True
+notch.name = 'PointerNotch'
+notch.scale = (0.7, 2.4, 0.4)
 
-# Make notch a child of knob so it rotates with the knob
+# Dark recessed material for the pointer
+notch_mat = bpy.data.materials.new('PointerInk')
+notch_mat.use_nodes = True
+np_ = notch_mat.node_tree.nodes['Principled BSDF']
+np_.inputs['Base Color'].default_value = (0.04, 0.03, 0.02, 1.0)
+np_.inputs['Roughness'].default_value = 0.55
+np_.inputs['Metallic'].default_value = 0.0
+notch.data.materials.append(notch_mat)
+
+# Parent to knob so it rotates with it
 notch.parent = knob
 
 # --- Material: PBR chrome with slight anisotropic brushing ---

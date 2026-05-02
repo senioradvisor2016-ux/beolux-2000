@@ -1052,37 +1052,10 @@
         transparent 5deg, transparent 15deg);
     pointer-events: none;
   }
-  /* Indicator overlay — small pointer line on top of the filmstrip.
-     Provides unambiguous rotation feedback for users who can't see the
-     subtle pointer notch in the filmstrip frame. */
+  /* Indicator hidden — rotation is baked into the filmstrip frames,
+     so an extra overlay would only flatten the 3D look. */
   .knob .indicator {
-    position: absolute;
-    top: 4px; left: 50%;
-    width: 2.5px; height: 11px;
-    background: linear-gradient(180deg, #2a1a08 0%, #1a0c04 100%);
-    border-radius: 1.5px;
-    transform-origin: 50% 19px;
-    transform: translateX(-50%) rotate(0deg);
-    box-shadow: 0 0 0 0.5px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.15);
-    z-index: 3;
-    pointer-events: none;
-  }
-  /* TREBLE/BASS larger knobs — pivot deeper */
-  .knob-cluster .knob-row:first-child .knob .indicator {
-    height: 13px;
-    transform-origin: 50% 22px;
-  }
-  /* Smaller secondary knobs */
-  .knob-cluster .knob-row:nth-child(n+2) .knob .indicator {
-    height: 8px;
-    width: 2.5px;
-    transform-origin: 50% 17px;
-  }
-  /* MASTER knob */
-  .knob.master-knob .indicator {
-    height: 14px !important;
-    width: 3px !important;
-    transform-origin: 50% 28px !important;
+    display: none;
   }
   /* TREBLE/BASS: 44px knobs — pivot is deeper (knob radius 22 vs 17 for small) */
   .knob-cluster .knob-row:first-child .knob .indicator {
