@@ -84,6 +84,27 @@
       0 1px 0 rgba(255,200,140,0.1) inset;
     padding: 14px;
   }
+  /* Global key light @ upper-left 45° — radial highlight + opposite shadow.
+     Layered above the panel content via pointer-events:none, so it tints
+     everything consistently without breaking interaction. */
+  .deck::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background:
+      radial-gradient(ellipse 65% 50% at 25% 18%,
+        rgba(255, 240, 210, 0.10) 0%,
+        rgba(255, 240, 210, 0.04) 35%,
+        transparent 60%),
+      radial-gradient(ellipse 80% 55% at 78% 88%,
+        rgba(0, 0, 0, 0.18) 0%,
+        rgba(0, 0, 0, 0.06) 45%,
+        transparent 70%);
+    pointer-events: none;
+    z-index: 9;
+    mix-blend-mode: soft-light;
+  }
 
   /* wood grain overlay */
   .deck::before {
@@ -1003,8 +1024,15 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background:
+    /* Filmstrip rendering: 60-frame baked chrome with consistent upper-left key light.
+       Falls back to CSS gradient if filmstrip fails to load. */
+    background-color: #2a2620;
+    background-image: url('knob_chrome_filmstrip.png'),
       radial-gradient(circle at 30% 25%, #f4f0e8 0%, #c8c0b0 25%, #6e6a62 70%, #2a2620 100%);
+    background-size: 100% 6000%, 100% 100%;  /* 60 frames stacked vertically */
+    background-position-y: calc(var(--knob-frame, 30) * 1.694915%);  /* 100% / 59 */
+    background-position-x: center;
+    background-repeat: no-repeat;
     box-shadow:
       0 0 0 1px #1a1612,
       0 0 0 4px #14110e,
@@ -1025,16 +1053,10 @@
         transparent 5deg, transparent 15deg);
     pointer-events: none;
   }
+  /* The rotation indicator is now baked into the filmstrip frames.
+     Hide the legacy CSS-rotated indicator to avoid double-rendering. */
   .knob .indicator {
-    position: absolute;
-    top: 3px; left: 50%;
-    width: 3px; height: 12px;
-    background: linear-gradient(180deg, #d8a23a 0%, #8a5a18 60%, #1a0a05 100%);
-    transform-origin: 50% 19px;
-    transform: translateX(-50%) rotate(0deg);
-    border-radius: 1.5px;
-    box-shadow: 0 0 2px rgba(216,162,58,0.5), 0 0 0 0.5px rgba(0,0,0,0.4);
-    z-index: 2;
+    display: none;
   }
   /* TREBLE/BASS: 44px knobs — pivot is deeper (knob radius 22 vs 17 for small) */
   .knob-cluster .knob-row:first-child .knob .indicator {
@@ -2011,7 +2033,7 @@
         <div class="brand-mid">
           <div class="b">BEOFLUX</div>
           <div class="s">2000 · DELUXE</div>
-          <div style="font-family: ui-monospace, monospace; font-size: 8px; letter-spacing: 0.18em; color: var(--ink-faint); margin-top: 2px;">v29.4 · BC2000DL · COMPLETE</div>
+          <div style="font-family: ui-monospace, monospace; font-size: 8px; letter-spacing: 0.18em; color: var(--ink-faint); margin-top: 2px;">v29.5 · BC2000DL · 3D-LIGHTING</div>
         </div>
 
         <div class="connector-row" style="justify-content:flex-end;">
@@ -2118,12 +2140,15 @@ function setRotary(id, v) {
   State.rotary[id] = v;
   const el = document.querySelector(`.knob[data-rotary="${id}"]`);
   if (!el) return;
+  // Filmstrip frame index 0..59 — drives the chrome dome rotation via baked PNG.
+  const frame = Math.round((v / 100) * 59);
+  el.style.setProperty('--knob-frame', frame);
+  // Legacy CSS indicator (now display:none, but kept as fallback).
   const ind = el.querySelector('.indicator');
-  // -135deg to +135deg
-  const deg = -135 + (v / 100) * 270;
-  ind.style.transform = `translateX(-50%) rotate(${deg}deg)`;
-
-
+  if (ind) {
+    const deg = -135 + (v / 100) * 270;
+    ind.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+  }
 }
 function initRotaries() {
   document.querySelectorAll('.knob[data-rotary]').forEach(el => {
@@ -2221,14 +2246,112 @@ function setTransport(zone) {
 }
 function initLever() {
   const track = document.getElementById('lever-track');
+  const knob  = document.getElementById('lever-knob');
+  // Drag with momentum/inertia — like a real B&O lever weighted with metal.
+  // Holds at any X-percent during drag; on release, snaps to nearest detent
+  // (12.5/50/87.5%) using inertia model: position += velocity * decay.
+  let dragging = false;
+  let startX = 0;
+  let startPct = 50;
+  let lastT = 0;
+  let lastPct = 50;
+  let velocity = 0;        // pct/sec
+  let inertiaTimer = null;
+
+  function pctToZone(pct) {
+    if (pct < 30) return 'rw';
+    if (pct > 70) return 'ff';
+    return State.playing ? 'play' : 'stop'; // toggle in center
+  }
+  function setKnobPctRaw(pct) {
+    pct = Math.max(2, Math.min(98, pct));
+    knob.style.transition = 'none'; // disable CSS transition during drag
+    knob.style.left = pct + '%';
+    return pct;
+  }
+  function snapTo(pct) {
+    knob.style.transition = 'left 0.25s cubic-bezier(.4,0,.6,1)';
+    if (pct < 30)      { knob.style.left = '12%'; setTransport('rw'); }
+    else if (pct > 70) { knob.style.left = '88%'; setTransport('ff'); }
+    else               { knob.style.left = '50%'; setTransport(State.playing ? 'stop' : 'play'); }
+  }
+  function inertiaStep() {
+    // Simulate weighted lever returning toward nearest detent
+    const decay = 0.86;
+    velocity *= decay;
+    lastPct += velocity * 0.016;  // ~60fps step
+    setKnobPctRaw(lastPct);
+    if (Math.abs(velocity) > 8) {
+      inertiaTimer = requestAnimationFrame(inertiaStep);
+    } else {
+      cancelAnimationFrame(inertiaTimer);
+      inertiaTimer = null;
+      snapTo(lastPct);
+    }
+  }
+  function startDrag(clientX) {
+    dragging = true;
+    if (inertiaTimer) { cancelAnimationFrame(inertiaTimer); inertiaTimer = null; }
+    const rect = track.getBoundingClientRect();
+    startX = clientX;
+    const cur = parseFloat(getComputedStyle(knob).left);  // px
+    startPct = (cur / rect.width) * 100;
+    lastPct = startPct;
+    lastT = performance.now();
+    velocity = 0;
+  }
+  function onDragMove(clientX) {
+    if (!dragging) return;
+    const rect = track.getBoundingClientRect();
+    const dx = clientX - startX;
+    const newPct = startPct + (dx / rect.width) * 100;
+    const t = performance.now();
+    const dt = Math.max(1, t - lastT);
+    velocity = (newPct - lastPct) / dt * 1000;  // pct/sec
+    lastPct = setKnobPctRaw(newPct);
+    lastT = t;
+  }
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    // If moving fast, let inertia carry the lever; otherwise snap immediately.
+    if (Math.abs(velocity) > 40) {
+      inertiaTimer = requestAnimationFrame(inertiaStep);
+    } else {
+      snapTo(lastPct);
+    }
+  }
+
+  // Knob drag
+  knob.addEventListener('mousedown', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    startDrag(e.clientX);
+    const onMove = (ev) => onDragMove(ev.clientX);
+    const onUp = () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      endDrag();
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  });
+
+  // Click anywhere on track jumps lever to that zone (preserves old behavior)
   track.addEventListener('click', (e) => {
+    if (e.target === knob || dragging) return;
     const rect = track.getBoundingClientRect();
     const pct = ((e.clientX - rect.left) / rect.width) * 100;
-    if (pct < 25) setTransport('rw');
-    else if (pct > 75) setTransport('ff');
-    else setTransport(State.playing ? 'stop' : 'play');
+    snapTo(pct);
   });
-  // start at stop
+
+  // Keyboard support: arrow keys when track focused
+  track.tabIndex = 0;
+  track.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft')  { snapTo(12);  }
+    else if (e.key === 'ArrowRight') { snapTo(88); }
+    else if (e.key === ' ' || e.key === 'Enter') { snapTo(50); }
+  });
+
   setTransport('stop');
 }
 
