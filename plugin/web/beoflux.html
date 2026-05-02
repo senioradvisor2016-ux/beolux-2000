@@ -534,12 +534,12 @@
   .vu-meter {
     background: linear-gradient(180deg, #2a2620 0%, #1a1612 100%);
     border-radius: 4px;
-    padding: 2px;
+    padding: 14px 2px 2px 2px;  /* extra top space for label above scale */
     box-shadow:
       0 0 0 1px #3a3228,
       0 0 0 2px #0a0807,
       0 2px 6px rgba(0,0,0,0.6);
-    height: 52px;
+    height: 64px;
     position: relative;
     overflow: hidden;
   }
@@ -657,15 +657,16 @@
   }
   .vu-meter .vu-label {
     position: absolute;
-    bottom: 1px;
+    top: 2px;
     left: 0; right: 0;
-    font-size: 5px;
-    letter-spacing: 0.28em;
-    color: rgba(26,12,4,0.5);
+    font-size: 7px;
+    letter-spacing: 0.32em;
+    color: var(--silk);
     text-transform: uppercase;
     text-align: center;
     font-weight: 700;
-    z-index: 2;
+    z-index: 5;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.6);
   }
 
   /* Lever */
@@ -1502,6 +1503,7 @@
       <div class="meter-bridge">
         <div class="vu-stack-h">
           <div class="vu-meter" data-tip>
+  <div class="vu-label">INPUT · L</div>
   <div class="bezel"></div>
   <div class="face">
     <div class="scale">
@@ -1535,12 +1537,12 @@
       <div class="needle" id="vu-l"><div class="shaft"></div><div class="weight"></div></div>
       <div class="pivot"></div>
     </div>
-    <div class="vu-label">INPUT · L</div>
   </div>
   <div class="glass"></div>
   <div class="tip">Input level — Left (sums Mic + Phono + Radio L)</div>
 </div>
           <div class="vu-meter" data-tip>
+  <div class="vu-label">INPUT · R</div>
   <div class="bezel"></div>
   <div class="face">
     <div class="scale">
@@ -1574,12 +1576,12 @@
       <div class="needle" id="vu-r"><div class="shaft"></div><div class="weight"></div></div>
       <div class="pivot"></div>
     </div>
-    <div class="vu-label">INPUT · R</div>
   </div>
   <div class="glass"></div>
   <div class="tip">Input level — Right (sums Mic + Phono + Radio R)</div>
 </div>
           <div class="vu-meter" data-tip>
+  <div class="vu-label">MASTER · OUT</div>
   <div class="bezel"></div>
   <div class="face">
     <div class="scale">
@@ -1613,7 +1615,6 @@
       <div class="needle" id="vu-out"><div class="shaft"></div><div class="weight"></div></div>
       <div class="pivot"></div>
     </div>
-    <div class="vu-label">MASTER · OUT</div>
   </div>
   <div class="glass"></div>
   <div class="tip">Output level meter</div>
@@ -2274,6 +2275,127 @@ initLever();
 initCounter();
 initVU();
 initKeys();
+
+/* ============================================================
+   TOOLTIP COVERAGE — single floating tooltip for every interactive
+   control, sourced from a descriptive map. Augments the existing
+   inline .tip system so nothing needs per-element editing.
+   ============================================================ */
+(function() {
+  const DESC = {
+    // Faders
+    'fader:radio-l': 'RADIO · LEFT — Tuner input level (−∞…+10 dB)',
+    'fader:radio-r': 'RADIO · RIGHT — Tuner input level (−∞…+10 dB)',
+    'fader:phono-l': 'PHONO · LEFT — Turntable input (−∞…+10 dB)',
+    'fader:phono-r': 'PHONO · RIGHT — Turntable input (−∞…+10 dB)',
+    'fader:mic-l':   'MIC · LEFT — Microphone input (−∞…+10 dB)',
+    'fader:mic-r':   'MIC · RIGHT — Microphone input (−∞…+10 dB)',
+    'fader:drive-l': 'DRIVE · LEFT — Tape input drive (0…+10)',
+    'fader:drive-r': 'DRIVE · RIGHT — Tape input drive (0…+10)',
+    'fader:echo-l':  'ECHO SEND · LEFT (0…+10)',
+    'fader:echo-r':  'ECHO SEND · RIGHT (0…+10)',
+    // Knobs
+    'rotary:treble': 'TREBLE — High-shelf ±12 dB',
+    'rotary:bass':   'BASS — Low-shelf ±12 dB',
+    'rotary:bias':   'BIAS — Tape bias offset (−50%…+50%, factory at 12 o’clock)',
+    'rotary:wow':    'WOW & FLUTTER — Speed instability (0…100%)',
+    'rotary:sat':    'SAT — Tape mid-stage saturation curve (0…100%)',
+    'rotary:bal':    'BALANCE — L↔R pan',
+    'rotary:echor':  'ECHO·R — Echo regeneration / feedback (0…95%)',
+    'rotary:mult':   'MULT — Multiplay generation (1…3 with HF roll-off per gen)',
+    // Toggles
+    'toggle:track-rec':  '2/4 TRACK · RECORD head selector',
+    'toggle:track-play': '2/4 TRACK · PLAYBACK head selector',
+    'toggle:arm1':   'ARM 1 — Arm track 1 for record',
+    'toggle:arm2':   'ARM 2 — Arm track 2 for record',
+    'toggle:pause':  'PAUSE — Pause transport',
+    'toggle:echo':   'ECHO — Enable echo send',
+    'toggle:sync':   'SYNC — Synchroplay (multitrack overdub)',
+    'toggle:bypass': 'BYPASS — Bypass tape stage',
+    'toggle:spkA':   'SPK · A — Speaker output A',
+    'toggle:spkB':   'SPK · B — Speaker output B',
+    'toggle:mute':   'MUTE — Master mute',
+    'toggle:loz':    'Lo-Z — Microphone low-impedance mode',
+    'toggle:pa':     'P.A. — Public Address amplifier mode',
+    'toggle:sos':    'S/S — Sound on Sound',
+    'toggle:ab-a':   'A — Compare A snapshot',
+    'toggle:ab-b':   'B — Compare B snapshot',
+    'toggle:mem':    'MEM — Memorize counter / preset state',
+    // Mode selectors
+    'mode:speed:475':       'Tape speed 4.75 cm/s (1 7/8 ips) — long play',
+    'mode:speed:950':       'Tape speed 9.5 cm/s (3 3/4 ips) — standard',
+    'mode:speed:1900':      'Tape speed 19 cm/s (7 1/2 ips) — high fidelity',
+    'mode:formula:AGFA':    'AGFA PE-31 — warm classic European tape',
+    'mode:formula:BASF':    'BASF LGS-26 — neutral, balanced response',
+    'mode:formula:SCOTCH':  'SCOTCH 111 — bright, American studio character',
+    'mode:phono:L':         'PHONO · L — Low input (RIAA magnetic, 3 mV)',
+    'mode:phono:H':         'PHONO · H — High input (ceramic, 100 mV)',
+    'mode:radio-in:L':      'RADIO · L — Low input (3 mV / 47 kΩ)',
+    'mode:radio-in:H':      'RADIO · H — High input (100 mV / 1 MΩ)',
+    'mode:monitor:TAPE':    'MONITOR · TAPE — Listen to playback head',
+    'mode:monitor:SRC':     'MONITOR · SOURCE — Listen to input',
+    'mode:output:ST':       'OUTPUT · STEREO',
+    'mode:output:1':        'OUTPUT · TRACK 1',
+    'mode:output:2':        'OUTPUT · TRACK 2',
+  };
+
+  function describe(el) {
+    if (!el || !el.dataset) return null;
+    const d = el.dataset;
+    if (d.fader)  return DESC['fader:'  + d.fader];
+    if (d.rotary) return DESC['rotary:' + d.rotary];
+    if (d.toggle) return DESC['toggle:' + d.toggle];
+    if (d.modeGroup && d.modeVal)
+      return DESC['mode:' + d.modeGroup + ':' + d.modeVal];
+    return null;
+  }
+  // Walk up to find a host element with relevant data-*
+  function findHost(el) {
+    let n = el;
+    while (n && n !== document.body) {
+      if (n.dataset && (n.dataset.fader || n.dataset.rotary
+          || n.dataset.toggle || (n.dataset.modeGroup && n.dataset.modeVal)))
+        return n;
+      n = n.parentElement;
+    }
+    return null;
+  }
+  // Floating tooltip element
+  const float = document.createElement('div');
+  float.id = 'tip-floater';
+  Object.assign(float.style, {
+    position: 'fixed', background: '#1a1612', color: '#ece4d0',
+    fontSize: '10px', letterSpacing: '0.12em', padding: '5px 9px',
+    borderRadius: '3px', whiteSpace: 'nowrap', pointerEvents: 'none',
+    boxShadow: '0 0 0 1px #3a3228, 0 4px 10px rgba(0,0,0,0.7)',
+    zIndex: '9999', display: 'none', textTransform: 'uppercase',
+    fontWeight: '600',
+  });
+  document.body.appendChild(float);
+
+  let showTimer = null;
+  document.addEventListener('mousemove', (e) => {
+    const host = findHost(e.target);
+    const text = host ? describe(host) : null;
+    if (!text) {
+      float.style.display = 'none';
+      clearTimeout(showTimer); showTimer = null;
+      return;
+    }
+    if (float.textContent !== text) float.textContent = text;
+    // Position above cursor, offset 14px
+    const x = Math.min(window.innerWidth - 240, Math.max(8, e.clientX - 80));
+    const y = Math.max(8, e.clientY - 28);
+    float.style.left = x + 'px';
+    float.style.top  = y + 'px';
+    if (float.style.display !== 'block') {
+      // delay show ~250ms (Soundtoys / UAD timing)
+      clearTimeout(showTimer);
+      showTimer = setTimeout(() => { float.style.display = 'block'; }, 250);
+    }
+  });
+  document.addEventListener('mouseleave', () => { float.style.display = 'none'; });
+})();
 
 /* ============================================================
    JUCE BRIDGE — connects BEOFLUX HTML to BC2000DL APVTS params.
