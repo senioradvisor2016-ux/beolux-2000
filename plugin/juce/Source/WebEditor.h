@@ -10,6 +10,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_extra/juce_gui_extra.h>
+#include <unordered_map>
 
 #include "PluginProcessor.h"
 
@@ -37,6 +38,10 @@ private:
 
     // Peak-hold state för VU
     float peakL { -20.0f }, peakR { -20.0f };
+
+    // Track last value sent FROM JS to suppress echo when listener
+    // fires for our own UI-originated change (avoids drag snap-back).
+    std::unordered_map<juce::String, float> lastJSValue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BC2000DLWebEditor)
 };

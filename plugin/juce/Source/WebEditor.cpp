@@ -133,18 +133,20 @@ BC2000DLWebEditor::~BC2000DLWebEditor()
         processor.apvts.removeParameterListener (id, this);
 }
 
-void BC2000DLWebEditor::parameterChanged (const juce::String& parameterID, float newValue)
+void BC2000DLWebEditor::parameterChanged (const juce::String& parameterID, float /*newValue*/)
 {
-    // Convert real-world value -> 0..1 normalized for JS
     if (auto* prm = processor.apvts.getParameter (parameterID))
     {
         const float v01 = prm->getValue();
-        // Marshal to JS thread-safely
+        // Echo suppression: if this matches the last value JS sent for this
+        // param, the change came from our own UI — don't push back.
+        auto it = lastJSValue.find (parameterID);
+        if (it != lastJSValue.end() && std::abs (it->second - v01) < 1e-5f)
+            return;
         juce::MessageManager::callAsync ([this, parameterID, v01]() {
             pushOneParamToJS (parameterID, v01);
         });
     }
-    juce::ignoreUnused (newValue);
 }
 
 void BC2000DLWebEditor::pushOneParamToJS (const juce::String& id, float value01)
@@ -171,6 +173,8 @@ void BC2000DLWebEditor::onParamChangeFromJS (const juce::var& payload)
     const auto paramId = idVar.toString();
     const auto value01 = juce::jlimit (0.0f, 1.0f,
                                        static_cast<float> ((double) valueVar));
+    // Track this so the listener echo-back is suppressed for OUR own UI-originated changes
+    lastJSValue[paramId] = value01;
     if (auto* prm = processor.apvts.getParameter (paramId))
         prm->setValueNotifyingHost (value01);
 }
