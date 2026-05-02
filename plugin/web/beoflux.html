@@ -2583,6 +2583,15 @@ initKeys();
 
   // Suppress echo loops: when C++ pushes paramSync, our setters call would re-emit.
   let suppressEmit = false;
+  // Defensive: if suppressEmit ever stays true >50ms, reset it (safety against
+  // any unhandled exception leaving the bridge stuck).
+  let _suppressTouchAt = 0;
+  setInterval(() => {
+    if (suppressEmit && Date.now() - _suppressTouchAt > 50) {
+      console.warn('[BEOFLUX] suppressEmit watchdog reset');
+      suppressEmit = false;
+    }
+  }, 100);
 
   function emit(id, normalized01) {
     if (!id || suppressEmit) return;
@@ -2623,6 +2632,7 @@ initKeys();
   window.__JUCE__.backend.addEventListener("paramSync", function(payload) {
     if (!payload || !payload.id) return;
     suppressEmit = true;
+    _suppressTouchAt = Date.now();
     try {
       const id = payload.id;
       const v01 = Math.max(0, Math.min(1, Number(payload.value)));
@@ -2661,8 +2671,12 @@ initKeys();
     const nameEl = document.getElementById('preset-name');
     const metaEl = document.getElementById('preset-counter');
     if (nameEl && names && names[idx]) {
-      // Strip leading "NN · " ordering prefix for display
-      nameEl.textContent = String(names[idx]).replace(/^\d+\s*[·.\-]\s*/, '');
+      // Strip leading "NN " or "NN <anything-not-letter> " prefix robustly
+      // (handles middot, hyphen, en-dash, em-dash, encoding artifacts).
+      let display = String(names[idx]);
+      const m = display.match(/^\d+\s*([^\w\s]+)?\s*(.+)$/);
+      if (m && m[2]) display = m[2];
+      nameEl.textContent = display;
     }
     if (metaEl && names) metaEl.textContent = (idx + 1) + ' / ' + names.length;
   }
@@ -2865,11 +2879,19 @@ initKeys();
   };
 
   /* --- Preset list popup: click on preset name -> grouped picker --- */
+  let _presetPopup = null;
+  let _presetPopupCleanup = null;
+  function _closePresetPopup() {
+    if (_presetPopup) { _presetPopup.remove(); _presetPopup = null; }
+    if (_presetPopupCleanup) { _presetPopupCleanup(); _presetPopupCleanup = null; }
+  }
   function _openPresetPopup() {
     _hideCtx();
+    if (_presetPopup) { _closePresetPopup(); return; }  // toggle behavior
     const names = window.__BEOFLUX_PRESETS__ || [];
     if (!names.length) return;
     const pop = document.createElement('div');
+    _presetPopup = pop;
     Object.assign(pop.style, {
       position: 'fixed', top: '50%', left: '50%',
       transform: 'translate(-50%, -50%)',
@@ -2915,19 +2937,29 @@ initKeys();
       }
       item.addEventListener('mouseenter', () => item.style.background = '#3a3228');
       item.addEventListener('mouseleave', () => item.style.background = idx === window.__BEOFLUX_PRESET_IDX__ ? 'rgba(216,162,58,0.1)' : '');
-      item.addEventListener('click', () => {
+      item.addEventListener('click', (ev) => {
+        ev.stopPropagation();
         window.__BEOFLUX_PRESET_IDX__ = idx;
         _updatePresetUI(idx, names);
         window.__JUCE__.backend.emitEvent("presetChange", { index: idx });
-        pop.remove();
+        _closePresetPopup();
       });
       pop.appendChild(item);
     });
     document.body.appendChild(pop);
-    const closeOnOutside = (e) => {
-      if (!pop.contains(e.target)) { pop.remove(); document.removeEventListener('click', closeOnOutside, true); }
+    // Outside-click + Escape key close, with proper cleanup
+    const onOutsideClick = (e) => {
+      if (_presetPopup && !_presetPopup.contains(e.target)) _closePresetPopup();
     };
-    setTimeout(() => document.addEventListener('click', closeOnOutside, true), 50);
+    const onEscape = (e) => { if (e.key === 'Escape') _closePresetPopup(); };
+    setTimeout(() => {
+      document.addEventListener('click', onOutsideClick, true);
+      document.addEventListener('keydown', onEscape);
+    }, 50);
+    _presetPopupCleanup = () => {
+      document.removeEventListener('click', onOutsideClick, true);
+      document.removeEventListener('keydown', onEscape);
+    };
   }
   const presetNameEl = document.getElementById('preset-name');
   if (presetNameEl) presetNameEl.addEventListener('click', _openPresetPopup);
