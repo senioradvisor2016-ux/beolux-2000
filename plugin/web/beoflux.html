@@ -1052,10 +1052,37 @@
         transparent 5deg, transparent 15deg);
     pointer-events: none;
   }
-  /* The rotation indicator is now baked into the filmstrip frames.
-     Hide the legacy CSS-rotated indicator to avoid double-rendering. */
+  /* Indicator overlay — small pointer line on top of the filmstrip.
+     Provides unambiguous rotation feedback for users who can't see the
+     subtle pointer notch in the filmstrip frame. */
   .knob .indicator {
-    display: none;
+    position: absolute;
+    top: 4px; left: 50%;
+    width: 2.5px; height: 11px;
+    background: linear-gradient(180deg, #2a1a08 0%, #1a0c04 100%);
+    border-radius: 1.5px;
+    transform-origin: 50% 19px;
+    transform: translateX(-50%) rotate(0deg);
+    box-shadow: 0 0 0 0.5px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.15);
+    z-index: 3;
+    pointer-events: none;
+  }
+  /* TREBLE/BASS larger knobs — pivot deeper */
+  .knob-cluster .knob-row:first-child .knob .indicator {
+    height: 13px;
+    transform-origin: 50% 22px;
+  }
+  /* Smaller secondary knobs */
+  .knob-cluster .knob-row:nth-child(n+2) .knob .indicator {
+    height: 8px;
+    width: 2.5px;
+    transform-origin: 50% 17px;
+  }
+  /* MASTER knob */
+  .knob.master-knob .indicator {
+    height: 14px !important;
+    width: 3px !important;
+    transform-origin: 50% 28px !important;
   }
   /* TREBLE/BASS: 44px knobs — pivot is deeper (knob radius 22 vs 17 for small) */
   .knob-cluster .knob-row:first-child .knob .indicator {
@@ -2138,9 +2165,12 @@ function setRotary(id, v) {
   const el = document.querySelector(`.knob[data-rotary="${id}"]`);
   if (!el) return;
   // Filmstrip frame index 0..59 — drives the chrome dome rotation via baked PNG.
+  // Set background-position-y directly (more robust than calc(var(...) * %) in WebView).
   const frame = Math.round((v / 100) * 59);
-  el.style.setProperty('--knob-frame', frame);
-  // Legacy CSS indicator (now display:none, but kept as fallback).
+  const posY = (frame * 1.694915).toFixed(3) + '%';
+  el.style.backgroundPositionY = posY;
+  el.style.setProperty('--knob-frame', frame);  // also set var for any CSS that reads it
+  // Indicator overlay still rotates as a clear visual feedback layer
   const ind = el.querySelector('.indicator');
   if (ind) {
     const deg = -135 + (v / 100) * 270;
