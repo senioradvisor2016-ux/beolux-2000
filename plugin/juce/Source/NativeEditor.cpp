@@ -346,13 +346,16 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("BC2000DL · v32.0 BLACK METAL DECK")
-                .withMessage ("Bang & Olufsen Beocord 2000 De Luxe (1968-69)\n\n"
-                              "DSP: Jiles-Atherton hysteresis · 8× oversampling\n"
+                .withTitle ("Beolux 2000 · v33.0")
+                .withMessage ("BEOLUX 2000 — Danish Tape Emulation\n"
+                              "by SOUNDBOYS\n\n"
+                              "Inspired by the Bang & Olufsen Beocord 2000\n"
+                              "De Luxe reel-to-reel (1968-69).\n\n"
+                              "DSP: Jiles-Atherton tape hysteresis · 8× oversampling\n"
                               "21/21 PASS vs Studio-Sound + Service Manual\n\n"
                               "UI: native JUCE · hardware-accurate aesthetic\n"
-                              "Teak frame · brushed aluminium deck · bullseye reels\n"
-                              "Chunky chrome slide-fader caps · amber arc knobs")
+                              "Teak frame · black-metal deck · 3D bullseye reels\n"
+                              "Analog VU meters · cream instruction-card panel")
                 .withButton ("OK"), nullptr);
     };
     addAndMakeVisible (btn_about);
@@ -386,7 +389,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (16, 6).removeFromTop (24),
-                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v32.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v33.0");
 
     // Counter (bottom-centre of deck, just below the VU pair)
     {

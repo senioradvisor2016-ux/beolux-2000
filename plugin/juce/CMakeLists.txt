@@ -28,19 +28,19 @@ endif()
 
 # Plugin-target
 juce_add_plugin(BC2000DL
-    COMPANY_NAME             "BC2000DL Audio"
-    BUNDLE_ID                "com.bc2000dl.audio.plugin"
+    COMPANY_NAME             "Soundboys"
+    BUNDLE_ID                "com.soundboys.beolux2000.plugin"
     IS_SYNTH                 FALSE
     NEEDS_MIDI_INPUT         FALSE
     NEEDS_MIDI_OUTPUT        FALSE
     IS_MIDI_EFFECT           FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     COPY_PLUGIN_AFTER_BUILD  TRUE
-    PLUGIN_MANUFACTURER_CODE BcAU
-    PLUGIN_CODE              Bc2k
+    PLUGIN_MANUFACTURER_CODE Sbys
+    PLUGIN_CODE              Blx2
     FORMATS                  AU VST3 Standalone
-    PRODUCT_NAME             "BC2000DL"
-    DESCRIPTION              "Danish Tape 2000 — VST/AU emulation of a 1968 reel-to-reel"
+    PRODUCT_NAME             "Beolux 2000"
+    DESCRIPTION              "Beolux 2000 — Danish tape emulation by Soundboys"
 )
 
 target_sources(BC2000DL PRIVATE
