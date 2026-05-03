@@ -135,7 +135,7 @@ private:
     juce::TooltipWindow tooltipWindow { this, 500 };
 
     // Real Gaussian shadows (JUCE-native, applied via setComponentEffect)
-    juce::DropShadowEffect vuShadow, reelShadow;
+    juce::DropShadowEffect vuShadow, reelShadow, presetShadow;
 
     /** Right-click context menu for sliders — Reset / Type-in / Copy.
         Attached to every slider so any control supports the UAD-style RMB menu. */
@@ -166,9 +166,11 @@ private:
     };
     DualFader radio, phono, mic, drive, echo;
 
-    // ---- 7 knobs ----
+    // ---- 8 knobs ----
     juce::Slider knob_bias, knob_bass, knob_treble, knob_wow, knob_mult, knob_balance, knob_master;
+    juce::Slider knob_asym;
     juce::Label  lbl_bias, lbl_bass, lbl_treble, lbl_wow, lbl_mult, lbl_balance, lbl_master;
+    juce::Label  lbl_asym;
 
     // ---- 5 selectors ----
     juce::ComboBox cb_speed, cb_monitor, cb_phono, cb_radio, cb_formula;

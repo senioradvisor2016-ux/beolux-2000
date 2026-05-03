@@ -49,8 +49,9 @@ namespace
     constexpr auto kP_MicLoZ        = "mic_loz";
     constexpr auto kP_PhonoMode     = "phono_mode";
     constexpr auto kP_RadioMode     = "radio_mode";
-    constexpr auto kP_TapeFormula   = "tape_formula";  // 0=Agfa 1=BASF 2=Scotch
-    constexpr auto kP_PrintThrough  = "print_through"; // 0..0.05 (specs §10)
+    constexpr auto kP_TapeFormula      = "tape_formula";      // 0=Agfa 1=BASF 2=Scotch
+    constexpr auto kP_PrintThrough     = "print_through";     // 0..0.05 (specs §10)
+    constexpr auto kP_StereoAsymmetry  = "stereo_asymmetry";  // 0..0.05 (spec §10)
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout
@@ -186,6 +187,11 @@ BC2000DLProcessor::createParameterLayout()
         juce::ParameterID { kP_PrintThrough, 1 }, "Print Through",
         juce::NormalisableRange<float> { 0.0f, 0.05f, 0.001f }, 0.0f));
 
+    // Stereo-asymmetri (spec §10 — L/R Ge-stage-mismatch; 0.02 = autentisk 1968)
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_StereoAsymmetry, 1 }, "Stereo Asymmetry",
+        juce::NormalisableRange<float> { 0.0f, 0.05f, 0.001f }, 0.02f));
+
     return layout;
 }
 
@@ -263,6 +269,7 @@ void BC2000DLProcessor::updateChainParameters()
     p.tapeFormula      = static_cast<int> (getF (kP_TapeFormula));
     p.radioMode        = static_cast<int> (getF (kP_RadioMode));
     p.printThrough     = getF (kP_PrintThrough);
+    p.stereoAsymmetry  = getF (kP_StereoAsymmetry);
 
     // P.A. mode — duckar phono+radio när mic aktiv (-12 dB)
     if (p.publicAddress && (p.micGain > 0.05f || p.micGainR > 0.05f))

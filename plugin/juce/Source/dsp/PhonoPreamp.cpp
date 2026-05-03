@@ -34,6 +34,12 @@ namespace bc2000dl::dsp
         updateRIAA();
     }
 
+    void PhonoPreamp::setChannelAsymmetry (float offset)
+    {
+        uw0029.setChannelAsymmetry (static_cast<double> (offset));
+        n2613.setChannelAsymmetry  (static_cast<double> (offset));
+    }
+
     void PhonoPreamp::updateRIAA()
     {
         if (mode == PhonoMode::H)

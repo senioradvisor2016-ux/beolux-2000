@@ -29,6 +29,7 @@ namespace bc2000dl::dsp
                       std::uint32_t baseSeed = 0);
         void reset();
         void setMode (PhonoMode m);
+        void setChannelAsymmetry (float offset);
 
         void process (juce::AudioBuffer<float>& buffer, int channel);
 

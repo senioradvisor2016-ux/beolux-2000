@@ -69,7 +69,8 @@ namespace
         if (id == "track_2")          return "Lyssna spår 2";
         if (id == "speaker_ext")      return "Extern högtalare A";
         if (id == "speaker_int")      return "Intern högtalare B";
-        if (id == "speaker_mute")     return "Mute alla högtalare";
+        if (id == "speaker_mute")      return "Mute alla högtalare";
+        if (id == "stereo_asymmetry")  return "L/R Ge-stage mismatch · 0 = symmetric · 0.02 = 1968 authentic";
         return {};
     }
 }
@@ -205,6 +206,17 @@ namespace bc2000dl
     void AnalogVU::paint (juce::Graphics& g)
     {
         ui::InstructionCardLnF::drawAnalogVU (g, getLocalBounds(), current, peaking, channel);
+
+        // Melatonin InnerShadow — depth ring that makes the face look recessed
+        {
+            juce::Path facePath;
+            facePath.addRoundedRectangle (getLocalBounds().toFloat().reduced (1.0f), 3.0f);
+            static thread_local melatonin::InnerShadow vuInner {
+                { juce::Colours::black.withAlpha (0.45f), 5, { 0, 3 } }
+            };
+            vuInner.render (g, facePath);
+        }
+
         // Overlay: amber peak-hold needle
         if (peakHoldDb > -19.0f && std::abs (peakHoldDb - current) > 0.5f)
         {
@@ -366,6 +378,9 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::DropShadow (juce::Colours::black.withAlpha (0.55f), 8, { 0, 3 }));
     reelShadow.setShadowProperties (
         juce::DropShadow (juce::Colours::black.withAlpha (0.45f), 12, { 0, 4 }));
+    // Preset bar: subtle drop-shadow → preset strip "floats" above panel
+    presetShadow.setShadowProperties (
+        juce::DropShadow (juce::Colours::black.withAlpha (0.50f), 5, { 0, 2 }));
 
     vuInL.setComponentEffect (&vuShadow);
     vuInR.setComponentEffect (&vuShadow);
@@ -445,16 +460,23 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         creamLbl (l, cap);
         l.setInterceptsMouseClicks (false, false);
     };
-    setupKnob (knob_treble,  lbl_treble,  "treble_db",      "TREBLE dB");
-    setupKnob (knob_bass,    lbl_bass,    "bass_db",        "BASS dB");
-    setupKnob (knob_balance, lbl_balance, "balance",        "BAL L\xe2\x86\x94R");
-    setupKnob (knob_bias,    lbl_bias,    "bias_amount",    "BIAS %");
-    setupKnob (knob_wow,     lbl_wow,     "wow_flutter",    "WOW %");
-    setupKnob (knob_mult,    lbl_mult,    "multiplay_gen",  "MULT x");
-    setupKnob (knob_master,  lbl_master,  "master_volume",  "VOL dB");
+    setupKnob (knob_treble,  lbl_treble,  "treble_db",        "TREBLE dB");
+    setupKnob (knob_bass,    lbl_bass,    "bass_db",          "BASS dB");
+    setupKnob (knob_balance, lbl_balance, "balance",          "BAL L\xe2\x86\x94R");
+    setupKnob (knob_asym,    lbl_asym,    "stereo_asymmetry", "ASYM");
+    setupKnob (knob_bias,    lbl_bias,    "bias_amount",      "BIAS %");
+    setupKnob (knob_wow,     lbl_wow,     "wow_flutter",      "WOW %");
+    setupKnob (knob_mult,    lbl_mult,    "multiplay_gen",    "MULT x");
+    setupKnob (knob_master,  lbl_master,  "master_volume",    "VOL dB");
 
     // Engineering-unit popup readout for every knob.
     // textFromValueFunction is a public std::function on juce::Slider (JUCE 7+).
+    knob_asym.textFromValueFunction = [] (double v)
+    {
+        if (v < 0.001)  return juce::String ("symmetric");
+        return juce::String (v * 100.0, 1) + "% mismatch";
+    };
+
     knob_treble.textFromValueFunction  = [] (double v)
         { return (v >= 0 ? "+" : "") + juce::String (v, 1) + " dB"; };
     knob_bass.textFromValueFunction    = [] (double v)
@@ -481,6 +503,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     };
 
     // Double-click resets to the hardware-default position + marks the detent.
+    knob_asym.setDoubleClickReturnValue    (true, 0.02);   // 1968 authentic default
     knob_treble.setDoubleClickReturnValue  (true, 0.0);
     knob_bass.setDoubleClickReturnValue    (true, 0.0);
     knob_balance.setDoubleClickReturnValue (true, 0.0);
@@ -605,19 +628,28 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("Beolux 2000 · v57.1")
+                .withTitle ("Beolux 2000 · v58.0")
                 .withMessage ("BEOLUX 2000 — Danish Tape Emulation\n"
                               "by SOUNDBOYS\n\n"
                               "Inspired by the Bang & Olufsen Beocord 2000\n"
                               "De Luxe reel-to-reel (1968-69).\n\n"
                               "DSP: Jiles-Atherton tape hysteresis · 8× oversampling\n"
-                              "22/22 PASS vs Studio-Sound + Service Manual\n\n"
+                              "23/23 PASS vs Studio-Sound + Service Manual\n\n"
                               "UI: native JUCE · hardware-accurate aesthetic\n"
                               "Teak frame · black-metal deck · 3D bullseye reels\n"
-                              "Analog VU meters · cream instruction-card panel")
+                              "Analog VU meters · melatonin Gaussian shadows")
                 .withButton ("OK"), nullptr);
     };
     addAndMakeVisible (btn_about);
+
+    // Preset bar shadow (floats the bar above the black panel)
+    for (auto* c : { static_cast<juce::Component*> (&cb_preset),
+                     static_cast<juce::Component*> (&btn_prev),
+                     static_cast<juce::Component*> (&btn_next),
+                     static_cast<juce::Component*> (&btn_a),
+                     static_cast<juce::Component*> (&btn_b),
+                     static_cast<juce::Component*> (&btn_about) })
+        c->setComponentEffect (&presetShadow);
 
     stateA = audioProc.apvts.copyState();
     startTimerHz (30);
@@ -707,16 +739,24 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v57.1");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v58.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
         constexpr int cW = 76, cH = 18;
-        LnF::drawCounter (g,
-            juce::Rectangle<int> (inner.getCentreX() - cW / 2,
-                                  aluZone.getBottom() - cH - 4,
-                                  cW, cH),
-            counterText);
+        const juce::Rectangle<int> counterRect (inner.getCentreX() - cW / 2,
+                                                aluZone.getBottom() - cH - 4,
+                                                cW, cH);
+        LnF::drawCounter (g, counterRect, counterText);
+        // Melatonin InnerShadow — LCD panel recessed into deck
+        {
+            juce::Path cp;
+            cp.addRoundedRectangle (counterRect.toFloat(), 2.0f);
+            static thread_local melatonin::InnerShadow counterInner {
+                { juce::Colours::black.withAlpha (0.55f), 4, { 0, 2 } }
+            };
+            counterInner.render (g, cp);
+        }
     }
 
     // ===== Recording LED (red dot to the LEFT of the counter, lights when running) =====
@@ -726,9 +766,15 @@ void NativeEditor::paint (juce::Graphics& g)
         const float ly = (float) (aluZone.getBottom() - 13);
         if (recLedOn)
         {
-            // Glow halo
-            g.setColour (juce::Colour (0xFFFF6050).withAlpha (0.55f));
-            g.fillEllipse (lx - lr * 2.4f, ly - lr * 2.4f, lr * 4.8f, lr * 4.8f);
+            // Melatonin Gaussian glow — replaces manual halo with real blur
+            {
+                juce::Path ledGlowPath;
+                ledGlowPath.addEllipse (lx - lr, ly - lr, lr * 2, lr * 2);
+                static thread_local melatonin::DropShadow ledGlow {
+                    { juce::Colour (0xFFFF3020).withAlpha (0.75f), 10, { 0, 0 } }
+                };
+                ledGlow.render (g, ledGlowPath);
+            }
             // LED body
             juce::ColourGradient lg (
                 juce::Colour (0xFFFFE070), lx - lr * 0.4f, ly - lr * 0.5f,
@@ -841,6 +887,31 @@ void NativeEditor::paint (juce::Graphics& g)
     auto blackZone = inner.withY (kAluH + kDivH)
                          .withHeight (bounds.getHeight() - kAluH - kDivH);
     LnF::drawBlackPanel (g, blackZone);
+
+    // Melatonin InnerShadow on teak/panel boundary — frame holds the panel
+    {
+        juce::Path innerEdge;
+        innerEdge.addRectangle (inner.toFloat());
+        static thread_local melatonin::InnerShadow teakInner {
+            { juce::Colours::black.withAlpha (0.42f), 8, { 0, 0 } }
+        };
+        teakInner.render (g, innerEdge);
+    }
+
+    // Melatonin InnerShadow on center DualFader column — groove depth for faders
+    {
+        const auto faderCol = juce::Rectangle<int> (
+            kTeakW + kLeftColW,
+            kAluH + kDivH + kPresetH,
+            kCenterColW,
+            bounds.getHeight() - kAluH - kDivH - kPresetH).toFloat();
+        juce::Path faderPath;
+        faderPath.addRectangle (faderCol);
+        static thread_local melatonin::InnerShadow faderInner {
+            { juce::Colours::black.withAlpha (0.30f), 12, { 0, 0 } }
+        };
+        faderInner.render (g, faderPath);
+    }
 
     // Column dividers — thin chrome lines on black panel
     const int leftEnd   = kTeakW + kLeftColW;
@@ -1121,7 +1192,6 @@ void NativeEditor::resized()
     // =====================================================================
     {
         const int rowW  = rightCol.getWidth();
-        const int cell3 = rowW / 3;
         const int cell4 = rowW / 4;
 
         auto layoutKnob = [&] (juce::Slider& s, juce::Label& l,
@@ -1140,10 +1210,11 @@ void NativeEditor::resized()
         rightCol.removeFromTop (gap);
         auto row2 = rightCol;        // remainder fills to bottom
 
-        // Row 1: TREBLE / BASS / BAL
-        layoutKnob (knob_treble,  lbl_treble,  row1, cell3);
-        layoutKnob (knob_bass,    lbl_bass,    row1, cell3);
-        layoutKnob (knob_balance, lbl_balance, row1, cell3);
+        // Row 1: TREBLE / BASS / BAL / ASYM  (4 × cell4)
+        layoutKnob (knob_treble,  lbl_treble,  row1, cell4);
+        layoutKnob (knob_bass,    lbl_bass,    row1, cell4);
+        layoutKnob (knob_balance, lbl_balance, row1, cell4);
+        layoutKnob (knob_asym,    lbl_asym,    row1, cell4);
 
         // Row 2: BIAS / WOW / MULT / VOL — pinned to bottom
         layoutKnob (knob_bias,   lbl_bias,   row2, cell4);

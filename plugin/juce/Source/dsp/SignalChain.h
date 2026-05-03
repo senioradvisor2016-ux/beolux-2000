@@ -87,6 +87,11 @@ namespace bc2000dl::dsp
             // 0 = off, 0.01 = subtil, 0.05 = maximum (−26 dB ghost)
             float printThrough      { 0.0f };
 
+            // Stereo-asymmetri (spec §10) — L/R Ge-stage-mismatch.
+            // 0 = perfekt symmetri, 0.02 = autentisk 1968-tolerans (default).
+            // L-kanal får +asym, R-kanal -asym → subtilt skild distortionsprofil.
+            float stereoAsymmetry   { 0.02f };
+
             // Radio AUX input sensitivity (hardware sensitivity switch)
             // 0 = L (3 mV ceramic/low-level) → high preamp gain → more character
             // 1 = H (100 mV line/tuner)      → lower preamp gain → cleaner
@@ -166,9 +171,7 @@ namespace bc2000dl::dsp
         Echo echoL, echoR;
         BalanceMaster balanceMaster;
 
-        // Per-kanal asymmetri (L/R-skillnad) — reducerad 0.075 → 0.02 i samma
-        // anda som GE-asymmetri-fixen, så stereo-bilden är subtilt asymmetrisk
-        // utan att aggravera cascade-THD.
+        // Initial asymmetri vid prepare() — matchas sedan av setParameters() via APVTS.
         static constexpr float kAsymmetryAmount = 0.02f;
 
         void prepareChannel (ChannelChain& ch, double sr,

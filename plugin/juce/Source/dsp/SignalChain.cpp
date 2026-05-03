@@ -154,6 +154,20 @@ namespace bc2000dl::dsp
         // Print-through (specs §10)
         L.tape.setPrintThrough (p.printThrough); R.tape.setPrintThrough (p.printThrough);
 
+        // Stereo-asymmetri (spec §10) — L +asym, R −asym på alla Ge-stages
+        {
+            const double la =  static_cast<double> (p.stereoAsymmetry);
+            const double ra = -static_cast<double> (p.stereoAsymmetry);
+            L.micUw0029.setChannelAsymmetry (la);    R.micUw0029.setChannelAsymmetry (ra);
+            L.micN2613.setChannelAsymmetry  (la);    R.micN2613.setChannelAsymmetry  (ra);
+            L.phono.setChannelAsymmetry     (static_cast<float> (la));
+            R.phono.setChannelAsymmetry     (static_cast<float> (ra));
+            L.radioUw0029.setChannelAsymmetry (la);  R.radioUw0029.setChannelAsymmetry (ra);
+            L.radioN2613.setChannelAsymmetry  (la);  R.radioN2613.setChannelAsymmetry  (ra);
+            L.ac126_1.setChannelAsymmetry   (la);    R.ac126_1.setChannelAsymmetry   (ra);
+            L.ac126_2.setChannelAsymmetry   (la);    R.ac126_2.setChannelAsymmetry   (ra);
+        }
+
         // Notera: mixer.setGains används bara för totalgain (för bypass-mode).
         // Per-kanal-gain hanteras i processChannelChain.
         mixer.setGains (p.micGain, p.phonoGain, p.radioGain);
