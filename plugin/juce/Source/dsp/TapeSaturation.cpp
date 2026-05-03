@@ -38,6 +38,10 @@ namespace bc2000dl::dsp
     {
         hfFilter.reset();
         bumpFilter.reset();
+        biasReject.reset();
+        hysteresis.reset();   // clears J-A magnetisation history
+        biasPhase = 0.0;
+        if (oversampler) oversampler->reset();
         std::fill (printBuffer.begin(), printBuffer.end(), 0.0f);
         printIdx = 0;
     }
