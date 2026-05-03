@@ -87,23 +87,30 @@ namespace bc2000dl::dsp
                 break;
         }
 
-        // Tape-formel-justering (plan §7 — typiska 1968-formler)
+        // Tape-formel-justering (plan §7 — typiska 1968-formler).
+        // Förstärkta differentialer (v29.8.1) för att vara tydligt hörbara
+        // utan ansträngning. Tidigare värden var subtila (±2 dB max);
+        // nu får varje formel egen distinkt karaktär.
         switch (formula)
         {
             case TapeFormula::Agfa:
-                // default — ingen justering, mid-forward warm
+                // Agfa PEM468 — mid-forward, warm, balanced (referens)
+                // Lite extra LF-bump för "Visconti '74 Berlin"-känslan
+                headBumpGainDb += 0.8;  // mer bass-warmth
                 break;
             case TapeFormula::BASF:
-                // BASF har bättre HF-headroom: höj corner ~+15 %, mindre brus
-                hfCorner *= 1.15;
-                headBumpGainDb -= 0.5;
-                noiseDb -= 2.0;
+                // BASF SPR50LH — bright, clean, modern. Mer HF-extension,
+                // tighter low end, lägre brus. "CHROME"-karaktär.
+                hfCorner *= 1.40;       // markant brighter (var 1.15)
+                headBumpGainDb -= 1.5;  // tighter low (var -0.5)
+                noiseDb -= 3.5;         // tystare (var -2)
                 break;
             case TapeFormula::Scotch:
-                // Scotch (typ 111/202): mer kompression, mörkare HF, mer brus
-                hfCorner *= 0.88;
-                headBumpGainDb += 0.5;
-                noiseDb += 1.5;
+                // Scotch 111/202 — dark, compressed, grungy. Markant
+                // mörkare HF, fatter low, mer brus. "METAL IV"-karaktär.
+                hfCorner *= 0.65;       // markant mörkare (var 0.88)
+                headBumpGainDb += 2.5;  // fatter low (var +0.5)
+                noiseDb += 3.0;         // mer brus (var +1.5)
                 break;
         }
 
@@ -165,8 +172,12 @@ namespace bc2000dl::dsp
         // ===== 2. Per-formel asymmetrisk + tape-asymmetri =====
         // J-A är 3rd-dominant. Reell tape har även 2nd-harm asymmetri eftersom
         // magnetic flux negativ != positiv. Per-formula skillnad förstärks.
-        const float perFormulaAsym = (formula == TapeFormula::Scotch ?  0.08f :
-                                       formula == TapeFormula::BASF   ? -0.03f : 0.0f);
+        // Per-formel asymmetri-spread (v29.8.1 — förstärkt från ±0.05 till ±0.15).
+        // Scotch = mer 2nd-harmonic crunch, BASF = renare även-symmetrisk distortion,
+        // Agfa = balanserad mellan dem.
+        const float perFormulaAsym = (formula == TapeFormula::Scotch ?  0.18f :
+                                       formula == TapeFormula::BASF   ? -0.10f :
+                                                                          0.04f); // Agfa lite varm
         // Generic tape-asymmetri (baseline +0.04 = magnetisk preferens åt positiv flux)
         const float baseAsym = 0.04f;
 
