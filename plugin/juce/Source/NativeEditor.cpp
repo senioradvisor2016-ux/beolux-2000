@@ -1,29 +1,24 @@
-/*  NativeEditor implementation — instruction-card layout.
+/*  NativeEditor — hardware-accurate BC2000DL v29.9.
 
-    Layout (1180×760, paper-card aspect ratio matching the eBay reference):
-      ┌─ wood end-cap ─────────────── PAPER CARD ─────────────── wood end-cap ─┐
-      │                                                                         │
-      │  TITLE (top-left)              [Preset · A/B · About] (top-right)      │
-      │                                                                         │
-      │  ┌─ DECK ZONE ──────────────────────────────────────────────────────┐  │
-      │  │   ●●●  REEL L   [head assembly + counter]   REEL R  ●●●          │  │
-      │  │   ↑ "Tape direction"           ↑ "Heads"          ↑ "Take-up"     │  │
-      │  └─────────────────────────────────────────────────────────────────┘  │
-      │                                                                         │
-      │  ┌─ INPUT FADERS ──┐  ┌─ TONE & METER ────────────────────────────┐  │
-      │  │ ║ ║  ║ ║  ║ ║  │  │ VU L ─────────────                          │  │
-      │  │ RADIO PHONO MIC │  │ VU R ─────────────                          │  │
-      │  └─────────────────┘  │ ◐BIAS ◐BASS ◐TREBLE ◐WOW ◐MULT ◐BAL ◐MAST │  │
-      │                       └────────────────────────────────────────────┘  │
-      │  ┌─ DRIVE ECHO ────┐  ┌─ MODE SELECTORS ─────────────────────────┐  │
-      │  │ ║ ║  ║ ║         │  │ SPEED MONITOR PHONO RADIO FORMULA          │  │
-      │  └─────────────────┘  └────────────────────────────────────────────┘  │
-      │                                                                         │
-      │  ┌─ TRANSPORT (piano keys) ────────────────────────────────────────┐  │
-      │  │ [REC1][REC2][TRK1][TRK2]    [SPKa][SPKb][MUTE]   [ECHO][BYP][SP][SY]│  │
-      │  │                                                  [LO-Z][P.A][SOS][PA]│  │
-      │  └─────────────────────────────────────────────────────────────────┘  │
-      └────────────────────────────────────────────────────────────────────────┘
+    Layout mirrors the physical Beocord 2000 De Luxe:
+
+      ┌─ teak ──── BRUSHED ALUMINIUM ──────────────────────── teak ─┐
+      │              [BC2000DL]  [BEOCORD 2000 DE LUXE]              │
+      │   ◉ REEL L         [counter]         REEL R ◉                │
+      └────────────── (thin black metallic divider) ─────────────────┘
+      ┌─ teak ──── BLACK PANEL ─────────────────────────── teak ─────┐
+      │  [preset <  combo  > A B ?]                                   │
+      │  ─────────────┬──────────────────────┬────────────────────── │
+      │  VU L ──────  │  ║RADIO║PHONO║MIC║   │  TREBLE BASS BAL      │
+      │  VU R ──────  │  ║     ║     ║   ║   │                       │
+      │  SPEED combo  │  ║DRIVE║ECHO ║   ║   │  BIAS WOW MULT MASTER │
+      │  MONITOR      │  ║     ║     ║   ║   │                       │
+      │  PHONO        │                       │  [counter]            │
+      │  RADIO        │                       │                       │
+      │  FORMULA      │                       │                       │
+      │  toggles ×8   │                       │                       │
+      │  keys ×7      │                       │                       │
+      └───────────────┴──────────────────────┴───────────────────────┘
 */
 
 #include "NativeEditor.h"
@@ -32,48 +27,54 @@ namespace
 {
     using LnF = bc2000dl::ui::InstructionCardLnF;
 
-    constexpr int kEditorW   = 1180;
-    constexpr int kEditorH   = 760;
-    constexpr int kWoodCap   = 36;
-    constexpr int kPadding   = 16;
+    constexpr int kEditorW    = 1180;
+    constexpr int kEditorH    = 760;
+    constexpr int kTeakW      = 42;     // wood end-cap width (each side)
+    constexpr int kInnerW     = kEditorW - 2 * kTeakW;   // 1096
+    constexpr int kAluH       = 258;    // brushed-aluminium zone height
+    constexpr int kDivH       = 6;      // metallic divider height
+    constexpr int kPresetH    = 42;     // preset/nav bar height inside black panel
+    constexpr int kLeftColW   = 286;    // left column (VU + selectors + toggles)
+    constexpr int kCenterColW = 490;    // center column (faders)
+    // right column width = kInnerW - kLeftColW - kCenterColW = 320
 
     juce::String tooltipFor (const juce::String& id)
     {
-        if (id == "speed")              return "Bandhastighet (4.75 / 9.5 / 19 cm/s)";
-        if (id == "monitor_mode")       return "Source = pre-tape · Tape = post-tape";
-        if (id == "phono_mode")         return "L = ceramic · H = magnetic (RIAA)";
-        if (id == "radio_mode")         return "L = 3 mV · H = 100 mV linenivå";
-        if (id == "tape_formula")       return "Agfa / BASF / Scotch tape-emulering";
-        if (id == "saturation_drive")   return "Tape-saturation drive";
-        if (id == "echo_amount")        return "Echo-mängd (high = self-oscillation)";
-        if (id == "bias_amount")        return "Bias-ström (under nominal = mer 3rd harm)";
-        if (id == "wow_flutter")        return "Wow & flutter-amplitud";
-        if (id == "multiplay_gen")      return "Multiplay-generation 1-5";
-        if (id == "master_volume")      return "Master output";
-        if (id == "balance")            return "L/R-balans";
-        if (id == "bass_db")            return "Bass (Baxandall, post-playback)";
-        if (id == "treble_db")          return "Treble (Baxandall, post-playback)";
-        if (id == "echo_enabled")       return "Aktivera echo-loop";
-        if (id == "bypass_tape")        return "Bypass tape — ren input + tone";
-        if (id == "speaker_monitor")    return "AD139 power-amp + soft-clip";
-        if (id == "synchroplay")        return "Record-headet som playback";
-        if (id == "mic_loz")            return "Lo-Z mic via ingångstrafo";
-        if (id == "pa_enabled")         return "P.A.: mic duckar phono+radio";
-        if (id == "sos_enabled")        return "Sound-on-Sound";
-        if (id == "pause")              return "Tysta output";
-        if (id == "rec_arm_1")          return "Arma spår 1";
-        if (id == "rec_arm_2")          return "Arma spår 2";
-        if (id == "track_1")            return "Lyssna spår 1";
-        if (id == "track_2")            return "Lyssna spår 2";
-        if (id == "speaker_ext")        return "Extern högtalare A";
-        if (id == "speaker_int")        return "Intern högtalare B";
-        if (id == "speaker_mute")       return "Mute alla högtalare";
+        if (id == "speed")            return "Bandhastighet (4.75 / 9.5 / 19 cm/s)";
+        if (id == "monitor_mode")     return "Source = pre-tape · Tape = post-tape";
+        if (id == "phono_mode")       return "L = ceramic · H = magnetic (RIAA)";
+        if (id == "radio_mode")       return "L = 3 mV · H = 100 mV line";
+        if (id == "tape_formula")     return "Agfa / BASF / Scotch tape-emulering";
+        if (id == "saturation_drive") return "Tape-saturation drive";
+        if (id == "echo_amount")      return "Echo-mängd (high = self-oscillation)";
+        if (id == "bias_amount")      return "Bias-ström (under nominal = mer 3rd harm)";
+        if (id == "wow_flutter")      return "Wow & flutter-amplitud";
+        if (id == "multiplay_gen")    return "Multiplay-generation 1-5";
+        if (id == "master_volume")    return "Master output";
+        if (id == "balance")          return "L/R-balans";
+        if (id == "bass_db")          return "Bass (Baxandall, post-playback)";
+        if (id == "treble_db")        return "Treble (Baxandall, post-playback)";
+        if (id == "echo_enabled")     return "Aktivera echo-loop";
+        if (id == "bypass_tape")      return "Bypass tape — ren input + tone";
+        if (id == "speaker_monitor")  return "AD139 power-amp + soft-clip";
+        if (id == "synchroplay")      return "Record-headet som playback";
+        if (id == "mic_loz")          return "Lo-Z mic via ingångstrafo";
+        if (id == "pa_enabled")       return "P.A.: mic duckar phono+radio";
+        if (id == "sos_enabled")      return "Sound-on-Sound";
+        if (id == "pause")            return "Tysta output";
+        if (id == "rec_arm_1")        return "Arma spår 1";
+        if (id == "rec_arm_2")        return "Arma spår 2";
+        if (id == "track_1")          return "Lyssna spår 1";
+        if (id == "track_2")          return "Lyssna spår 2";
+        if (id == "speaker_ext")      return "Extern högtalare A";
+        if (id == "speaker_int")      return "Intern högtalare B";
+        if (id == "speaker_mute")     return "Mute alla högtalare";
         return {};
     }
 }
 
 //=============================================================================
-//  ReelDeck — animated reels (two thin-line circles)
+//  ReelDeck — two animated bullseye reels + head assembly
 //=============================================================================
 namespace bc2000dl
 {
@@ -84,7 +85,7 @@ namespace bc2000dl
     {
         if (isActive)
         {
-            const float delta = 0.10f * speedFactor;
+            const float delta = 0.09f * speedFactor;
             angleL += delta;
             angleR += delta;
             if (angleL > juce::MathConstants<float>::twoPi) angleL -= juce::MathConstants<float>::twoPi;
@@ -96,47 +97,43 @@ namespace bc2000dl
     void ReelDeck::paint (juce::Graphics& g)
     {
         auto bounds = getLocalBounds();
-        const int reelSize = juce::jmin (bounds.getWidth() / 3 - 8, bounds.getHeight() - 8);
-        const int gap = 60;
 
-        // Center the pair
-        const int totalW = reelSize * 2 + gap;
-        const int startX = bounds.getCentreX() - totalW / 2;
-        const int reelY = bounds.getCentreY() - reelSize / 2;
+        // Reels are ~40% of total width each, with gap in the middle for heads + counter
+        const int reelDiam = juce::jmin (bounds.getHeight() - 10, (int) (bounds.getWidth() * 0.40f));
+        const int gapW     = bounds.getWidth() - reelDiam * 2;
+        const int reelY    = bounds.getCentreY() - reelDiam / 2;
 
-        // Left reel
-        const juce::Rectangle<int> leftReel (startX, reelY, reelSize, reelSize);
+        const juce::Rectangle<int> leftReel  (bounds.getX(),                      reelY, reelDiam, reelDiam);
+        const juce::Rectangle<int> rightReel (bounds.getRight() - reelDiam,       reelY, reelDiam, reelDiam);
+        const juce::Rectangle<int> gapRect   (bounds.getX() + reelDiam, reelY, gapW, reelDiam);
+
+        // Left reel (feeds tape)
         ui::InstructionCardLnF::drawReel (g, leftReel, angleL, isActive);
 
-        // Head assembly between reels
-        const juce::Rectangle<int> heads (
-            startX + reelSize + 4, reelY + reelSize / 3,
-            gap - 8, reelSize / 3);
-        ui::InstructionCardLnF::drawHeadAssembly (g, heads);
+        // Right reel (takes up tape; rotates opposite direction on takeup)
+        ui::InstructionCardLnF::drawReel (g, rightReel, -angleR * 0.7f, isActive);
 
-        // Right reel
-        const juce::Rectangle<int> rightReel (startX + reelSize + gap, reelY, reelSize, reelSize);
-        ui::InstructionCardLnF::drawReel (g, rightReel, -angleR, isActive); // counter-rotation
+        // Head assembly centred in the gap
+        auto headsRect = gapRect.reduced (gapW / 6, reelDiam / 4);
+        ui::InstructionCardLnF::drawHeadAssembly (g, headsRect);
 
-        // Subtle "tape path" line connecting reels via heads
-        g.setColour (ui::InstructionCardLnF::ink().withAlpha (0.35f));
-        const float tapeY = (float) (reelY + reelSize / 2);
-        g.drawLine ((float) leftReel.getRight() - reelSize * 0.05f, tapeY,
-                    (float) heads.getX(), tapeY, 0.8f);
-        g.drawLine ((float) heads.getRight(), tapeY,
-                    (float) rightReel.getX() + reelSize * 0.05f, tapeY, 0.8f);
+        // Tape path lines
+        const float tapeY = (float) bounds.getCentreY();
+        g.setColour (juce::Colour (0xFF202020).withAlpha (0.55f));
+        g.drawLine ((float) leftReel.getRight() - reelDiam * 0.04f, tapeY,
+                    (float) headsRect.getX() - 2,                   tapeY, 1.0f);
+        g.drawLine ((float) headsRect.getRight() + 2, tapeY,
+                    (float) rightReel.getX() + reelDiam * 0.04f, tapeY, 1.0f);
     }
 
     //=========================================================================
-    //  VU bar
+    //  VU bar — green→yellow→red gradient on dark background
     //=========================================================================
     void VUBar::setLevel (float dbfs)
     {
         const auto target = juce::jlimit (-60.0f, 6.0f, dbfs);
-        if (target > current)
-            current = target;                              // attack: instant
-        else
-            current = juce::jmax (target, current - 0.6f); // release: ~18 dB/s @ 30 Hz
+        if (target > current) current = target;
+        else                  current = juce::jmax (target, current - 0.5f); // ~18 dB/s release
         repaint();
     }
 
@@ -144,48 +141,47 @@ namespace bc2000dl
     {
         const auto r = getLocalBounds().toFloat();
 
-        // Recessed window
-        g.setColour (ui::InstructionCardLnF::ink());
-        g.fillRoundedRectangle (r, 3.0f);
-        g.setColour (ui::InstructionCardLnF::ink().darker (0.3f));
-        g.drawRoundedRectangle (r, 3.0f, 0.8f);
+        // Recessed dark window
+        g.setColour (juce::Colour (0xFF0A0A0C));
+        g.fillRoundedRectangle (r, 2.5f);
+        g.setColour (juce::Colour (0xFF383840).withAlpha (0.6f));
+        g.drawRoundedRectangle (r, 2.5f, 0.7f);
 
         // Bar fill
         const float pos = juce::jlimit (0.0f, 1.0f, (current + 60.0f) / 66.0f);
         if (pos > 0.005f)
         {
-            auto bar = r.reduced (2.5f);
+            auto bar = r.reduced (2.0f);
             bar.setWidth (bar.getWidth() * pos);
 
             juce::ColourGradient grad (
-                juce::Colour (0xff3ad07a), bar.getX(),     bar.getCentreY(),
-                juce::Colour (0xffd03a3a), r.getRight(),   bar.getCentreY(), false);
-            grad.addColour (0.65, juce::Colour (0xffd0c43a));
-            grad.addColour (0.85, juce::Colour (0xffd07a3a));
+                juce::Colour (0xff28C45A), bar.getX(),   bar.getCentreY(),
+                juce::Colour (0xffD03030), r.getRight(), bar.getCentreY(), false);
+            grad.addColour (0.60, juce::Colour (0xffC8B830));
+            grad.addColour (0.82, juce::Colour (0xffD07020));
             g.setGradientFill (grad);
-            g.fillRoundedRectangle (bar, 1.5f);
+            g.fillRoundedRectangle (bar, 1.2f);
         }
 
         // Tick marks at -40, -20, -10, -3, 0
-        g.setColour (ui::InstructionCardLnF::amber().withAlpha (0.45f));
+        g.setColour (ui::InstructionCardLnF::amber().withAlpha (0.40f));
         for (int db : { -40, -20, -10, -3, 0 })
         {
-            const float x = r.getX() + r.getWidth() * (db + 60.0f) / 66.0f;
-            g.drawLine (x, r.getY() + 1, x, r.getBottom() - 1, 0.5f);
+            const float fx = r.getX() + r.getWidth() * (db + 60.0f) / 66.0f;
+            g.drawLine (fx, r.getY() + 1, fx, r.getBottom() - 1, 0.5f);
         }
 
         // dB readout
         g.setColour (ui::InstructionCardLnF::amberHot());
-        g.setFont (ui::InstructionCardLnF::monoFont (9.5f));
-        g.drawText (juce::String (current, 1) + " dBFS",
-                    r.reduced (6, 0).toNearestInt(),
-                    juce::Justification::centredRight, false);
+        g.setFont (ui::InstructionCardLnF::monoFont (8.5f));
+        g.drawText (juce::String (current, 1) + " dB",
+                    r.reduced (5, 0).toNearestInt(), juce::Justification::centredRight, false);
 
-        // REC blink
+        // REC blink dot
         if (recording)
         {
             g.setColour (ui::InstructionCardLnF::redAccent());
-            g.fillEllipse (r.getRight() - 14, r.getY() + 4, 5, 5);
+            g.fillEllipse (r.getX() + 4, r.getCentreY() - 2.5f, 5, 5);
         }
     }
 }
@@ -200,6 +196,16 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setSize (kEditorW, kEditorH);
     setResizable (false, false);
 
+    // Helper: cream label on dark panel
+    auto creamLbl = [&] (juce::Label& l, const juce::String& text)
+    {
+        l.setText (text, juce::dontSendNotification);
+        l.setFont (LnF::sectionFont (9.0f));
+        l.setColour (juce::Label::textColourId, LnF::creamLabel());
+        l.setJustificationType (juce::Justification::centred);
+        addAndMakeVisible (l);
+    };
+
     // ---- Top deck zone ----
     addAndMakeVisible (reelDeck);
     addAndMakeVisible (vuL);
@@ -207,8 +213,8 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     auto styleVuLbl = [&] (juce::Label& l, const juce::String& t)
     {
         l.setText (t, juce::dontSendNotification);
-        l.setFont (LnF::sectionFont (10.0f));
-        l.setColour (juce::Label::textColourId, LnF::redAccent());
+        l.setFont (LnF::monoFont (10.0f));
+        l.setColour (juce::Label::textColourId, LnF::amber());
         l.setJustificationType (juce::Justification::centred);
         addAndMakeVisible (l);
     };
@@ -232,8 +238,8 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         sAtts.push_back (std::make_unique<SAtt> (processor.apvts, idR, f.r));
 
         f.caption.setText (cap, juce::dontSendNotification);
-        f.caption.setFont (LnF::sectionFont (10.5f));
-        f.caption.setColour (juce::Label::textColourId, LnF::ink());
+        f.caption.setFont (LnF::sectionFont (9.5f));
+        f.caption.setColour (juce::Label::textColourId, LnF::creamLabel());
         f.caption.setJustificationType (juce::Justification::centred);
         addAndMakeVisible (f.caption);
     };
@@ -254,24 +260,20 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         s.setTooltip (tooltipFor (id));
         addAndMakeVisible (s);
         sAtts.push_back (std::make_unique<SAtt> (processor.apvts, id, s));
-
-        l.setText (cap, juce::dontSendNotification);
-        l.setFont (LnF::sectionFont (8.5f));
-        l.setColour (juce::Label::textColourId, LnF::ink());
-        l.setJustificationType (juce::Justification::centred);
-        addAndMakeVisible (l);
+        creamLbl (l, cap);
     };
-    setupKnob (knob_bias,    lbl_bias,    "bias_amount",    "BIAS");
-    setupKnob (knob_bass,    lbl_bass,    "bass_db",        "BASS");
     setupKnob (knob_treble,  lbl_treble,  "treble_db",      "TREBLE");
+    setupKnob (knob_bass,    lbl_bass,    "bass_db",        "BASS");
+    setupKnob (knob_balance, lbl_balance, "balance",        "BAL");
+    setupKnob (knob_bias,    lbl_bias,    "bias_amount",    "BIAS");
     setupKnob (knob_wow,     lbl_wow,     "wow_flutter",    "WOW");
     setupKnob (knob_mult,    lbl_mult,    "multiplay_gen",  "MULT");
-    setupKnob (knob_balance, lbl_balance, "balance",        "BAL");
-    setupKnob (knob_master,  lbl_master,  "master_volume",  "MASTER");
+    setupKnob (knob_master,  lbl_master,  "master_volume",  "VOL");
 
     // ---- 5 selectors ----
     auto setupCombo = [&] (juce::ComboBox& c, juce::Label& l, const juce::String& id,
-                            const juce::String& cap, std::initializer_list<const char*> items)
+                            const juce::String& cap,
+                            std::initializer_list<const char*> items)
     {
         int idx = 1;
         for (auto* it : items) c.addItem (it, idx++);
@@ -281,7 +283,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
 
         l.setText (cap, juce::dontSendNotification);
         l.setFont (LnF::sectionFont (8.5f));
-        l.setColour (juce::Label::textColourId, LnF::ink());
+        l.setColour (juce::Label::textColourId, LnF::creamDim());
         l.setJustificationType (juce::Justification::centredLeft);
         addAndMakeVisible (l);
     };
@@ -291,7 +293,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setupCombo (cb_radio,   lbl_radio,   "radio_mode",   "RADIO IN",    { "L (3 mV)", "H (100 mV)" });
     setupCombo (cb_formula, lbl_formula, "tape_formula", "TAPE FORMULA",{ "Agfa", "BASF", "Scotch" });
 
-    // ---- Toggle buttons (small square checkboxes with red fill when ON) ----
+    // ---- Toggle buttons ----
     auto setupToggle = [&] (juce::ToggleButton& b, const juce::String& cap, const juce::String& id)
     {
         b.setButtonText (cap);
@@ -308,13 +310,13 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setupToggle (t_sos,     "SOS",     "sos_enabled");
     setupToggle (t_pause,   "PAUSE",   "pause");
 
-    // ---- Transport keys (TextButton with toggle, styled by L&F) ----
+    // ---- Transport keys ----
     auto setupKey = [&] (juce::TextButton& b, const juce::String& cap, const juce::String& id)
     {
         b.setButtonText (cap);
         b.setClickingTogglesState (true);
         b.setTooltip (tooltipFor (id));
-        if (cap.startsWith ("REC")) b.setName ("REC"); // L&F uses this for red strip
+        if (cap.startsWith ("REC")) b.setName ("REC");
         addAndMakeVisible (b);
         bAtts.push_back (std::make_unique<BAtt> (processor.apvts, id, b));
     };
@@ -326,33 +328,34 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setupKey (k_spkB, "SPK B", "speaker_int");
     setupKey (k_mute, "MUTE",  "speaker_mute");
 
-    // ---- Header ----
-    int pid = 1;
-    for (auto* name : { "FACTORY", "BERG · DEPECHE PAD", "BERG · DELTA SYNTH", "BERG · PROTON CRUNCH",
-                         "BERG · REEL VOCALS", "FERRO+", "CHROME", "METAL IV",
-                         "BBC J", "NAGRA", "CASSETTE 70s", "BROADCAST",
-                         "VISCONTI '74", "BUTLER MIX", "KRAFTWERK '78", "RHODES WARM",
-                         "DRUM SMASH", "VOCAL SILK", "BASS WEIGHT", "LO-FI POP",
-                         "DUB ECHO", "GLUE MASTER", "SHOEGAZE", "CRT NIGHTMARE" })
-        cb_preset.addItem (name, pid++);
-    cb_preset.setText ("FACTORY", juce::dontSendNotification);
-    cb_preset.onChange = [this]
+    // ---- Preset header ----
     {
-        const int sel = cb_preset.getSelectedId() - 1;
-        if (sel >= 0) applyPreset (sel);
-    };
-    addAndMakeVisible (cb_preset);
+        int pid = 1;
+        for (auto* name : { "FACTORY", "BERG · DEPECHE PAD", "BERG · DELTA SYNTH",
+                             "BERG · PROTON CRUNCH", "BERG · REEL VOCALS", "FERRO+",
+                             "CHROME", "METAL IV", "BBC J", "NAGRA", "CASSETTE 70s",
+                             "BROADCAST", "VISCONTI '74", "BUTLER MIX", "KRAFTWERK '78",
+                             "RHODES WARM", "DRUM SMASH", "VOCAL SILK", "BASS WEIGHT",
+                             "LO-FI POP", "DUB ECHO", "GLUE MASTER", "SHOEGAZE",
+                             "CRT NIGHTMARE" })
+            cb_preset.addItem (name, pid++);
+        cb_preset.setText ("FACTORY", juce::dontSendNotification);
+        cb_preset.onChange = [this] {
+            const int sel = cb_preset.getSelectedId() - 1;
+            if (sel >= 0) applyPreset (sel);
+        };
+        addAndMakeVisible (cb_preset);
+    }
 
     auto setupNav = [&] (juce::TextButton& b, int delta)
     {
         addAndMakeVisible (b);
         b.onClick = [this, delta]
         {
-            const int n = cb_preset.getNumItems();
-            int curr = cb_preset.getSelectedId();
+            const int n    = cb_preset.getNumItems();
+            int       curr = cb_preset.getSelectedId();
             if (curr < 1) curr = 1;
-            int next = ((curr - 1 + delta + n) % n) + 1;
-            cb_preset.setSelectedId (next);
+            cb_preset.setSelectedId (((curr - 1 + delta + n) % n) + 1);
         };
     };
     setupNav (btn_prev, -1);
@@ -366,11 +369,10 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         b.onClick = [this, isA]
         {
             auto& store = slotIsA ? stateA : stateB;
-            store = processor.apvts.copyState();
+            store   = processor.apvts.copyState();
             slotIsA = isA;
             auto& load = slotIsA ? stateA : stateB;
-            if (load.isValid())
-                processor.apvts.replaceState (load);
+            if (load.isValid()) processor.apvts.replaceState (load);
         };
     };
     setupAB (btn_a, true);
@@ -383,14 +385,13 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("BC2000DL · v29.8 NATIVE")
+                .withTitle ("BC2000DL · v29.9 HARDWARE")
                 .withMessage ("Bang & Olufsen Beocord 2000 De Luxe (1968-69)\n\n"
-                              "DSP: Jiles-Atherton hysteresis, 8x oversampling,\n"
-                              "21/21 PASS vs Studio-Sound + Service Manual.\n\n"
-                              "UI: native JUCE — instruction-card aesthetic\n"
-                              "(inspired by the operating-instructions inlay).")
-                .withButton ("OK"),
-            nullptr);
+                              "DSP: Jiles-Atherton hysteresis · 8× oversampling\n"
+                              "21/21 PASS vs Studio-Sound + Service Manual\n\n"
+                              "UI: native JUCE · hardware-accurate aesthetic\n"
+                              "Teak frame · brushed aluminium deck · bullseye reels")
+                .withButton ("OK"), nullptr);
     };
     addAndMakeVisible (btn_about);
 
@@ -404,71 +405,75 @@ NativeEditor::~NativeEditor()
 }
 
 //=============================================================================
-//  Paint — paper card + wood end-caps + section frames + decorative labels
+//  Paint
 //=============================================================================
 void NativeEditor::paint (juce::Graphics& g)
 {
-    const auto bounds = getLocalBounds();
+    auto bounds = getLocalBounds();
 
-    // Wood end-caps
-    LnF::drawWoodEndCap (g, bounds.withWidth (kWoodCap), true);
-    LnF::drawWoodEndCap (g, bounds.withTrimmedLeft (bounds.getWidth() - kWoodCap), false);
+    // ===== Teak end-caps (full height, each side) =====
+    LnF::drawWoodEndCap (g, bounds.withWidth (kTeakW), true);
+    LnF::drawWoodEndCap (g, bounds.withTrimmedLeft (bounds.getWidth() - kTeakW), false);
 
-    // Paper panel between
-    auto card = bounds.reduced (kWoodCap, 0);
-    LnF::drawPaperPanel (g, card);
+    // ===== Inner zone (between teak caps) =====
+    auto inner = bounds.withTrimmedLeft (kTeakW).withTrimmedRight (kTeakW);
 
-    // Title (top-left)
-    auto header = card.reduced (kPadding, kPadding).removeFromTop (60);
-    LnF::drawTitle (g, header.removeFromLeft (380),
-                     "BC2000DL", "DANISH TAPE 2000 · v29.8 NATIVE");
+    // ===== Brushed aluminium top zone =====
+    auto aluZone = inner.withHeight (kAluH);
+    LnF::drawPaperPanel (g, aluZone);
 
-    // Status (header right side, just text — actual controls drawn elsewhere)
-    g.setColour (LnF::inkSoft());
-    g.setFont (LnF::labelFont (10.0f));
-    g.drawText (statusText, bounds.getRight() - 320, 28, 180, 16,
-                juce::Justification::right, false);
+    // Title (top-left of alu deck)
+    LnF::drawTitle (g, aluZone.reduced (20, 10).removeFromTop (28),
+                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v29.9");
 
-    // Re-derive section rectangles to draw frames
-    auto card_inner = card.reduced (kPadding, kPadding);
-    card_inner.removeFromTop (60); // skip header
+    // Counter (bottom-centre of alu zone, between the reels)
+    {
+        constexpr int cW = 88, cH = 26;
+        LnF::drawCounter (g,
+            juce::Rectangle<int> (inner.getCentreX() - cW / 2,
+                                  aluZone.getBottom() - cH - 12,
+                                  cW, cH),
+            counterText);
+    }
 
-    // Deck zone (reels + heads + counter + VU)
-    const int deckH = 200;
-    auto deck = card_inner.removeFromTop (deckH);
-    LnF::drawSectionBox (g, deck.reduced (2, 2), "DECK");
+    // ===== Divider strip =====
+    auto divRect = inner.withY (kAluH).withHeight (kDivH);
+    g.setColour (juce::Colour (0xFF060608));
+    g.fillRect (divRect);
+    g.setColour (juce::Colour (0xFF404048).withAlpha (0.5f));
+    g.drawHorizontalLine (divRect.getY() + 1, (float) divRect.getX(), (float) divRect.getRight());
 
-    card_inner.removeFromTop (8);
+    // ===== Black panel (bottom zone) =====
+    auto blackZone = inner.withY (kAluH + kDivH)
+                         .withHeight (bounds.getHeight() - kAluH - kDivH);
+    LnF::drawBlackPanel (g, blackZone);
 
-    // Mid section: faders + (tone+knobs)
-    const int midH = 240;
-    auto midRow = card_inner.removeFromTop (midH);
+    // Column dividers
+    const int leftEnd   = kTeakW + kLeftColW;
+    const int centerEnd = leftEnd + kCenterColW;
+    const int divTop    = kAluH + kDivH + kPresetH + 14;
+    const int divBot    = bounds.getBottom() - 8;
+    g.setColour (juce::Colour (0xFF2C2C34));
+    g.drawVerticalLine (leftEnd,   (float) divTop, (float) divBot);
+    g.drawVerticalLine (centerEnd, (float) divTop, (float) divBot);
 
-    // Faders: 5 dual-faders take the full width's 60%
-    auto fadersBox = midRow.removeFromLeft ((int) (midRow.getWidth() * 0.58f));
-    LnF::drawSectionBox (g, fadersBox.reduced (2, 2), "INPUT · BUS");
+    // Section labels
+    const int lblY = kAluH + kDivH + kPresetH + 4;
+    g.setFont (LnF::sectionFont (8.0f));
+    g.setColour (LnF::creamDim());
+    g.drawText ("INPUT",    juce::Rectangle<int> (kTeakW + 8, lblY, kLeftColW - 12, 12), juce::Justification::left);
+    g.drawText ("FADERS",   juce::Rectangle<int> (leftEnd + 8, lblY, 80, 12), juce::Justification::left);
+    g.drawText ("TONE · TAPE", juce::Rectangle<int> (centerEnd + 8, lblY, 130, 12), juce::Justification::left);
 
-    midRow.removeFromLeft (8);
-    auto rightBox = midRow;
-    LnF::drawSectionBox (g, rightBox.reduced (2, 2), "TONE · METER");
-
-    card_inner.removeFromTop (8);
-
-    // Selectors
-    const int selH = 56;
-    auto selBox = card_inner.removeFromTop (selH);
-    LnF::drawSectionBox (g, selBox.reduced (2, 2), "MODE");
-
-    card_inner.removeFromTop (8);
-
-    // Transport row
-    auto transBox = card_inner.removeFromTop (80);
-    LnF::drawSectionBox (g, transBox.reduced (2, 2), "TRANSPORT");
-
-    // Footer hairline
-    g.setColour (LnF::inkSoft().withAlpha (0.3f));
-    g.drawHorizontalLine (bounds.getBottom() - 16, (float) kWoodCap + 8.0f,
-                          (float) bounds.getRight() - kWoodCap - 8.0f);
+    // Status bar (preset row, right side)
+    if (statusText.isNotEmpty())
+    {
+        g.setColour (LnF::amber().withAlpha (0.55f));
+        g.setFont (LnF::monoFont (9.0f));
+        g.drawText (statusText,
+                    juce::Rectangle<int> (centerEnd - 220, kAluH + kDivH + 4, 210, kPresetH - 8),
+                    juce::Justification::centredRight, false);
+    }
 }
 
 //=============================================================================
@@ -476,142 +481,165 @@ void NativeEditor::paint (juce::Graphics& g)
 //=============================================================================
 void NativeEditor::resized()
 {
-    auto bounds = getLocalBounds();
-    bounds.removeFromLeft (kWoodCap);
-    bounds.removeFromRight (kWoodCap);
+    const auto bounds = getLocalBounds();
+    auto inner = bounds.withTrimmedLeft (kTeakW).withTrimmedRight (kTeakW);
 
-    auto card_inner = bounds.reduced (kPadding, kPadding);
+    // ===== Aluminium zone: reel deck (below title strip) =====
+    auto aluZone = inner.withHeight (kAluH).withTrimmedTop (30).reduced (8, 4);
+    reelDeck.setBounds (aluZone);
 
-    // ===== Header =====
-    auto header = card_inner.removeFromTop (60);
-    header.removeFromLeft (380); // title-zon (reserved by paint())
+    // ===== Black panel zone =====
+    auto blackZone = inner.withY (kAluH + kDivH)
+                         .withHeight (bounds.getHeight() - kAluH - kDivH);
 
-    btn_about.setBounds (header.removeFromRight (32).reduced (2));
-    header.removeFromRight (8);
-    btn_b.setBounds (header.removeFromRight (32).reduced (2));
-    header.removeFromRight (4);
-    btn_a.setBounds (header.removeFromRight (32).reduced (2));
-    header.removeFromRight (12);
+    // --- Preset / nav bar (full width at top of black panel) ---
+    auto presetBar = blackZone.removeFromTop (kPresetH).reduced (8, 6);
 
-    auto presetW = juce::jmin (320, header.getWidth());
-    auto presetArea = header.removeFromRight (presetW);
-    btn_prev.setBounds (presetArea.removeFromLeft (24).reduced (1, 4));
-    presetArea.removeFromLeft (4);
-    btn_next.setBounds (presetArea.removeFromRight (24).reduced (1, 4));
-    presetArea.removeFromRight (4);
-    cb_preset.setBounds (presetArea.reduced (0, 4));
+    btn_prev.setBounds (presetBar.removeFromLeft (24).reduced (1, 2));
+    presetBar.removeFromLeft (4);
+    btn_next.setBounds (presetBar.removeFromLeft (24).reduced (1, 2));
+    presetBar.removeFromLeft (8);
 
-    // ===== Deck zone (200 px) =====
-    const int deckH = 200;
-    auto deck = card_inner.removeFromTop (deckH).reduced (12, 16);
-    // Reels take left 2/3, VU+counter takes right 1/3
-    auto reelArea = deck.removeFromLeft ((int) (deck.getWidth() * 0.62f));
-    reelDeck.setBounds (reelArea);
+    btn_about.setBounds (presetBar.removeFromRight (28).reduced (1, 2));
+    presetBar.removeFromRight (4);
+    btn_b.setBounds (presetBar.removeFromRight (28).reduced (1, 2));
+    presetBar.removeFromRight (4);
+    btn_a.setBounds (presetBar.removeFromRight (28).reduced (1, 2));
+    presetBar.removeFromRight (12);
 
-    deck.removeFromLeft (12);
-    // VU stack on right
-    auto vuStack = deck;
-    auto vuLArea = vuStack.removeFromTop (vuStack.getHeight() / 2).reduced (4);
-    vuL_lbl.setBounds (vuLArea.removeFromLeft (16));
-    vuL.setBounds (vuLArea);
+    cb_preset.setBounds (presetBar.reduced (0, 2));
 
-    auto vuRArea = vuStack.reduced (4);
-    vuR_lbl.setBounds (vuRArea.removeFromLeft (16));
-    vuR.setBounds (vuRArea);
+    // Skip section-label row
+    blackZone.removeFromTop (20);
 
-    card_inner.removeFromTop (8);
+    // --- Three columns ---
+    auto leftCol   = blackZone.removeFromLeft (kLeftColW).reduced (8, 6);
+    auto centerCol = blackZone.removeFromLeft (kCenterColW).reduced (8, 6);
+    auto rightCol  = blackZone.reduced (8, 6);
 
-    // ===== Mid row (240 px): faders | tone+knobs =====
-    const int midH = 240;
-    auto midRow = card_inner.removeFromTop (midH);
-
-    auto fadersBox = midRow.removeFromLeft ((int) (midRow.getWidth() * 0.58f));
-    auto rightBox = midRow;
-    rightBox.removeFromLeft (8);
-
-    // Layout faders: 5 dual-faders, each is 2 vertical sliders + caption
-    fadersBox.reduce (12, 16);
-    const int dualW = fadersBox.getWidth() / 5;
-    auto layoutDual = [&] (juce::Rectangle<int> area, DualFader& f)
+    // =====================================================================
+    // LEFT COLUMN: VU meters → combos → toggles → transport keys
+    // =====================================================================
     {
-        f.caption.setBounds (area.removeFromTop (16));
-        area.removeFromBottom (4);
-        const int sw = area.getWidth() / 2;
-        f.l.setBounds (area.removeFromLeft (sw).reduced (4, 0));
-        f.r.setBounds (area.reduced (4, 0));
-    };
-    layoutDual (fadersBox.removeFromLeft (dualW), radio);
-    layoutDual (fadersBox.removeFromLeft (dualW), phono);
-    layoutDual (fadersBox.removeFromLeft (dualW), mic);
-    layoutDual (fadersBox.removeFromLeft (dualW), drive);
-    layoutDual (fadersBox.removeFromLeft (dualW), echo);
+        // VU meters
+        auto vuRow = leftCol.removeFromTop (60);
+        auto vuLRow = vuRow.removeFromTop (28).reduced (0, 1);
+        vuL_lbl.setBounds (vuLRow.removeFromLeft (16));
+        vuL.setBounds (vuLRow);
+        auto vuRRow = vuRow.removeFromTop (28).reduced (0, 1);
+        vuR_lbl.setBounds (vuRRow.removeFromLeft (16));
+        vuR.setBounds (vuRRow);
 
-    // Layout right box: 7 knobs in a single row
-    rightBox.reduce (12, 16);
-    const int knobW = rightBox.getWidth() / 7;
-    auto layoutKnob = [&] (juce::Rectangle<int> area, juce::Slider& s, juce::Label& l)
-    {
-        l.setBounds (area.removeFromTop (12));
-        s.setBounds (area.reduced (6, 4));
-    };
-    layoutKnob (rightBox.removeFromLeft (knobW), knob_bias,    lbl_bias);
-    layoutKnob (rightBox.removeFromLeft (knobW), knob_bass,    lbl_bass);
-    layoutKnob (rightBox.removeFromLeft (knobW), knob_treble,  lbl_treble);
-    layoutKnob (rightBox.removeFromLeft (knobW), knob_wow,     lbl_wow);
-    layoutKnob (rightBox.removeFromLeft (knobW), knob_mult,    lbl_mult);
-    layoutKnob (rightBox.removeFromLeft (knobW), knob_balance, lbl_balance);
-    layoutKnob (rightBox.removeFromLeft (knobW), knob_master,  lbl_master);
+        leftCol.removeFromTop (8);
 
-    card_inner.removeFromTop (8);
-
-    // ===== Selectors row (56 px) =====
-    auto selBox = card_inner.removeFromTop (56).reduced (12, 8);
-    const int cellW = selBox.getWidth() / 5;
-    auto layoutCombo = [&] (juce::Rectangle<int> area, juce::ComboBox& c, juce::Label& l)
-    {
-        l.setBounds (area.removeFromTop (12));
-        c.setBounds (area.reduced (2, 2));
-    };
-    layoutCombo (selBox.removeFromLeft (cellW), cb_speed,   lbl_speed);
-    layoutCombo (selBox.removeFromLeft (cellW), cb_monitor, lbl_monitor);
-    layoutCombo (selBox.removeFromLeft (cellW), cb_phono,   lbl_phono);
-    layoutCombo (selBox.removeFromLeft (cellW), cb_radio,   lbl_radio);
-    layoutCombo (selBox.removeFromLeft (cellW), cb_formula, lbl_formula);
-
-    card_inner.removeFromTop (8);
-
-    // ===== Transport (80 px) =====
-    auto transBox = card_inner.removeFromTop (80).reduced (12, 8);
-    auto trKeyRow = transBox.removeFromTop (32);
-    transBox.removeFromTop (4);
-    auto toggleRow = transBox.removeFromTop (32);
-
-    // Transport keys: 7 piano-key-style buttons evenly distributed
-    auto layoutKeyRow = [&] (juce::Rectangle<int> row,
-                              std::initializer_list<juce::TextButton*> btns)
-    {
-        const int n = (int) btns.size();
-        const int gap = 4;
-        const int btnW = (row.getWidth() - gap * (n - 1)) / n;
-        for (auto* b : btns)
+        // 5 combo boxes
+        auto layoutCombo = [&] (juce::ComboBox& c, juce::Label& l)
         {
-            b->setBounds (row.removeFromLeft (btnW));
-            row.removeFromLeft (gap);
-        }
-    };
-    layoutKeyRow (trKeyRow, { &k_rec1, &k_rec2, &k_trk1, &k_trk2,
-                              &k_spkA, &k_spkB, &k_mute });
+            l.setBounds (leftCol.removeFromTop (12));
+            c.setBounds (leftCol.removeFromTop (22).reduced (0, 1));
+            leftCol.removeFromTop (4);
+        };
+        layoutCombo (cb_speed,   lbl_speed);
+        layoutCombo (cb_monitor, lbl_monitor);
+        layoutCombo (cb_phono,   lbl_phono);
+        layoutCombo (cb_radio,   lbl_radio);
+        layoutCombo (cb_formula, lbl_formula);
 
-    // Toggle row: 8 small-checkbox-with-label
-    const int n = 8;
-    const int gap = 4;
-    const int tW = (toggleRow.getWidth() - gap * (n - 1)) / n;
-    juce::ToggleButton* toggles[] = { &t_echo, &t_bypass, &t_speaker, &t_sync,
-                                       &t_loz, &t_pa, &t_sos, &t_pause };
-    for (auto* tb : toggles)
+        leftCol.removeFromTop (6);
+
+        // 8 toggles in 2 rows of 4
+        const int tW = leftCol.getWidth() / 4;
+        auto togRow1 = leftCol.removeFromTop (22);
+        auto togRow2 = leftCol.removeFromTop (22);
+        leftCol.removeFromTop (4);
+        juce::ToggleButton* r1[] = { &t_echo, &t_bypass, &t_speaker, &t_sync };
+        juce::ToggleButton* r2[] = { &t_loz,  &t_pa,     &t_sos,     &t_pause };
+        for (auto* tb : r1) { tb->setBounds (togRow1.removeFromLeft (tW).reduced (1, 1)); }
+        for (auto* tb : r2) { tb->setBounds (togRow2.removeFromLeft (tW).reduced (1, 1)); }
+
+        leftCol.removeFromTop (4);
+
+        // Transport: 4 keys row 1
+        {
+            auto kRow = leftCol.removeFromTop (28);
+            const int kW = kRow.getWidth() / 4;
+            k_rec1.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
+            k_rec2.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
+            k_trk1.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
+            k_trk2.setBounds (kRow.reduced (2, 1));
+        }
+        leftCol.removeFromTop (4);
+        // Transport: 3 keys row 2
+        {
+            auto kRow = leftCol.removeFromTop (28);
+            const int kW = kRow.getWidth() / 3;
+            k_spkA.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
+            k_spkB.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
+            k_mute.setBounds (kRow.reduced (2, 1));
+        }
+    }
+
+    // =====================================================================
+    // CENTER COLUMN: 5 dual slide faders (full height)
+    // =====================================================================
     {
-        tb->setBounds (toggleRow.removeFromLeft (tW));
-        toggleRow.removeFromLeft (gap);
+        const int dualW = centerCol.getWidth() / 5;
+        auto layoutDual = [&] (juce::Rectangle<int> area, DualFader& f)
+        {
+            f.caption.setBounds (area.removeFromTop (18));
+            area.removeFromBottom (4);
+            const int sw = area.getWidth() / 2;
+            f.l.setBounds (area.removeFromLeft (sw).reduced (5, 0));
+            f.r.setBounds (area.reduced (5, 0));
+        };
+        layoutDual (centerCol.removeFromLeft (dualW), radio);
+        layoutDual (centerCol.removeFromLeft (dualW), phono);
+        layoutDual (centerCol.removeFromLeft (dualW), mic);
+        layoutDual (centerCol.removeFromLeft (dualW), drive);
+        layoutDual (centerCol.removeFromLeft (dualW), echo);
+    }
+
+    // =====================================================================
+    // RIGHT COLUMN: 7 knobs in 2 rows + right-side counter
+    //   Row 1 (3 tone knobs: TREBLE, BASS, BAL)  — wider cells
+    //   Row 2 (4 tape knobs: BIAS, WOW, MULT, VOL)
+    // =====================================================================
+    {
+        const int rowW  = rightCol.getWidth();
+        const int cell3 = rowW / 3;    // 3-knob row
+        const int cell4 = rowW / 4;    // 4-knob row
+
+        auto layoutKnob = [&] (juce::Slider& s, juce::Label& l,
+                                juce::Rectangle<int>& row, int cellW)
+        {
+            auto cell = row.removeFromLeft (cellW);
+            l.setBounds (cell.removeFromTop (14));
+            s.setBounds (cell.reduced (4, 4));
+        };
+
+        // Row 1: TREBLE / BASS / BAL  (tone controls — bigger knobs)
+        const int row1H = juce::jmin (120, (int) (rightCol.getHeight() * 0.45f));
+        auto row1 = rightCol.removeFromTop (row1H);
+        layoutKnob (knob_treble,  lbl_treble,  row1, cell3);
+        layoutKnob (knob_bass,    lbl_bass,    row1, cell3);
+        layoutKnob (knob_balance, lbl_balance, row1, cell3);
+
+        rightCol.removeFromTop (8);
+
+        // Row 2: BIAS / WOW / MULT / VOL
+        const int row2H = juce::jmin (110, (int) (rightCol.getHeight() * 0.42f));
+        auto row2 = rightCol.removeFromTop (row2H);
+        layoutKnob (knob_bias,   lbl_bias,   row2, cell4);
+        layoutKnob (knob_wow,    lbl_wow,    row2, cell4);
+        layoutKnob (knob_mult,   lbl_mult,   row2, cell4);
+        layoutKnob (knob_master, lbl_master, row2, cell4);
+
+        // Counter display in remaining space
+        rightCol.removeFromTop (10);
+        if (rightCol.getHeight() >= 28)
+        {
+            // drawn in paint() — nothing to lay out here
+        }
     }
 }
 
@@ -626,24 +654,24 @@ void NativeEditor::timerCallback()
     vuL.setRecording (chain.isRecordingL.load());
     vuR.setRecording (chain.isRecordingR.load());
 
-    // Reels turn when there's signal moving through
+    // Reel spin when any input gain > threshold
     const float inputAny = processor.apvts.getRawParameterValue ("mic_gain")->load()
                          + processor.apvts.getRawParameterValue ("phono_gain")->load()
                          + processor.apvts.getRawParameterValue ("radio_gain")->load();
     reelDeck.setActive (inputAny > 0.05f);
+
     const int speedIdx = (int) processor.apvts.getRawParameterValue ("speed")->load();
     reelDeck.setSpeed (speedIdx);
 
-    const auto sr = processor.getSampleRate();
+    const double sr = processor.getSampleRate();
     if (sr > 0.0)
     {
-        const char* speedStr = (speedIdx == 0 ? "4.75" : speedIdx == 1 ? "9.5" : "19");
-        juce::String s = juce::String (speedStr) + " cm/s · "
-                       + juce::String (sr / 1000.0, 1) + " kHz";
+        const char* sp = (speedIdx == 0 ? "4.75" : speedIdx == 1 ? "9.5" : "19");
+        juce::String s = juce::String (sp) + " cm/s · " + juce::String (sr / 1000.0, 1) + " kHz";
         if (s != statusText)
         {
             statusText = s;
-            repaint (juce::Rectangle<int> (getWidth() - 360, 24, 280, 24));
+            repaint (juce::Rectangle<int> (kTeakW, kAluH + kDivH, kInnerW, kPresetH));
         }
     }
 }
@@ -661,26 +689,26 @@ void NativeEditor::applyPreset (int idx)
     };
     auto setBool = [&] (const juce::String& id, bool b) { set (id, b ? 1.0f : 0.0f); };
 
-    // Reset baseline
+    // Baseline reset
     set ("speed", 2);
-    set ("mic_gain", 0.5f); set ("mic_gain_r", 0.5f);
-    set ("phono_gain", 0); set ("phono_gain_r", 0);
-    set ("radio_gain", 0); set ("radio_gain_r", 0);
+    set ("mic_gain", 0.5f);   set ("mic_gain_r",         0.5f);
+    set ("phono_gain", 0);    set ("phono_gain_r",        0);
+    set ("radio_gain", 0);    set ("radio_gain_r",        0);
     set ("saturation_drive", 1.0f); set ("saturation_drive_r", 1.0f);
-    set ("echo_amount", 0); set ("echo_amount_r", 0);
+    set ("echo_amount", 0);   set ("echo_amount_r",       0);
     set ("bias_amount", 1.0f);
     set ("wow_flutter", 0.3f);
     set ("multiplay_gen", 1);
-    set ("bass_db", 0); set ("treble_db", 0);
-    set ("balance", 0); set ("master_volume", 0.85f);
-    setBool ("echo_enabled", false);
-    setBool ("bypass_tape", false);
+    set ("bass_db", 0);    set ("treble_db", 0);
+    set ("balance", 0);    set ("master_volume", 0.85f);
+    setBool ("echo_enabled",    false);
+    setBool ("bypass_tape",     false);
     setBool ("speaker_monitor", false);
-    setBool ("synchroplay", false);
-    setBool ("pause", false);
-    setBool ("sos_enabled", false);
-    setBool ("pa_enabled", false);
-    setBool ("mic_loz", false);
+    setBool ("synchroplay",     false);
+    setBool ("pause",           false);
+    setBool ("sos_enabled",     false);
+    setBool ("pa_enabled",      false);
+    setBool ("mic_loz",         false);
 
     switch (idx)
     {

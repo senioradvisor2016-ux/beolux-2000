@@ -1,17 +1,12 @@
-/*  BC2000LookAndFeel — instruction-card aesthetic for BC2000DL.
+/*  BC2000LookAndFeel — hardware-accurate aesthetic for BC2000DL.
 
-    Inspired by Juno60AF's procedural-drawing approach, but skinned to match
-    the iconic Beocord 2000 DL operating-instructions card (the cream-coloured
-    paper diagram that lived under the lid, in German, showing how every
-    control mapped to a section of the deck).
-
-    Visual language:
-      - Cream paper panel (#EDE5D4)
-      - Black hairlines as section frames
-      - Helvetica Neue Condensed Bold for labels (tech-drawing style)
-      - Sparse Bang & Olufsen amber for highlights
-      - Roland-red mapped to "active state" (REC armed, parameter changed, etc.)
-      - Two thin-line "reels" at the top, slide-faders below, transport at bottom
+    Visual language matches the physical Beocord 2000 De Luxe (1968-69):
+      - Teak/walnut end-caps (#3A1F0E → #7A4A2A grain)
+      - Brushed silver-aluminium top deck (horizontal stripe noise)
+      - Black control panel (#141416) for all knobs/faders/buttons
+      - RED BULLSEYE reels (black rim → cream band → red ring → cream → red dot)
+      - Cream-amber (#D4C89A) text on dark surfaces
+      - Bang & Olufsen amber for counter / VU readouts
 
     All drawing is procedural. No bitmaps. Bundle stays tiny.
 */
@@ -27,27 +22,53 @@ namespace bc2000dl::ui
     public:
         InstructionCardLnF();
 
-        //==================== Color palette ===================
-        static juce::Colour paper()       { return juce::Colour (0xFFEDE5D4); }
-        static juce::Colour paperDarker() { return juce::Colour (0xFFD8CFB8); }
-        static juce::Colour paperShadow() { return juce::Colour (0xFFC9BEA4); }
-        static juce::Colour ink()         { return juce::Colour (0xFF1E1E1C); }
-        static juce::Colour inkSoft()     { return juce::Colour (0xFF4A4A48); }
-        static juce::Colour amber()       { return juce::Colour (0xFFD0A040); }
-        static juce::Colour amberHot()    { return juce::Colour (0xFFE0B860); }
-        static juce::Colour redAccent()   { return juce::Colour (0xFFC23A2A); } // REC, critical
-        static juce::Colour woodDark()    { return juce::Colour (0xFF3B2620); }
-        static juce::Colour woodLight()   { return juce::Colour (0xFF5B3A30); }
-        static juce::Colour metalHi()     { return juce::Colour (0xFFD0D0CE); }
-        static juce::Colour metalLo()     { return juce::Colour (0xFF7C7C7A); }
+        //==================== Colour palette ======================
+        // --- Paper / popup colours (kept cream for popup menus / tooltips) ---
+        static juce::Colour paper()        { return juce::Colour (0xFFEDE5D4); }
+        static juce::Colour paperDarker()  { return juce::Colour (0xFFD8CFB8); }
+        static juce::Colour paperShadow()  { return juce::Colour (0xFFC9BEA4); }
 
-        //==================== Typography ======================
-        static juce::Font labelFont   (float sizePx);  // body labels
-        static juce::Font sectionFont (float sizePx);  // section headers (kerned)
-        static juce::Font monoFont    (float sizePx);  // counter / readouts
+        // --- Dark panel colours (main surface) ---
+        static juce::Colour blackPanel()   { return juce::Colour (0xFF141416); }
+        static juce::Colour panelMid()     { return juce::Colour (0xFF242428); }
+        static juce::Colour panelEdge()    { return juce::Colour (0xFF383840); }
+
+        // --- Brushed aluminium (top deck) ---
+        static juce::Colour aluHi()        { return juce::Colour (0xFFD2D2D0); }
+        static juce::Colour aluMid()       { return juce::Colour (0xFFB4B4B2); }
+        static juce::Colour aluLo()        { return juce::Colour (0xFF909090); }
+
+        // --- Teak / walnut end-caps ---
+        static juce::Colour teakDark()     { return juce::Colour (0xFF3A1F0E); }
+        static juce::Colour teakMid()      { return juce::Colour (0xFF5C3118); }
+        static juce::Colour teakLight()    { return juce::Colour (0xFF7A4A2A); }
+
+        // --- Text on dark panel ---
+        static juce::Colour creamLabel()   { return juce::Colour (0xFFD4C89A); }
+        static juce::Colour creamDim()     { return juce::Colour (0xFF908868); }
+
+        // --- Ink (general dark) ---
+        static juce::Colour ink()          { return juce::Colour (0xFF1E1E1C); }
+        static juce::Colour inkSoft()      { return juce::Colour (0xFF4A4A48); }
+
+        // --- Accents ---
+        static juce::Colour amber()        { return juce::Colour (0xFFD0A040); }
+        static juce::Colour amberHot()     { return juce::Colour (0xFFE0B860); }
+        static juce::Colour redAccent()    { return juce::Colour (0xFFC23A2A); }
+
+        // --- Legacy (kept for callers that still reference them) ---
+        static juce::Colour woodDark()     { return teakDark(); }
+        static juce::Colour woodLight()    { return teakLight(); }
+        static juce::Colour metalHi()      { return aluHi(); }
+        static juce::Colour metalLo()      { return aluLo(); }
+
+        //==================== Typography ==========================
+        static juce::Font labelFont   (float sizePx);
+        static juce::Font sectionFont (float sizePx);
+        static juce::Font monoFont    (float sizePx);
         static juce::Font logoFont    (float sizePx);
 
-        //==================== L&F overrides ===================
+        //==================== L&F overrides =======================
         void drawLinearSlider (juce::Graphics&, int x, int y, int w, int h,
                                float sliderPos, float minPos, float maxPos,
                                juce::Slider::SliderStyle, juce::Slider&) override;
@@ -67,10 +88,10 @@ namespace bc2000dl::ui
                             bool isButtonDown, int buttonX, int buttonY,
                             int buttonW, int buttonH, juce::ComboBox&) override;
 
-        juce::Font getComboBoxFont (juce::ComboBox&) override;
-        juce::Font getLabelFont    (juce::Label&) override;
-        juce::Font getTextButtonFont (juce::TextButton&, int buttonHeight) override;
-        juce::Font getPopupMenuFont() override;
+        juce::Font getComboBoxFont  (juce::ComboBox&) override;
+        juce::Font getLabelFont     (juce::Label&) override;
+        juce::Font getTextButtonFont(juce::TextButton&, int buttonHeight) override;
+        juce::Font getPopupMenuFont () override;
 
         void getIdealPopupMenuItemSize (const juce::String&, bool isSeparator,
                                         int standardHeight, int& w, int& h) override;
@@ -82,44 +103,49 @@ namespace bc2000dl::ui
                                 const juce::Drawable* icon,
                                 const juce::Colour* textColour) override;
 
-        //==================== Panel painters (public helpers) =====
-        /** Draw the entire cream paper panel with subtle paper-grain shadow. */
+        //==================== Panel painters ======================
+
+        /** Brushed-aluminium top-deck panel. */
         static void drawPaperPanel (juce::Graphics&, juce::Rectangle<int>);
 
-        /** Wood end-cap (left/right book-ends, like real Beocord). */
+        /** Warm teak/walnut end-caps. */
         static void drawWoodEndCap (juce::Graphics&, juce::Rectangle<int>, bool isLeft);
 
-        /** Section box: thin black hairline frame with optional title in upper-left tab. */
+        /** Solid dark control-panel area (bottom zone). */
+        static void drawBlackPanel (juce::Graphics&, juce::Rectangle<int>);
+
+        /** Section box: subtle dark-outline frame with optional title tab. */
         static void drawSectionBox (juce::Graphics&, juce::Rectangle<int>,
                                     const juce::String& title = {});
 
-        /** Stylised reel: two concentric circles, three-spoke hub, "tape" rim. */
+        /** Beocord bullseye reel: black rim → cream → red ring → cream → red dot. */
         static void drawReel (juce::Graphics&, juce::Rectangle<int>,
                               float rotationRad = 0.0f, bool active = false);
 
-        /** Tape head/erase head pictogram (between reels). */
+        /** Tape head/erase-head pictogram. */
         static void drawHeadAssembly (juce::Graphics&, juce::Rectangle<int>);
 
-        /** Transport piano-key style button background (used by drawButtonBackground). */
+        /** Transport piano-key style button background. */
         static void drawTransportKey (juce::Graphics&, juce::Rectangle<int>,
-                                      bool down, bool active, juce::Colour accent = amber());
+                                      bool down, bool active,
+                                      juce::Colour accent = redAccent());
 
-        /** Slide-fader cap (silver with red center line). */
+        /** Slide-fader cap (dark chrome with red centre line). */
         static void drawSlideFaderCap (juce::Graphics&, juce::Rectangle<float>,
                                         bool bright = true);
 
-        /** Slide-fader channel (recessed black slot with tick marks). */
+        /** Slide-fader channel (recessed slot with tick marks). */
         static void drawSlideChannel (juce::Graphics&, juce::Rectangle<float>);
 
-        /** Section label with small arrow (instruction-card style). */
+        /** Section label with small arrow. */
         static void drawArrowLabel (juce::Graphics&, juce::Rectangle<int>,
                                     const juce::String& text, bool arrowRight = true);
 
-        /** Title with optional subtitle (Beocord 2000 De Luxe / DANISH TAPE 2000). */
+        /** Title / logo area (renders on aluminium background). */
         static void drawTitle (juce::Graphics&, juce::Rectangle<int>,
                                const juce::String& title, const juce::String& subtitle);
 
-        /** Counter readout (4-digit mechanical-style). */
+        /** Mechanical counter readout (4-digit, amber digits on dark window). */
         static void drawCounter (juce::Graphics&, juce::Rectangle<int>,
                                  const juce::String& text);
     };
