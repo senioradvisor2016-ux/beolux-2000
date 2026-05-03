@@ -205,12 +205,12 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setSize (kEditorW, kEditorH);
     setResizable (false, false);
 
-    // Helper: dark-ink label on cream paper — never intercepts mouse.
+    // Helper: white silkscreen label on black panel — never intercepts mouse.
     auto creamLbl = [&] (juce::Label& l, const juce::String& text)
     {
         l.setText (text, juce::dontSendNotification);
         l.setFont (LnF::sectionFont (9.0f));
-        l.setColour (juce::Label::textColourId, LnF::ink());
+        l.setColour (juce::Label::textColourId, juce::Colour (0xFFE0E0E4));
         l.setJustificationType (juce::Justification::centred);
         l.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (l);
@@ -261,7 +261,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
 
         f.caption.setText (cap, juce::dontSendNotification);
         f.caption.setFont (LnF::sectionFont (10.5f));
-        f.caption.setColour (juce::Label::textColourId, LnF::ink());
+        f.caption.setColour (juce::Label::textColourId, juce::Colour (0xFFE0E0E4));
         f.caption.setJustificationType (juce::Justification::centred);
         f.caption.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (f.caption);
@@ -312,7 +312,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
 
         l.setText (cap, juce::dontSendNotification);
         l.setFont (LnF::sectionFont (8.5f));
-        l.setColour (juce::Label::textColourId, LnF::ink().withAlpha (0.75f));
+        l.setColour (juce::Label::textColourId, juce::Colour (0xFFB8B8BE));
         l.setJustificationType (juce::Justification::centredLeft);
         l.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (l);
@@ -458,7 +458,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v39.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v40.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -508,28 +508,29 @@ void NativeEditor::paint (juce::Graphics& g)
                          .withHeight (bounds.getHeight() - kAluH - kDivH);
     LnF::drawBlackPanel (g, blackZone);
 
-    // Column dividers — thin black ink lines on cream paper
+    // Column dividers — thin chrome lines on black panel
     const int leftEnd   = kTeakW + kLeftColW;
     const int centerEnd = leftEnd + kCenterColW;
     const int divTop    = kAluH + kDivH + kPresetH + 14;
     const int divBot    = bounds.getBottom() - 8;
-    g.setColour (LnF::ink().withAlpha (0.45f));
+    g.setColour (juce::Colour (0xFF383840).withAlpha (0.6f));
     g.drawVerticalLine (leftEnd,   (float) divTop, (float) divBot);
     g.drawVerticalLine (centerEnd, (float) divTop, (float) divBot);
 
-    // Engraved section labels (ivory-emboss on cream paper)
+    // White silkscreen section labels (Beocord 2400 style)
     const int lblY = kAluH + kDivH + kPresetH + 2;
-    auto drawEngraved = [&] (const char* text, juce::Rectangle<int> rect)
+    auto drawSilk = [&] (const char* text, juce::Rectangle<int> rect)
     {
         g.setFont (LnF::sectionFont (9.0f));
-        g.setColour (juce::Colours::white.withAlpha (0.55f));
+        // Tiny black shadow under (sells "printed silkscreen on the panel")
+        g.setColour (juce::Colours::black.withAlpha (0.85f));
         g.drawText (text, rect.translated (0, 1), juce::Justification::left);
-        g.setColour (LnF::ink().withAlpha (0.8f));
+        g.setColour (juce::Colour (0xFFE0E0E4));
         g.drawText (text, rect, juce::Justification::left);
     };
-    drawEngraved ("INPUT",       { kTeakW + 8, lblY, kLeftColW - 12, 12 });
-    drawEngraved ("FADERS",      { leftEnd + 8, lblY, 80, 12 });
-    drawEngraved ("TONE · TAPE", { centerEnd + 8, lblY, 130, 12 });
+    drawSilk ("INPUT",       { kTeakW + 8, lblY, kLeftColW - 12, 12 });
+    drawSilk ("FADERS",      { leftEnd + 8, lblY, 80, 12 });
+    drawSilk ("TONE · TAPE", { centerEnd + 8, lblY, 130, 12 });
 
     // ===== Soundboys brand medallion (engraved on the black metal deck) =====
     // Small chrome-rimmed circular badge, just under the title text on the left.
@@ -588,10 +589,10 @@ void NativeEditor::paint (juce::Graphics& g)
         g.fillRect (bf);
     }
 
-    // Status bar (preset row) — dark ink on cream
+    // Status bar (preset row) — silver silkscreen on black
     if (statusText.isNotEmpty())
     {
-        g.setColour (LnF::ink().withAlpha (0.65f));
+        g.setColour (juce::Colour (0xFFB8B8BE));
         g.setFont (LnF::monoFont (9.0f));
         g.drawText (statusText,
                     juce::Rectangle<int> (centerEnd - 220, kAluH + kDivH + 4, 210, kPresetH - 8),
