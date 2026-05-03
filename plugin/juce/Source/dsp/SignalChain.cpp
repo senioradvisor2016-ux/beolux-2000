@@ -99,6 +99,9 @@ namespace bc2000dl::dsp
         balanceMaster.reset();
         phonoScratch.clear();
         radioScratch.clear();
+        // Reset per-source noise and modulation phases
+        L.radioHumPhase = R.radioHumPhase = 0.0f;
+        L.phonoRumbleState = R.phonoRumbleState = 0.0f;
 
         // Reset tape-transport counters so the UI counter returns to 0000
         // when the DAW transport rewinds or the processor is re-initialised.

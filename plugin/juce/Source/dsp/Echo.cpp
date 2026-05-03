@@ -24,6 +24,7 @@ namespace bc2000dl::dsp
         std::fill (buf.begin(), buf.end(), 0.0f);
         writeIdx = 0;
         hfLossFilter.reset();
+        echoWowPhase = 0.0f;
     }
 
     void Echo::setSpeed (TapeSpeed speed)
