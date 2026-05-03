@@ -1776,24 +1776,24 @@
         <!-- Numerals — placed INSIDE arc at radius ~70, large readable font -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
            fill="rgba(20,10,4,0.92)" text-anchor="middle" font-size="7.5">
-          <text x="50"  y="48">-20</text>
-          <text x="68"  y="28">-10</text>
-          <text x="87"  y="17.5">-5</text>
-          <text x="98"  y="14">-3</text>
-          <text x="110" y="13">0</text>
+          <text x="40"  y="46">-20</text>
+          <text x="65"  y="26">-10</text>
+          <text x="86"  y="15.5">-5</text>
+          <text x="98"  y="11.8">-3</text>
+          <text x="110" y="11">0</text>
         </g>
         <!-- Red numerals -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
            fill="#c42820" text-anchor="middle" font-size="7.5">
-          <text x="125" y="14.5">+1</text>
-          <text x="148" y="25">+3</text>
+          <text x="124" y="12.5">+1</text>
+          <text x="147" y="22">+3</text>
         </g>
 
         <!-- VU brand text — italic serif, between scale and pivot -->
-        <text x="110" y="40"
+        <text x="110" y="42"
               font-family="Georgia, 'Times New Roman', serif"
               font-style="italic" font-weight="700"
-              fill="rgba(20,10,4,0.6)" text-anchor="middle" font-size="9.5">VU</text>
+              fill="rgba(20,10,4,0.72)" text-anchor="middle" font-size="11">VU</text>
       </svg>
       <div class="needle-shadow" id="vu-l-shadow"></div>
       <div class="needle" id="vu-l"><div class="shaft"></div><div class="weight"></div></div>
@@ -1853,24 +1853,24 @@
         <!-- Numerals — placed INSIDE arc at radius ~70, large readable font -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
            fill="rgba(20,10,4,0.92)" text-anchor="middle" font-size="7.5">
-          <text x="50"  y="48">-20</text>
-          <text x="68"  y="28">-10</text>
-          <text x="87"  y="17.5">-5</text>
-          <text x="98"  y="14">-3</text>
-          <text x="110" y="13">0</text>
+          <text x="40"  y="46">-20</text>
+          <text x="65"  y="26">-10</text>
+          <text x="86"  y="15.5">-5</text>
+          <text x="98"  y="11.8">-3</text>
+          <text x="110" y="11">0</text>
         </g>
         <!-- Red numerals -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
            fill="#c42820" text-anchor="middle" font-size="7.5">
-          <text x="125" y="14.5">+1</text>
-          <text x="148" y="25">+3</text>
+          <text x="124" y="12.5">+1</text>
+          <text x="147" y="22">+3</text>
         </g>
 
         <!-- VU brand text — italic serif, between scale and pivot -->
-        <text x="110" y="40"
+        <text x="110" y="42"
               font-family="Georgia, 'Times New Roman', serif"
               font-style="italic" font-weight="700"
-              fill="rgba(20,10,4,0.6)" text-anchor="middle" font-size="9.5">VU</text>
+              fill="rgba(20,10,4,0.72)" text-anchor="middle" font-size="11">VU</text>
       </svg>
       <div class="needle-shadow" id="vu-r-shadow"></div>
       <div class="needle" id="vu-r"><div class="shaft"></div><div class="weight"></div></div>
@@ -1930,24 +1930,24 @@
         <!-- Numerals — placed INSIDE arc at radius ~70, large readable font -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
            fill="rgba(20,10,4,0.92)" text-anchor="middle" font-size="7.5">
-          <text x="50"  y="48">-20</text>
-          <text x="68"  y="28">-10</text>
-          <text x="87"  y="17.5">-5</text>
-          <text x="98"  y="14">-3</text>
-          <text x="110" y="13">0</text>
+          <text x="40"  y="46">-20</text>
+          <text x="65"  y="26">-10</text>
+          <text x="86"  y="15.5">-5</text>
+          <text x="98"  y="11.8">-3</text>
+          <text x="110" y="11">0</text>
         </g>
         <!-- Red numerals -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
            fill="#c42820" text-anchor="middle" font-size="7.5">
-          <text x="125" y="14.5">+1</text>
-          <text x="148" y="25">+3</text>
+          <text x="124" y="12.5">+1</text>
+          <text x="147" y="22">+3</text>
         </g>
 
         <!-- VU brand text — italic serif, between scale and pivot -->
-        <text x="110" y="40"
+        <text x="110" y="42"
               font-family="Georgia, 'Times New Roman', serif"
               font-style="italic" font-weight="700"
-              fill="rgba(20,10,4,0.6)" text-anchor="middle" font-size="9.5">VU</text>
+              fill="rgba(20,10,4,0.72)" text-anchor="middle" font-size="11">VU</text>
       </svg>
       <div class="needle-shadow" id="vu-out-shadow"></div>
       <div class="needle" id="vu-out"><div class="shaft"></div><div class="weight"></div></div>
@@ -3019,11 +3019,13 @@ initKeys();
   /* --- Stop synthetic VU ticker so C++-driven meters take over --- */
   if (typeof window.stopSyntheticVU === 'function') window.stopSyntheticVU();
 
-  /* --- Listen for VU meter updates (30 Hz from C++) --- */
+  /* --- Listen for VU meter updates (30 Hz from C++) ---
+     Calibration: -45 dBFS → -20 VU mark (left), -15 dBFS → +3 VU mark (max).
+     This 30 dB range covers typical mix levels (-30 to -15 dBFS) so the needle
+     responds to mic, line, radio AND phono — not just phono. */
   window.__JUCE__.backend.addEventListener("meters", function(p) {
     if (!p) return;
-    // C++ sends dBFS values (-30..0 typical). Map to needle 0..100.
-    const dbToPos = (db) => Math.max(0, Math.min(100, ((Number(db) + 20) / 23) * 100));
+    const dbToPos = (db) => Math.max(0, Math.min(100, ((Number(db) + 45) / 30) * 100));
     if (typeof window.setVUNeedle === 'function') {
       window.setVUNeedle('vu-l',   dbToPos(p.L));
       window.setVUNeedle('vu-r',   dbToPos(p.R));
