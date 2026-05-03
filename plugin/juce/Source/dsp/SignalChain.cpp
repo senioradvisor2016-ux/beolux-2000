@@ -280,7 +280,9 @@ namespace bc2000dl::dsp
         // ===== Efter input-mixern: gemensam record-tape-playback-pipeline =====
 
         // 5. Echo (record→play-head feedback-loop, manual §d)
-        if (params.echoEnabled && params.echoAmount > 1e-6f)
+        // Use per-channel amount so L/R echo amounts are independently gateable.
+        const float echoAmt = (channel == 0) ? params.echoAmount : params.echoAmountR;
+        if (params.echoEnabled && echoAmt > 1e-6f)
             echo.process (buffer, channel);
 
         // 6. Record-amp + pre-emphasis
@@ -420,7 +422,7 @@ namespace bc2000dl::dsp
         {
             const float lvl = computeBlockRMSdBFS (buffer.getReadPointer (1), buffer.getNumSamples());
             meterLevelR_dBFS.store (lvl);
-            isRecordingR.store (params.micGain > 0.05f && ! params.bypassTape);
+            isRecordingR.store (params.micGainR > 0.05f && ! params.bypassTape);
         }
 
         // ---- Push mono mix into spectrum FIFO (UI thread reads via FFT) ----
