@@ -40,12 +40,25 @@ namespace bc2000dl::dsp
             static_cast<int> (buf.size()) - 1);
 
         // Wow depth: slower tape → less mechanical stability → more pitch-wander in echo
+        // HF loss LP: matches tape bandwidth per speed (echo re-records through tape path)
+        float hfLossHz;
         switch (speed)
         {
-            case TapeSpeed::Speed19:  echoWowDepth = delaySamples * 0.00050f; break;
-            case TapeSpeed::Speed95:  echoWowDepth = delaySamples * 0.00080f; break;
-            case TapeSpeed::Speed475: echoWowDepth = delaySamples * 0.00120f; break;
+            case TapeSpeed::Speed19:
+                echoWowDepth = delaySamples * 0.00050f;
+                hfLossHz = 10000.0f;   // 19 cm/s: tape to 20 kHz, loss to ~10 kHz per pass
+                break;
+            case TapeSpeed::Speed95:
+                echoWowDepth = delaySamples * 0.00080f;
+                hfLossHz = 7000.0f;    // 9.5 cm/s: tape to 12 kHz, loss to ~7 kHz per pass
+                break;
+            case TapeSpeed::Speed475:
+                echoWowDepth = delaySamples * 0.00120f;
+                hfLossHz = 4500.0f;    // 4.75 cm/s: tape to 6 kHz, loss to ~4.5 kHz per pass
+                break;
         }
+        hfLossFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowPass (
+            sampleRate, hfLossHz);
     }
 
     float Echo::processSample (float x)
