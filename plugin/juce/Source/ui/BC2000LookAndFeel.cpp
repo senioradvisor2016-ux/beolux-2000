@@ -400,22 +400,39 @@ namespace bc2000dl::ui
         }
 
         // -------------------------------------------------------------------
-        // 3. 12 PERIMETER TICK-MARKS (silkscreen on the panel around knob)
+        // 3. 11 PERIMETER TICKS + scale numbers (Fairchild silkscreen scale)
         // -------------------------------------------------------------------
         {
             const float tickR1 = radius + 1.5f;
-            const float tickR2 = radius + 6.0f;
+            const float tickR2 = radius + 5.0f;
             const float majorR2 = radius + 8.0f;
-            for (int i = 0; i < 12; ++i)
+            const float numR = radius + 14.0f;     // distance for scale numbers
+            g.setFont (sectionFont (8.5f));
+            for (int i = 0; i <= 10; ++i)
             {
-                const float t = (float) i / 11.0f;
+                const float t = (float) i / 10.0f;
                 const float a = angleStart + t * (angleEnd - angleStart);
-                const bool major = (i == 0 || i == 6 || i == 11);
+                const bool major = (i == 0 || i == 5 || i == 10);
                 const float r2 = major ? majorR2 : tickR2;
-                g.setColour (juce::Colour (0xFFE0E0E4).withAlpha (major ? 0.85f : 0.55f));
+                g.setColour (juce::Colour (0xFFE8E8EA).withAlpha (major ? 0.90f : 0.55f));
                 g.drawLine (cx + tickR1 * std::sin (a), cy - tickR1 * std::cos (a),
                             cx + r2 * std::sin (a),     cy - r2 * std::cos (a),
-                            major ? 1.2f : 0.7f);
+                            major ? 1.3f : 0.7f);
+
+                // Scale numbers at major positions
+                if (major)
+                {
+                    const float nx = cx + numR * std::sin (a);
+                    const float ny = cy - numR * std::cos (a);
+                    juce::Rectangle<int> numBox ((int) nx - 10, (int) ny - 6, 20, 12);
+                    // dark shadow under (silkscreen-into-panel emboss)
+                    g.setColour (juce::Colours::black.withAlpha (0.80f));
+                    g.drawText (juce::String (i), numBox.translated (0, 1),
+                                juce::Justification::centred, false);
+                    g.setColour (juce::Colour (0xFFE8E8EA));
+                    g.drawText (juce::String (i), numBox,
+                                juce::Justification::centred, false);
+                }
             }
         }
 
@@ -424,61 +441,38 @@ namespace bc2000dl::ui
         //    Warm mahogany tones, glossy lacquer surface, subtle marbling.
         // -------------------------------------------------------------------
         {
-            // Outer thin brass-ish bezel ring (frames the bakelite body)
+            // Outer chrome bezel ring — Fairchild signature polished steel
             juce::ColourGradient bezelGrad (
-                juce::Colour (0xFF8A6840), cx, cy - bezR,
-                juce::Colour (0xFF3A2814), cx, cy + bezR, false);
-            bezelGrad.addColour (0.50, juce::Colour (0xFF604824));
+                juce::Colour (0xFFE8E8EA), cx, cy - bezR,
+                juce::Colour (0xFF40404A), cx, cy + bezR, false);
+            bezelGrad.addColour (0.40, juce::Colour (0xFFC0C0C8));
+            bezelGrad.addColour (0.65, juce::Colour (0xFF707078));
             g.setGradientFill (bezelGrad);
             g.fillEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2);
             g.setColour (juce::Colours::black.withAlpha (0.85f));
             g.drawEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2, 1.0f);
 
-            // ---- BAKELITE BASE — warm mahogany-to-umber gradient ----
-            // Real Fairchild knobs are deep brown phenolic resin: warm sienna
-            // top, dark umber bottom, with translucency at the edges.
+            // ---- GLOSSY BLACK PHENOLIC BODY (Fairchild 670 / UAD Tube Limiter) ----
+            // Deep black with warm undertones — the iconic vintage knob look
             juce::ColourGradient bodyGrad (
-                juce::Colour (0xFF6A3820), cx, cy - bodyR,
-                juce::Colour (0xFF150806), cx, cy + bodyR, false);
-            bodyGrad.addColour (0.20, juce::Colour (0xFF52281A));
-            bodyGrad.addColour (0.55, juce::Colour (0xFF301810));
-            bodyGrad.addColour (0.85, juce::Colour (0xFF180A06));
+                juce::Colour (0xFF3A3A3E), cx, cy - bodyR,
+                juce::Colour (0xFF030305), cx, cy + bodyR, false);
+            bodyGrad.addColour (0.18, juce::Colour (0xFF222226));
+            bodyGrad.addColour (0.50, juce::Colour (0xFF101014));
+            bodyGrad.addColour (0.85, juce::Colour (0xFF050508));
             g.setGradientFill (bodyGrad);
             g.fillEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
 
-            // ---- BAKELITE MARBLING — subtle swirl streaks from moulding ----
-            // Phenolic resin has natural variation from how it flows when cast.
-            // Seeded random so it's stable per-knob position.
-            juce::Random rng (int (cx * 7.0f) ^ int (cy * 13.0f));
-            for (int i = 0; i < 8; ++i)
-            {
-                const float swirlAng = rng.nextFloat() * juce::MathConstants<float>::twoPi;
-                const float swirlR0 = bodyR * (0.20f + rng.nextFloat() * 0.55f);
-                const float swirlR1 = swirlR0 + bodyR * (0.05f + rng.nextFloat() * 0.10f);
-                const float arcSpan = 0.20f + rng.nextFloat() * 0.50f;
-
-                juce::Path swirl;
-                swirl.addCentredArc (cx, cy, (swirlR0 + swirlR1) * 0.5f,
-                                              (swirlR0 + swirlR1) * 0.5f, 0,
-                                              swirlAng, swirlAng + arcSpan, true);
-                const auto warmTint = rng.nextBool()
-                                          ? juce::Colour (0xFF8A4828)
-                                          : juce::Colour (0xFF1E0E06);
-                g.setColour (warmTint.withAlpha (0.10f + rng.nextFloat() * 0.10f));
-                g.strokePath (swirl, juce::PathStrokeType (1.4f + rng.nextFloat() * 1.2f));
-            }
-
-            // ---- LIGHT 1: Main warm WHITE-ORANGE specular (lacquer gloss) ----
-            // Fairchild knobs are *very* glossy — high specular intensity
+            // ---- LIGHT 1: Main bright crescent specular (glossy lacquer) ----
             {
                 juce::Path glint;
                 const float gR = bodyR * 0.96f;
                 glint.addPieSegment (cx - gR, cy - gR, gR * 2, gR * 2,
                                       -juce::MathConstants<float>::pi * 0.65f,
                                       -juce::MathConstants<float>::pi * 0.10f,
-                                      0.42f);
+                                      0.40f);
                 juce::ColourGradient gg (
-                    juce::Colour (0xFFFFE8C0).withAlpha (0.55f),  // warm white
+                    juce::Colours::white.withAlpha (0.42f),
                     cx - bodyR * 0.4f, cy - bodyR,
                     juce::Colours::transparentWhite,
                     cx, cy + bodyR * 0.1f, false);
@@ -486,20 +480,19 @@ namespace bc2000dl::ui
                 g.fillPath (glint);
             }
 
-            // ---- LIGHT 2: Warm AMBER rim-light (top-right) ----
+            // ---- LIGHT 2: Cool rim-light (top-right) ----
             {
                 const float pR = bodyR * 0.32f;
                 const float px = cx + bodyR * 0.50f;
                 const float py = cy - bodyR * 0.30f;
                 juce::ColourGradient bg (
-                    juce::Colour (0xFFFFB060).withAlpha (0.30f), px, py,
+                    juce::Colour (0xFFC0D0E0).withAlpha (0.22f), px, py,
                     juce::Colours::transparentWhite,             px + pR, py + pR, true);
                 g.setGradientFill (bg);
                 g.fillEllipse (px - pR, py - pR, pR * 2, pR * 2);
             }
 
-            // ---- LIGHT 3: Deep RED-AMBER bounce light underside ----
-            // Bakelite glows warm where light passes through — subsurface scattering
+            // ---- LIGHT 3: Subtle warm rim-light underside ----
             {
                 juce::Path rimLight;
                 const float gR = bodyR * 0.94f;
@@ -507,20 +500,18 @@ namespace bc2000dl::ui
                                          juce::MathConstants<float>::pi * 0.25f,
                                          juce::MathConstants<float>::pi * 0.75f,
                                          0.90f);
-                g.setColour (juce::Colour (0xFFE08040).withAlpha (0.30f));
+                g.setColour (juce::Colour (0xFFC0A080).withAlpha (0.16f));
                 g.fillPath (rimLight);
             }
 
-            // ---- POINT-LIGHT WET-GLINT on top — Fairchild lacquer reflection ----
-            // The signature "single bright dot" you see catching light on real
-            // bakelite knobs photographed in studio.
+            // ---- POINT-LIGHT WET-GLINT — bright spot catching the studio light ----
             {
                 const float pgR = bodyR * 0.14f;
                 const float pgX = cx - bodyR * 0.38f;
                 const float pgY = cy - bodyR * 0.58f;
                 juce::ColourGradient pg (
-                    juce::Colour (0xFFFFFFE0).withAlpha (0.85f), pgX, pgY,
-                    juce::Colours::transparentWhite,             pgX + pgR, pgY + pgR, true);
+                    juce::Colours::white.withAlpha (0.85f), pgX, pgY,
+                    juce::Colours::transparentWhite,         pgX + pgR, pgY + pgR, true);
                 g.setGradientFill (pg);
                 g.fillEllipse (pgX - pgR, pgY - pgR, pgR * 2, pgR * 2);
             }
@@ -587,54 +578,42 @@ namespace bc2000dl::ui
         }
 
         // -------------------------------------------------------------------
-        // 5. RECESSED INDICATOR — twin marker (dot + nub) like UAD 1176
+        // 5. LONG WHITE POINTER STRIPE — Fairchild signature
+        //    Painted stripe from near centre extending past the body rim,
+        //    just like the UAD Fairchild Tube Limiter Collection.
         // -------------------------------------------------------------------
         {
-            const float nubBaseR = bodyR * 0.92f;
-            const float nubTipR  = bodyR * 1.02f;
-            const float bx = cx + nubBaseR * std::sin (angle);
-            const float by = cy - nubBaseR * std::cos (angle);
-            const float tx = cx + nubTipR * std::sin (angle);
-            const float ty = cy - nubTipR * std::cos (angle);
+            const float stripeBaseR = bodyR * 0.20f;       // start near centre
+            const float stripeTipR  = bodyR * 1.04f;       // extend past rim
+            const float bx = cx + stripeBaseR * std::sin (angle);
+            const float by = cy - stripeBaseR * std::cos (angle);
+            const float tx = cx + stripeTipR  * std::sin (angle);
+            const float ty = cy - stripeTipR  * std::cos (angle);
 
-            // ---- 5a: Recessed white-painted dot (the inner-rim mark) ----
-            const float dotR  = bodyR * 0.10f;
-            const float dotXR = bodyR * 0.62f;             // distance from centre
-            const float dx = cx + dotXR * std::sin (angle);
-            const float dy = cy - dotXR * std::cos (angle);
-            // recess shadow under dot
-            g.setColour (juce::Colours::black.withAlpha (0.85f));
-            g.fillEllipse (dx - dotR - 0.6f, dy - dotR - 0.6f,
-                           (dotR + 0.6f) * 2, (dotR + 0.6f) * 2);
-            // bright white painted dot
-            juce::ColourGradient dotGrad (
-                juce::Colour (0xFFFFFFFF), dx - dotR * 0.3f, dy - dotR * 0.5f,
-                juce::Colour (0xFFC0C0C2), dx + dotR * 0.3f, dy + dotR * 0.5f, false);
-            g.setGradientFill (dotGrad);
-            g.fillEllipse (dx - dotR, dy - dotR, dotR * 2, dotR * 2);
-            // tiny specular on the dot
-            g.setColour (juce::Colours::white);
-            g.fillEllipse (dx - dotR * 0.35f, dy - dotR * 0.55f,
-                           dotR * 0.45f, dotR * 0.30f);
-
-            // ---- 5b: Outer pointer line + red tip ----
+            // Recessed groove shadow first (sells "engraved into knob")
             g.setColour (juce::Colours::black.withAlpha (0.95f));
-            g.drawLine (bx + 0.5f, by + 0.5f, tx + 0.5f, ty + 0.5f, 4.5f);
-            g.setColour (juce::Colour (0xFFF6F6F0));
-            g.drawLine (bx, by, tx, ty, 3.2f);
+            g.drawLine (bx + 0.6f, by + 0.6f, tx + 0.6f, ty + 0.6f, 4.5f);
 
-            // Red tip with glow halo
+            // Bright white painted stripe — stays bold and clear
+            g.setColour (juce::Colour (0xFFFAFAF4));
+            g.drawLine (bx, by, tx, ty, 3.0f);
+
+            // Subtle warm-tone variation along the stripe (bakelite undertone)
+            g.setColour (juce::Colour (0xFFFFF8E0).withAlpha (0.50f));
+            g.drawLine (bx, by, tx, ty, 1.6f);
+
+            // Red tip cap at the very end
             const auto tipCol = s.isEnabled() ? redAccent() : creamDim();
             juce::Path tipPath;
-            tipPath.addEllipse (tx - 3.2f, ty - 3.2f, 6.4f, 6.4f);
+            tipPath.addEllipse (tx - 2.6f, ty - 2.6f, 5.2f, 5.2f);
             static thread_local melatonin::DropShadow tipGlow {
-                { juce::Colour (0xFFFF6050).withAlpha (0.85f), 6, { 0, 0 }, 0 }
+                { juce::Colour (0xFFFF5040).withAlpha (0.85f), 6, { 0, 0 }, 0 }
             };
             tipGlow.render (g, tipPath);
             g.setColour (tipCol);
-            g.fillEllipse (tx - 2.6f, ty - 2.6f, 5.2f, 5.2f);
+            g.fillEllipse (tx - 2.2f, ty - 2.2f, 4.4f, 4.4f);
             g.setColour (juce::Colour (0xFFFFD0C0).withAlpha (0.85f));
-            g.fillEllipse (tx - 1.0f, ty - 1.4f, 1.6f, 1.0f);
+            g.fillEllipse (tx - 0.8f, ty - 1.2f, 1.4f, 0.9f);
         }
 
         // -------------------------------------------------------------------
@@ -1456,7 +1435,7 @@ namespace bc2000dl::ui
             g.drawLine (p.x - screwR * 0.6f, p.y, p.x + screwR * 0.6f, p.y, 0.7f);
         }
 
-        // ---- Cream-coloured meter face (deeply recessed) ----
+        // ---- Backlit cream-amber meter face (Fairchild glow effect) ----
         const float screwBuffer = screwR * 2.0f + 6.0f;
         const auto face = bf.reduced (screwBuffer, screwR + 5.0f);
 
@@ -1464,12 +1443,24 @@ namespace bc2000dl::ui
         g.setColour (juce::Colours::black.withAlpha (0.7f));
         g.fillRoundedRectangle (face.expanded (1.4f), 3.5f);
 
+        // Fairchild face — warmer, brighter, with subtle backlit glow
         juce::ColourGradient faceGrad (
-            juce::Colour (0xFFF8EFD4), face.getCentreX(), face.getY(),
-            juce::Colour (0xFFD2C7AA), face.getCentreX(), face.getBottom(), false);
-        faceGrad.addColour (0.5, juce::Colour (0xFFE6DDC0));
+            juce::Colour (0xFFFFF1D4), face.getCentreX(), face.getY(),
+            juce::Colour (0xFFE6D0A0), face.getCentreX(), face.getBottom(), false);
+        faceGrad.addColour (0.45, juce::Colour (0xFFFFE6B8));      // mid warm
         g.setGradientFill (faceGrad);
         g.fillRoundedRectangle (face, 3.0f);
+
+        // Subtle radial glow centre (suggests internal lamp behind dial)
+        {
+            juce::ColourGradient lamp (
+                juce::Colour (0xFFFFF8E0).withAlpha (0.55f),
+                face.getCentreX(), face.getCentreY() + face.getHeight() * 0.5f,
+                juce::Colours::transparentWhite,
+                face.getCentreX(), face.getY(), true);
+            g.setGradientFill (lamp);
+            g.fillRoundedRectangle (face, 3.0f);
+        }
 
         // Face inner shadow at top (real Gaussian, gives true recess feel)
         {
