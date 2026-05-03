@@ -3,6 +3,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "WebEditor.h"
+#include "NativeEditor.h"
 #include <cstring>
 
 namespace
@@ -290,9 +291,10 @@ void BC2000DLProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
 juce::AudioProcessorEditor* BC2000DLProcessor::createEditor()
 {
-    // v29.8 — native JUCE UI (ersätter sega WebView).
-    // WebView-version finns kvar i WebEditor.cpp för fallback om native havererar.
-    return new BC2000DLEditor (*this);
+    // v29.8 — clean-slate native JUCE UI (NativeEditor).
+    // Tidigare BC2000DLEditor (custom L&F + 3D-reels) och BC2000DLWebEditor
+    // finns kvar i build:en för fallback men används inte.
+    return new NativeEditor (*this);
 }
 
 // ============================================================================
