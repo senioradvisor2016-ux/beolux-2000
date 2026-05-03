@@ -204,68 +204,90 @@ namespace bc2000dl::ui
     void InstructionCardLnF::drawSlideFaderCap (juce::Graphics& g, juce::Rectangle<float> r,
                                                   bool bright)
     {
-        // AUTENTIC MATTE ALUMINIUM fader cap — anodised silver-grey, satin
-        // (no chrome highlights). Subtle top edge, red position-marker line.
-        // The real Beocord cap is a small extruded aluminium block with a
-        // recessed red stripe across the centre.
+        // PREMIUM MATTE-ALU FADER CAP — anodised silver-grey body with subtle
+        // top sheen, brushed grain, recessed red marker, deep drop shadow.
 
-        // ---- Soft drop shadow ----
-        g.setColour (juce::Colours::black.withAlpha (0.40f));
-        g.fillRoundedRectangle (r.translated (0, 1.0f).expanded (0.3f, 0.3f), 2.5f);
+        // ---- Premium drop shadow (multi-step) ----
+        for (int i = 0; i < 3; ++i)
+        {
+            g.setColour (juce::Colours::black.withAlpha (0.18f - (float) i * 0.04f));
+            g.fillRoundedRectangle (r.translated (0, 1.0f + i * 0.5f)
+                                       .expanded ((float) i * 0.3f), 3.0f);
+        }
 
-        // ---- Matte aluminium body (very subtle vertical gradient) ----
+        // ---- Anodised aluminium body (multi-stop satin gradient) ----
         juce::ColourGradient grad (
-            juce::Colour (0xFFB8B8B2), r.getCentreX(), r.getY(),
-            juce::Colour (0xFF8E8E88), r.getCentreX(), r.getBottom(), false);
-        grad.addColour (0.50, juce::Colour (0xFFA0A09A));
+            juce::Colour (0xFFC8C8C2), r.getCentreX(), r.getY(),
+            juce::Colour (0xFF7A7A74), r.getCentreX(), r.getBottom(), false);
+        grad.addColour (0.18, juce::Colour (0xFFB8B8B2));
+        grad.addColour (0.50, juce::Colour (0xFFA2A29C));
+        grad.addColour (0.85, juce::Colour (0xFF888882));
         g.setGradientFill (grad);
         g.fillRoundedRectangle (r, 2.5f);
 
-        // ---- Faint horizontal brushed-anodise grain (stable seeded noise) ----
+        // ---- Brushed-anodise grain (stable seeded noise) ----
         juce::Random rng (int (r.getY() * 17.0f) ^ int (r.getX() * 31.0f));
-        for (int i = 0; i < 18; ++i)
+        for (int i = 0; i < 22; ++i)
         {
             const float fy = r.getY() + 1.5f + rng.nextFloat() * (r.getHeight() - 3.0f);
             const bool dark = rng.nextBool();
-            g.setColour ((dark ? juce::Colour (0xFF6E6E68) : juce::Colour (0xFFD2D2CC))
+            g.setColour ((dark ? juce::Colour (0xFF6A6A64) : juce::Colour (0xFFE0E0DA))
                             .withAlpha (rng.nextFloat() * 0.10f + 0.02f));
             g.drawLine (r.getX() + 2.0f, fy, r.getRight() - 2.0f, fy, 0.4f);
         }
 
-        // ---- Top hairline highlight ----
-        g.setColour (juce::Colour (0xFFE0E0DA).withAlpha (0.55f));
-        g.drawLine (r.getX() + 2.0f, r.getY() + 0.6f,
-                    r.getRight() - 2.0f, r.getY() + 0.6f, 0.6f);
+        // ---- Subtle glass-like top sheen (point-light reflection upper-left) ----
+        {
+            const float sheenH = r.getHeight() * 0.35f;
+            const auto sheen = juce::Rectangle<float> (r.getX() + 2, r.getY() + 1,
+                                                        r.getWidth() - 4, sheenH);
+            juce::ColourGradient sg (
+                juce::Colours::white.withAlpha (0.30f), sheen.getX(), sheen.getY(),
+                juce::Colours::transparentWhite,         sheen.getX(), sheen.getBottom(), false);
+            g.setGradientFill (sg);
+            g.fillRoundedRectangle (sheen, 1.8f);
+        }
+
+        // ---- Bright top hairline highlight ----
+        g.setColour (juce::Colour (0xFFF0F0EA).withAlpha (0.75f));
+        g.drawLine (r.getX() + 2.5f, r.getY() + 0.7f,
+                    r.getRight() - 2.5f, r.getY() + 0.7f, 0.7f);
 
         // ---- Bottom edge shadow ----
-        g.setColour (juce::Colour (0xFF202020).withAlpha (0.35f));
-        g.drawLine (r.getX() + 2.0f, r.getBottom() - 0.6f,
-                    r.getRight() - 2.0f, r.getBottom() - 0.6f, 0.6f);
+        g.setColour (juce::Colour (0xFF202020).withAlpha (0.45f));
+        g.drawLine (r.getX() + 2.5f, r.getBottom() - 0.7f,
+                    r.getRight() - 2.5f, r.getBottom() - 0.7f, 0.7f);
 
         // ---- Crisp dark outline ----
-        g.setColour (juce::Colour (0xFF252522).withAlpha (0.85f));
-        g.drawRoundedRectangle (r, 2.5f, 0.8f);
+        g.setColour (juce::Colour (0xFF1C1C1A).withAlpha (0.90f));
+        g.drawRoundedRectangle (r, 2.5f, 0.9f);
 
-        // ---- Recessed red position-marker line ----
+        // ---- Recessed red position-marker bar ----
         const float cy = r.getCentreY();
-        const float barH = 2.0f;
-        const auto bar = juce::Rectangle<float> (r.getX() + 2.5f, cy - barH * 0.5f,
-                                                  r.getWidth() - 5.0f, barH);
-        // Recess shadow above the bar
-        g.setColour (juce::Colours::black.withAlpha (0.30f));
-        g.drawLine (bar.getX(), bar.getY() - 0.5f, bar.getRight(), bar.getY() - 0.5f, 0.5f);
-        // Red paint inside the recess
+        const float barH = 2.4f;
+        const auto bar = juce::Rectangle<float> (r.getX() + 3.0f, cy - barH * 0.5f,
+                                                  r.getWidth() - 6.0f, barH);
+        // Recess shadow (above the bar)
+        g.setColour (juce::Colours::black.withAlpha (0.45f));
+        g.drawLine (bar.getX(), bar.getY() - 0.7f, bar.getRight(), bar.getY() - 0.7f, 0.7f);
+        // Red paint inside recess
         juce::ColourGradient barGrad (
-            juce::Colour (0xFFD23828), bar.getCentreX(), bar.getY(),
-            juce::Colour (0xFF8C1810), bar.getCentreX(), bar.getBottom(), false);
+            juce::Colour (0xFFE03828), bar.getCentreX(), bar.getY(),
+            juce::Colour (0xFF7C140C), bar.getCentreX(), bar.getBottom(), false);
         g.setGradientFill (barGrad);
         g.fillRect (bar);
+        // Bar top highlight (sells "wet paint" look)
+        g.setColour (juce::Colour (0xFFFF8070).withAlpha (0.55f));
+        g.drawLine (bar.getX() + 0.5f, bar.getY() + 0.4f,
+                    bar.getRight() - 0.5f, bar.getY() + 0.4f, 0.5f);
 
         // ---- Hot amber ring on hover/drag ----
         if (bright)
         {
             g.setColour (juce::Colour (0xFFC2A050).withAlpha (0.35f));
-            g.drawRoundedRectangle (r.expanded (0.8f), 3.0f, 1.0f);
+            g.drawRoundedRectangle (r.expanded (1.0f), 3.2f, 1.0f);
+            g.setColour (juce::Colour (0xFFE0C070).withAlpha (0.20f));
+            g.drawRoundedRectangle (r.expanded (2.5f), 3.8f, 1.5f);
         }
     }
 
@@ -277,9 +299,9 @@ namespace bc2000dl::ui
                                                 float angleStart, float angleEnd,
                                                 juce::Slider& s)
     {
-        // INSTRUCTION-CARD STYLE: thin black-ink circle on cream paper, with a
-        // curved "rotation-direction" arrow at the top — exactly the symbol
-        // language used on the original B&O Beocord 2000 DL operating-card.
+        // PREMIUM KNOB: chrome bezel ring → satin black body → glass top sheen
+        // → recessed white indicator → red tip → centre rivet. Same fidelity
+        // as the VU bezels.
         const auto area = juce::Rectangle<float> ((float) x, (float) y, (float) w, (float) h)
                               .reduced (4.0f);
         const float radius = juce::jmin (area.getWidth(), area.getHeight()) * 0.5f;
@@ -290,72 +312,128 @@ namespace bc2000dl::ui
 
         const auto inkCol = juce::Colour (0xFF181408);
 
-        // ---- Hover halo (warm amber on cream) ----
+        // ---- Drop shadow ----
+        g.setColour (juce::Colours::black.withAlpha (0.45f));
+        g.fillEllipse (cx - radius * 0.94f, cy - radius * 0.94f + 2.0f,
+                        radius * 1.88f, radius * 1.88f);
+
+        // ---- Hover halo ----
         if (hot)
         {
-            g.setColour (juce::Colour (0xFFC2A050).withAlpha (0.20f));
-            g.fillEllipse (cx - radius - 2, cy - radius - 2,
-                           (radius + 2) * 2, (radius + 2) * 2);
+            g.setColour (juce::Colour (0xFFC2A050).withAlpha (0.25f));
+            g.fillEllipse (cx - radius - 3, cy - radius - 3,
+                           (radius + 3) * 2, (radius + 3) * 2);
         }
 
-        // ---- Outer ring (thin black ink line — like a printed schematic) ----
+        // ---- Tick marks at min/max (printed on cream paper) ----
         const float bezR = radius * 0.95f;
         g.setColour (inkCol.withAlpha (0.85f));
-        g.drawEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2, 1.4f);
-
-        // ---- Tick marks at min/max ----
         for (float a : { angleStart, angleEnd })
         {
-            const float r1 = bezR + 1.5f;
-            const float r2 = bezR + 5.0f;
+            const float r1 = bezR + 2.0f;
+            const float r2 = bezR + 6.0f;
             g.drawLine (cx + r1 * std::sin (a), cy - r1 * std::cos (a),
                         cx + r2 * std::sin (a), cy - r2 * std::cos (a), 1.0f);
         }
 
-        // ---- Knob body: dark satin (matte black plastic, like real B&O knobs) ----
+        // ---- 1. CHROME BEZEL RING (outer ~5% of radius) ----
+        juce::ColourGradient bezelGrad (
+            juce::Colour (0xFFE0E0E4), cx - bezR * 0.5f, cy - bezR * 0.6f,
+            juce::Colour (0xFF50505A), cx + bezR * 0.5f, cy + bezR * 0.6f, false);
+        bezelGrad.addColour (0.40, juce::Colour (0xFFB8B8BC));
+        bezelGrad.addColour (0.65, juce::Colour (0xFF7A7A82));
+        g.setGradientFill (bezelGrad);
+        g.fillEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2);
+
+        // Bezel inner shadow (separates bezel from body)
+        g.setColour (juce::Colours::black.withAlpha (0.75f));
         const float bodyR = radius * 0.82f;
+        g.drawEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2, 1.5f);
+
+        // ---- 2. BODY: deep satin black (multi-stop gradient) ----
         juce::ColourGradient bodyGrad (
-            juce::Colour (0xFF3A3A3E), cx, cy - bodyR,
-            juce::Colour (0xFF0E0E10), cx, cy + bodyR, false);
-        bodyGrad.addColour (0.45, juce::Colour (0xFF202024));
+            juce::Colour (0xFF44444A), cx, cy - bodyR,
+            juce::Colour (0xFF050507), cx, cy + bodyR, false);
+        bodyGrad.addColour (0.30, juce::Colour (0xFF2C2C32));
+        bodyGrad.addColour (0.65, juce::Colour (0xFF14141A));
         g.setGradientFill (bodyGrad);
         g.fillEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
 
-        // Body rim (thin chrome ring at outer edge)
-        g.setColour (juce::Colour (0xFF8A8A88));
-        g.drawEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2, 1.0f);
-        g.setColour (juce::Colours::black.withAlpha (0.7f));
-        g.drawEllipse (cx - bodyR + 0.7f, cy - bodyR + 0.7f, (bodyR - 0.7f) * 2, (bodyR - 0.7f) * 2, 0.5f);
-
-        // ---- Pointer: white indicator line (the iconic B&O white dot/line) ----
+        // ---- 3. RECESSED INDICATOR GROOVE ----
+        // Dark line cut into the body, white indicator paint sits in it
         const float indR0 = bodyR * 0.20f;
         const float indR1 = bodyR * 0.95f;
         const float sx = cx + indR0 * std::sin (angle);
         const float sy = cy - indR0 * std::cos (angle);
         const float ex = cx + indR1 * std::sin (angle);
         const float ey = cy - indR1 * std::cos (angle);
-        // White inner line
-        g.setColour (juce::Colours::white.withAlpha (0.95f));
+        // Recess shadow (slightly offset)
+        g.setColour (juce::Colours::black.withAlpha (0.85f));
+        g.drawLine (sx + 0.7f, sy + 0.7f, ex + 0.7f, ey + 0.7f, 3.2f);
+        // White indicator paint
+        g.setColour (juce::Colour (0xFFF8F8F0));
         g.drawLine (sx, sy, ex, ey, 2.4f);
-        // Red tip dot
-        g.setColour (s.isEnabled() ? redAccent() : creamDim());
-        g.fillEllipse (ex - 2.2f, ey - 2.2f, 4.4f, 4.4f);
+        // Red tip glow + dot
+        const auto tipCol = s.isEnabled() ? redAccent() : creamDim();
+        g.setColour (tipCol.withAlpha (0.50f));
+        g.fillEllipse (ex - 4.0f, ey - 4.0f, 8.0f, 8.0f);
+        g.setColour (tipCol);
+        g.fillEllipse (ex - 2.6f, ey - 2.6f, 5.2f, 5.2f);
+        g.setColour (juce::Colour (0xFFFFC0B0).withAlpha (0.7f));
+        g.fillEllipse (ex - 1.2f, ey - 1.6f, 2.0f, 1.4f);
 
-        // ---- Centre dot (small white) ----
-        g.setColour (juce::Colours::white.withAlpha (0.85f));
-        g.fillEllipse (cx - 1.4f, cy - 1.4f, 2.8f, 2.8f);
+        // ---- 4. GLASS TOP SHEEN (premium 3D glint) ----
+        // Specular crescent on upper half (60° arc)
+        {
+            juce::Path glint;
+            const float gR = bodyR * 0.92f;
+            glint.addPieSegment (cx - gR, cy - gR, gR * 2, gR * 2,
+                                  -juce::MathConstants<float>::pi * 0.55f,
+                                  -juce::MathConstants<float>::pi * 0.10f,
+                                  0.55f);
+            juce::ColourGradient gg (
+                juce::Colours::white.withAlpha (0.30f), cx, cy - bodyR,
+                juce::Colours::transparentWhite,         cx, cy + bodyR * 0.2f, false);
+            g.setGradientFill (gg);
+            g.fillPath (glint);
+        }
 
-        // ---- Curved arrow above the knob (printed-schematic indicator) ----
-        // The Beocord card always shows a curly arrow on either side of bigger
-        // tone knobs to indicate direction-of-increase.
-        const float arrR = bezR + 8.0f;
+        // Soft point-light glint (small bright dot upper-left)
+        {
+            const float pgR = bodyR * 0.20f;
+            const float pgX = cx - bodyR * 0.40f;
+            const float pgY = cy - bodyR * 0.55f;
+            juce::ColourGradient pg (
+                juce::Colours::white.withAlpha (0.45f), pgX, pgY,
+                juce::Colours::transparentWhite,         pgX + pgR, pgY + pgR, true);
+            g.setGradientFill (pg);
+            g.fillEllipse (pgX - pgR, pgY - pgR, pgR * 2, pgR * 2);
+        }
+
+        // ---- 5. CENTRE CHROME RIVET ----
+        const float rivR = bodyR * 0.16f;
+        // Recess
+        g.setColour (juce::Colours::black);
+        g.fillEllipse (cx - rivR - 0.6f, cy - rivR - 0.6f, (rivR + 0.6f) * 2, (rivR + 0.6f) * 2);
+        // Chrome dome
+        juce::ColourGradient rivGrad (
+            juce::Colour (0xFFEFEFE8), cx - rivR * 0.4f, cy - rivR * 0.5f,
+            juce::Colour (0xFF40404A), cx + rivR * 0.4f, cy + rivR * 0.5f, false);
+        rivGrad.addColour (0.5, juce::Colour (0xFFA8A8AC));
+        g.setGradientFill (rivGrad);
+        g.fillEllipse (cx - rivR, cy - rivR, rivR * 2, rivR * 2);
+        // Tiny highlight on rivet
+        g.setColour (juce::Colours::white.withAlpha (0.7f));
+        g.fillEllipse (cx - rivR * 0.4f, cy - rivR * 0.6f, rivR * 0.5f, rivR * 0.4f);
+
+        // ---- 6. CURVED DIRECTION-ARROW above the knob (cream-paper schematic) ----
+        const float arrR = bezR + 9.0f;
         const float a0 = -juce::MathConstants<float>::pi * 0.55f;
         const float a1 = -juce::MathConstants<float>::pi * 0.20f;
         juce::Path arrow;
         arrow.addCentredArc (cx, cy, arrR, arrR, 0, a0, a1, true);
-        g.setColour (inkCol.withAlpha (0.7f));
+        g.setColour (inkCol.withAlpha (0.65f));
         g.strokePath (arrow, juce::PathStrokeType (1.0f));
-        // Arrowhead at end of arc
         const float ahx = cx + arrR * std::sin (a1);
         const float ahy = cy - arrR * std::cos (a1);
         juce::Path head;
@@ -365,14 +443,16 @@ namespace bc2000dl::ui
         head.closeSubPath();
         g.fillPath (head);
 
-        // ---- Hot value arc (amber, on top of ring when interacting) ----
+        // ---- 7. Hot amber value-arc ----
         if (hot)
         {
-            const float trackR = bezR + 3.0f;
+            const float trackR = bezR + 4.0f;
             juce::Path arcFill;
             arcFill.addCentredArc (cx, cy, trackR, trackR, 0, angleStart, angle, true);
             g.setColour (juce::Colour (0xFFC2A050));
-            g.strokePath (arcFill, juce::PathStrokeType (1.6f));
+            g.strokePath (arcFill, juce::PathStrokeType (1.8f));
+            g.setColour (juce::Colour (0xFFE0C070).withAlpha (0.45f));
+            g.strokePath (arcFill, juce::PathStrokeType (3.5f));
         }
     }
 
@@ -382,44 +462,98 @@ namespace bc2000dl::ui
     void InstructionCardLnF::drawToggleButton (juce::Graphics& g, juce::ToggleButton& b,
                                                  bool highlighted, bool down)
     {
-        // INSTRUCTION-CARD STYLE: thin black-ink outlined rectangle on cream
-        // paper. Filled with red when ON. Crisp, schematic, exactly like the
-        // pictogram boxes printed on the original B&O card.
+        // PREMIUM TOGGLE: cream-paper lozenge with subtle 3D recess, glass
+        // LED indicator left of label, deep red glow when ON.
         const auto bounds = b.getLocalBounds().toFloat().reduced (1.0f);
         const bool on = b.getToggleState();
         const auto inkCol = juce::Colour (0xFF181408);
 
+        // ---- Soft inner shadow (recessed "key" on cream paper) ----
+        g.setColour (juce::Colours::black.withAlpha (0.18f));
+        g.fillRoundedRectangle (bounds.translated (0, 0.7f), 3.0f);
+
         // ---- Body fill ----
         if (on)
         {
-            // Red filled box when ON (like the red "REC" indicator on card)
+            // Premium red gradient with multi-stop
             juce::ColourGradient g1 (
-                juce::Colour (0xFFD4382A), bounds.getCentreX(), bounds.getY(),
-                juce::Colour (0xFFA22018), bounds.getCentreX(), bounds.getBottom(), false);
+                juce::Colour (0xFFE2402E), bounds.getCentreX(), bounds.getY(),
+                juce::Colour (0xFF82180E), bounds.getCentreX(), bounds.getBottom(), false);
+            g1.addColour (0.4, juce::Colour (0xFFC02818));
             g.setGradientFill (g1);
-            g.fillRoundedRectangle (bounds, 2.5f);
-        }
-        else if (down || highlighted)
-        {
-            g.setColour (juce::Colour (0xFFD9CFB2));
-            g.fillRoundedRectangle (bounds, 2.5f);
+            g.fillRoundedRectangle (bounds, 3.0f);
+            // Top sheen on the red (gloss)
+            juce::ColourGradient sheen (
+                juce::Colours::white.withAlpha (0.35f), bounds.getCentreX(), bounds.getY(),
+                juce::Colours::transparentWhite,         bounds.getCentreX(),
+                bounds.getY() + bounds.getHeight() * 0.55f, false);
+            g.setGradientFill (sheen);
+            g.fillRoundedRectangle (bounds.reduced (1.0f, 0.5f), 2.5f);
         }
         else
         {
-            // Slight tinted recess
-            g.setColour (juce::Colour (0xFFE5DBC0));
-            g.fillRoundedRectangle (bounds, 2.5f);
+            juce::ColourGradient g1 (
+                juce::Colour (0xFFF0E5C8), bounds.getCentreX(), bounds.getY(),
+                juce::Colour (0xFFD0C5A6), bounds.getCentreX(), bounds.getBottom(), false);
+            g1.addColour (0.50, juce::Colour (0xFFE1D5B4));
+            if (down || highlighted)
+                g1 = juce::ColourGradient (
+                    juce::Colour (0xFFD8CDAF), bounds.getCentreX(), bounds.getY(),
+                    juce::Colour (0xFFC0B596), bounds.getCentreX(), bounds.getBottom(), false);
+            g.setGradientFill (g1);
+            g.fillRoundedRectangle (bounds, 3.0f);
+
+            // Top hairline highlight (sells slight emboss)
+            g.setColour (juce::Colours::white.withAlpha (0.5f));
+            g.drawLine (bounds.getX() + 3, bounds.getY() + 0.6f,
+                        bounds.getRight() - 3, bounds.getY() + 0.6f, 0.6f);
         }
 
-        // ---- Black-ink outline ----
-        g.setColour (inkCol.withAlpha (on ? 0.7f : 0.85f));
-        g.drawRoundedRectangle (bounds, 2.5f, 1.0f);
+        // ---- Glass LED dot (left side, lights when ON) ----
+        const float ledR = juce::jmin (3.6f, bounds.getHeight() * 0.22f);
+        const float ledX = bounds.getX() + ledR + 5.0f;
+        const float ledY = bounds.getCentreY();
+        if (on)
+        {
+            // Outer halo glow
+            g.setColour (juce::Colour (0xFFFFA090).withAlpha (0.5f));
+            g.fillEllipse (ledX - ledR * 2.5f, ledY - ledR * 2.5f, ledR * 5.0f, ledR * 5.0f);
+            // Bright LED body
+            juce::ColourGradient lg (
+                juce::Colour (0xFFFFE8A0), ledX - ledR * 0.4f, ledY - ledR * 0.5f,
+                juce::Colour (0xFFC02018), ledX + ledR * 0.4f, ledY + ledR * 0.5f, false);
+            g.setGradientFill (lg);
+            g.fillEllipse (ledX - ledR, ledY - ledR, ledR * 2, ledR * 2);
+            // Glass highlight on top of LED
+            g.setColour (juce::Colours::white.withAlpha (0.9f));
+            g.fillEllipse (ledX - ledR * 0.4f, ledY - ledR * 0.7f, ledR * 0.7f, ledR * 0.5f);
+        }
+        else
+        {
+            // Recessed dark LED (off state)
+            g.setColour (juce::Colour (0xFF1A1A1A));
+            g.fillEllipse (ledX - ledR, ledY - ledR, ledR * 2, ledR * 2);
+            g.setColour (juce::Colour (0xFF6A6A6A).withAlpha (0.4f));
+            g.drawEllipse (ledX - ledR, ledY - ledR, ledR * 2, ledR * 2, 0.5f);
+        }
 
-        // ---- Label centred (white on red, dark ink on cream) ----
-        g.setColour (on ? juce::Colours::white : inkCol);
+        // ---- Outline ----
+        g.setColour (inkCol.withAlpha (on ? 0.65f : 0.85f));
+        g.drawRoundedRectangle (bounds, 3.0f, 0.9f);
+
+        // ---- Embossed label (right of LED) ----
+        auto textArea = bounds.toNearestInt();
+        textArea.removeFromLeft ((int) (ledR * 2 + 10.0f));
         g.setFont (sectionFont (9.5f));
-        g.drawFittedText (b.getButtonText(), bounds.reduced (4, 1).toNearestInt(),
-                           juce::Justification::centred, 1);
+        if (! on)
+        {
+            // Embossed: white-glow above + dark fill
+            g.setColour (juce::Colours::white.withAlpha (0.55f));
+            g.drawFittedText (b.getButtonText(), textArea.translated (0, 1),
+                              juce::Justification::centred, 1);
+        }
+        g.setColour (on ? juce::Colours::white : inkCol);
+        g.drawFittedText (b.getButtonText(), textArea, juce::Justification::centred, 1);
     }
 
     //=========================================================================
@@ -446,18 +580,36 @@ namespace bc2000dl::ui
         const auto box = juce::Rectangle<float> (0, 0, (float) width, (float) height).reduced (0.5f);
         const auto inkCol = juce::Colour (0xFF181408);
 
-        // Cream-paper recessed-look fill
+        // Premium recessed cream fill (multi-stop)
         juce::ColourGradient grad (
-            juce::Colour (0xFFF0E6CC), box.getCentreX(), box.getY(),
-            juce::Colour (0xFFD9CFB2), box.getCentreX(), box.getBottom(), false);
+            juce::Colour (0xFFD8CCAE), box.getCentreX(), box.getY(),
+            juce::Colour (0xFFF0E6C8), box.getCentreX(), box.getBottom(), false);
+        grad.addColour (0.12, juce::Colour (0xFFE8DEC0));
         g.setGradientFill (grad);
-        g.fillRoundedRectangle (box, 2.0f);
+        g.fillRoundedRectangle (box, 2.5f);
 
-        // Black-ink outline
+        // Top inner shadow (recessed feel)
+        juce::ColourGradient innerShadow (
+            juce::Colours::black.withAlpha (0.30f), box.getCentreX(), box.getY(),
+            juce::Colours::transparentBlack,         box.getCentreX(), box.getY() + 4.0f, false);
+        g.setGradientFill (innerShadow);
+        g.fillRoundedRectangle (box, 2.5f);
+
+        // Bottom hairline highlight (recess catches light at bottom)
+        g.setColour (juce::Colours::white.withAlpha (0.50f));
+        g.drawLine (box.getX() + 3, box.getBottom() - 0.7f,
+                    box.getRight() - 3, box.getBottom() - 0.7f, 0.6f);
+
+        // Crisp outline
         g.setColour (inkCol.withAlpha (0.85f));
-        g.drawRoundedRectangle (box, 2.0f, 1.0f);
+        g.drawRoundedRectangle (box, 2.5f, 1.0f);
 
-        // Down-arrow in dark ink
+        // Hairline separator before the arrow column
+        g.setColour (inkCol.withAlpha (0.45f));
+        g.drawLine ((float) buttonX, box.getY() + 3,
+                    (float) buttonX, box.getBottom() - 3, 0.7f);
+
+        // Premium down-arrow (inkCol with subtle white emboss above)
         const float ax = (float) (buttonX + buttonW * 0.5f);
         const float ay = (float) (buttonY + buttonH * 0.5f);
         juce::Path arrow;
@@ -465,12 +617,10 @@ namespace bc2000dl::ui
         arrow.lineTo          (ax + 4.0f, ay - 2.0f);
         arrow.lineTo          (ax,        ay + 3.0f);
         arrow.closeSubPath();
+        g.setColour (juce::Colours::white.withAlpha (0.45f));
+        g.fillPath (arrow, juce::AffineTransform::translation (0, 1));
         g.setColour (inkCol);
         g.fillPath (arrow);
-
-        // Hairline separator before the arrow column
-        g.setColour (inkCol.withAlpha (0.45f));
-        g.drawLine ((float) buttonX, box.getY() + 3, (float) buttonX, box.getBottom() - 3, 0.7f);
     }
 
     //=========================================================================
@@ -843,51 +993,87 @@ namespace bc2000dl::ui
     void InstructionCardLnF::drawTransportKey (juce::Graphics& g, juce::Rectangle<int> r,
                                                   bool down, bool active, juce::Colour accent)
     {
-        // INSTRUCTION-CARD STYLE: pictogram-box, thin black ink outline on
-        // cream paper. The button visibly depresses; an active key fills with
-        // accent (red for REC, amber for SPK/MUTE).
+        // PREMIUM TRANSPORT KEY: brushed-aluminium face with bevelled edges,
+        // multi-stop drop shadow, glass-like top sheen. Active state fills
+        // with accent gradient + glow halo.
         const auto bf = r.toFloat().reduced (1.0f);
         const auto inkCol = juce::Colour (0xFF181408);
-        const float keyOffset = down ? 1.0f : 0.0f;
+        const float keyOffset = down ? 1.5f : 0.0f;
         const auto keyRect = bf.translated (0, keyOffset);
 
-        // ---- Soft drop shadow when raised ----
+        // ---- Premium drop shadow (multi-step) ----
         if (! down)
         {
-            g.setColour (inkCol.withAlpha (0.20f));
-            g.fillRoundedRectangle (bf.translated (0, 1.5f), 2.5f);
+            for (int i = 0; i < 2; ++i)
+            {
+                g.setColour (juce::Colours::black.withAlpha (0.22f - (float) i * 0.08f));
+                g.fillRoundedRectangle (bf.translated (0, 1.0f + i * 0.8f)
+                                            .expanded ((float) i * 0.3f), 3.0f);
+            }
         }
 
         // ---- Body fill ----
         if (active)
         {
+            // Glow halo
+            g.setColour (accent.withAlpha (0.45f));
+            g.fillRoundedRectangle (keyRect.expanded (1.5f), 4.0f);
+
             juce::ColourGradient g1 (
-                accent.brighter (0.20f), keyRect.getCentreX(), keyRect.getY(),
-                accent.darker (0.20f),   keyRect.getCentreX(), keyRect.getBottom(), false);
+                accent.brighter (0.30f), keyRect.getCentreX(), keyRect.getY(),
+                accent.darker (0.30f),   keyRect.getCentreX(), keyRect.getBottom(), false);
+            g1.addColour (0.4, accent.brighter (0.05f));
             g.setGradientFill (g1);
-            g.fillRoundedRectangle (keyRect, 2.5f);
+            g.fillRoundedRectangle (keyRect, 3.0f);
+
+            // Glass sheen on active state
+            juce::ColourGradient sheen (
+                juce::Colours::white.withAlpha (0.35f), keyRect.getCentreX(), keyRect.getY(),
+                juce::Colours::transparentWhite,         keyRect.getCentreX(),
+                keyRect.getY() + keyRect.getHeight() * 0.55f, false);
+            g.setGradientFill (sheen);
+            g.fillRoundedRectangle (keyRect.reduced (1.0f, 0.5f), 2.5f);
         }
         else
         {
-            // Cream paper key with subtle edge gradient (raised)
+            // Brushed aluminium key (multi-stop satin)
             juce::ColourGradient g1 (
-                juce::Colour (0xFFF2E8CE), keyRect.getCentreX(), keyRect.getY(),
-                juce::Colour (0xFFCFC4A6), keyRect.getCentreX(), keyRect.getBottom(), false);
+                juce::Colour (0xFFD8D8D2), keyRect.getCentreX(), keyRect.getY(),
+                juce::Colour (0xFF7A7A74), keyRect.getCentreX(), keyRect.getBottom(), false);
+            g1.addColour (0.30, juce::Colour (0xFFC0C0BA));
+            g1.addColour (0.65, juce::Colour (0xFF969690));
             g.setGradientFill (g1);
-            g.fillRoundedRectangle (keyRect, 2.5f);
+            g.fillRoundedRectangle (keyRect, 3.0f);
+
+            // Subtle horizontal brushed grain
+            juce::Random rng (int (r.getX() * 53.0f) ^ int (r.getY() * 71.0f));
+            for (int i = 0; i < 8; ++i)
+            {
+                const float fy = keyRect.getY() + 1.5f + rng.nextFloat() * (keyRect.getHeight() - 3.0f);
+                const bool dk = rng.nextBool();
+                g.setColour ((dk ? juce::Colour (0xFF606058) : juce::Colour (0xFFE6E6E0))
+                                .withAlpha (rng.nextFloat() * 0.10f + 0.02f));
+                g.drawLine (keyRect.getX() + 2.0f, fy,
+                            keyRect.getRight() - 2.0f, fy, 0.4f);
+            }
         }
 
-        // ---- Black-ink outline ----
-        g.setColour (inkCol.withAlpha (0.85f));
-        g.drawRoundedRectangle (keyRect, 2.5f, 1.0f);
-
-        // ---- Top hairline highlight (sells "raised") ----
-        if (! down && ! active)
+        // ---- Top hairline highlight (sells raised metal) ----
+        if (! down)
         {
-            g.setColour (juce::Colours::white.withAlpha (0.5f));
-            g.drawLine (keyRect.getX() + 2, keyRect.getY() + 0.7f,
-                        keyRect.getRight() - 2, keyRect.getY() + 0.7f, 0.6f);
+            g.setColour (juce::Colour (0xFFF2F2EC).withAlpha (active ? 0.85f : 0.7f));
+            g.drawLine (keyRect.getX() + 3, keyRect.getY() + 0.7f,
+                        keyRect.getRight() - 3, keyRect.getY() + 0.7f, 0.7f);
         }
+
+        // ---- Bottom shadow line ----
+        g.setColour (juce::Colours::black.withAlpha (0.45f));
+        g.drawLine (keyRect.getX() + 3, keyRect.getBottom() - 0.7f,
+                    keyRect.getRight() - 3, keyRect.getBottom() - 0.7f, 0.7f);
+
+        // ---- Crisp dark outline ----
+        g.setColour (inkCol.withAlpha (0.85f));
+        g.drawRoundedRectangle (keyRect, 3.0f, 0.9f);
     }
 
     //=========================================================================

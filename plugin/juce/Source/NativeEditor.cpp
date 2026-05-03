@@ -390,7 +390,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (16, 6).removeFromTop (24),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v35.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v36.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -449,13 +449,19 @@ void NativeEditor::paint (juce::Graphics& g)
     g.drawVerticalLine (leftEnd,   (float) divTop, (float) divBot);
     g.drawVerticalLine (centerEnd, (float) divTop, (float) divBot);
 
-    // Section labels in dark ink
+    // Engraved section labels (ivory-emboss on cream paper)
     const int lblY = kAluH + kDivH + kPresetH + 4;
-    g.setFont (LnF::sectionFont (8.5f));
-    g.setColour (LnF::ink().withAlpha (0.75f));
-    g.drawText ("INPUT",    juce::Rectangle<int> (kTeakW + 8, lblY, kLeftColW - 12, 12), juce::Justification::left);
-    g.drawText ("FADERS",   juce::Rectangle<int> (leftEnd + 8, lblY, 80, 12), juce::Justification::left);
-    g.drawText ("TONE · TAPE", juce::Rectangle<int> (centerEnd + 8, lblY, 130, 12), juce::Justification::left);
+    auto drawEngraved = [&] (const char* text, juce::Rectangle<int> rect)
+    {
+        g.setFont (LnF::sectionFont (9.0f));
+        g.setColour (juce::Colours::white.withAlpha (0.55f));
+        g.drawText (text, rect.translated (0, 1), juce::Justification::left);
+        g.setColour (LnF::ink().withAlpha (0.8f));
+        g.drawText (text, rect, juce::Justification::left);
+    };
+    drawEngraved ("INPUT",       { kTeakW + 8, lblY, kLeftColW - 12, 12 });
+    drawEngraved ("FADERS",      { leftEnd + 8, lblY, 80, 12 });
+    drawEngraved ("TONE · TAPE", { centerEnd + 8, lblY, 130, 12 });
 
     // Status bar (preset row) — dark ink on cream
     if (statusText.isNotEmpty())
