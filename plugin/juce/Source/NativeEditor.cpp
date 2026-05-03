@@ -160,12 +160,11 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         addAndMakeVisible (l);
     };
 
-    // ---- Top deck zone: reels + 4 analog VU meters (IN+OUT) ----
+    // ---- Top deck zone: reels + 3 analog VU meters (IN L, IN R, OUT) ----
     addAndMakeVisible (reelDeck);
     addAndMakeVisible (vuInL);
     addAndMakeVisible (vuInR);
-    addAndMakeVisible (vuOutL);
-    addAndMakeVisible (vuOutR);
+    addAndMakeVisible (vuOut);
 
     // ---- 5 dual-faders ----
     // Bulletproof drag config: snap to mouse, no velocity-mode (predictable),
@@ -391,7 +390,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (16, 6).removeFromTop (24),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v34.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v34.1");
 
     // Counter (bottom-centre of deck, just below the VU pair)
     {
@@ -455,26 +454,22 @@ void NativeEditor::resized()
     auto deckZone = inner.withHeight (kAluH).withTrimmedTop (26).reduced (6, 3);
     reelDeck.setBounds (deckZone);
 
-    // 4 analog VU meters in centre gap: row1 = IN L/R, row2 = OUT L/R.
-    // Counter sits centred under the lower row.
+    // 3 analog VU meters in a single horizontal row: IN L | IN R | OUT.
+    // Counter sits centred just below.
     {
         const int reelDiam = juce::jmin (deckZone.getHeight() - 6,
                                           (int) (deckZone.getWidth() * 0.36f));
         const int gapL = deckZone.getX() + reelDiam + 8;
         const int gapR = deckZone.getRight() - reelDiam - 8;
-        const int gapW = juce::jmax (220, gapR - gapL);
+        const int gapW = juce::jmax (300, gapR - gapL);
 
-        const int colW = (gapW - 12) / 2;     // 2 columns (L, R)
-        const int rowH = juce::jmin (74, (deckZone.getHeight() - 28) / 2);
-        const int totalH = rowH * 2 + 6;
-        const int topY = deckZone.getY() + (deckZone.getHeight() - totalH - 22) / 2;
+        const int meterW = (gapW - 24) / 3;
+        const int meterH = juce::jmin (deckZone.getHeight() - 36, 130);
+        const int meterY = deckZone.getY() + (deckZone.getHeight() - meterH - 18) / 2;
 
-        // Row 1: IN L | IN R
-        vuInL .setBounds (gapL,                     topY,            colW, rowH);
-        vuInR .setBounds (gapL + colW + 12,         topY,            colW, rowH);
-        // Row 2: OUT L | OUT R
-        vuOutL.setBounds (gapL,                     topY + rowH + 6, colW, rowH);
-        vuOutR.setBounds (gapL + colW + 12,         topY + rowH + 6, colW, rowH);
+        vuInL.setBounds (gapL,                       meterY, meterW, meterH);
+        vuInR.setBounds (gapL +  meterW + 12,        meterY, meterW, meterH);
+        vuOut.setBounds (gapL + (meterW + 12) * 2,   meterY, meterW, meterH);
     }
 
     // ===== Black panel zone =====
@@ -620,10 +615,11 @@ void NativeEditor::resized()
 void NativeEditor::timerCallback()
 {
     auto& chain = processor.getChain();
-    vuInL .setLevel (chain.inputLevelL_dBFS .load());
-    vuInR .setLevel (chain.inputLevelR_dBFS .load());
-    vuOutL.setLevel (chain.meterLevelL_dBFS.load());
-    vuOutR.setLevel (chain.meterLevelR_dBFS.load());
+    vuInL.setLevel (chain.inputLevelL_dBFS.load());
+    vuInR.setLevel (chain.inputLevelR_dBFS.load());
+    // OUT meter: max of L/R post-processing (most useful for clip-detection)
+    vuOut.setLevel (juce::jmax (chain.meterLevelL_dBFS.load(),
+                                 chain.meterLevelR_dBFS.load()));
 
     // Reel spin when any input gain > threshold
     const float inputAny = processor.apvts.getRawParameterValue ("mic_gain")->load()

@@ -81,12 +81,11 @@ private:
     bc2000dl::ui::InstructionCardLnF lnf;
     juce::TooltipWindow tooltipWindow { this, 500 };
 
-    // ---- Top deck zone: reels + 4 analog VU meters (IN L/R + OUT L/R) ----
+    // ---- Top deck zone: reels + 3 analog VU meters (IN L, IN R, OUT) ----
     bc2000dl::ReelDeck reelDeck;
-    bc2000dl::AnalogVU vuInL  { "IN L" };
-    bc2000dl::AnalogVU vuInR  { "IN R" };
-    bc2000dl::AnalogVU vuOutL { "OUT L" };
-    bc2000dl::AnalogVU vuOutR { "OUT R" };
+    bc2000dl::AnalogVU vuInL { "IN L" };
+    bc2000dl::AnalogVU vuInR { "IN R" };
+    bc2000dl::AnalogVU vuOut { "OUT"  };
     juce::String       counterText { "0000" };
 
     // ---- 5 dual-faders (10 sliders) — instruction-card slide-faders ----
