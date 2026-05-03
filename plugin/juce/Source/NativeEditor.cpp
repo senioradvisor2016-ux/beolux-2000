@@ -978,7 +978,8 @@ void NativeEditor::paint (juce::Graphics& g)
     // ===== Soundboys brand medallion (engraved on the black metal deck) =====
     // Small chrome-rimmed circular badge, just under the title text on the left.
     {
-        const float bx = (float) kTeakW + 138.0f;
+        // Positioned past "BEOLUX 2000" title end (~x 206) + small gap
+        const float bx = (float) kTeakW + 258.0f;
         const float by = 6.0f;
         const float br = 13.0f;
 
