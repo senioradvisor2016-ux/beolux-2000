@@ -121,9 +121,26 @@ namespace bc2000dl
     //=========================================================================
     void AnalogVU::setLevel (float dbfs)
     {
-        // Authentic VU ballistic: 2nd-order spring/damper.
-        // ~300ms reach to 99% with ~1% overshoot, like a real moving-coil
-        // mechanism. Slightly faster decay matches a real meter at 30Hz.
+        // ---- Boot calibration sweep (first 1500 ms after open) ----
+        // The needle sweeps from -20 → +3 → back to current, like a pro meter
+        // self-test on power-up.
+        const auto now = juce::Time::getMillisecondCounter();
+        const auto bootElapsed = (int) (now - bootStart);
+        if (bootElapsed < 1500)
+        {
+            const float t = (float) bootElapsed / 1500.0f;
+            // Triangle wave: 0 → 1 → 0 over the 1.5s
+            const float tri = (t < 0.5f ? t * 2.0f : (1.0f - t) * 2.0f);
+            // Map 0..1 → -20..+3 dB
+            current = -20.0f + tri * 23.0f;
+            velocity = 0.0f;
+            peakHoldDb = current;
+            peakHoldFrames = 0;
+            repaint();
+            return;
+        }
+
+        // ---- Authentic VU ballistic: 2nd-order spring/damper ----
         const auto target = juce::jlimit (-30.0f, 6.0f, dbfs);
         const float spring  = 0.18f;
         const float damping = 0.50f;
@@ -131,6 +148,20 @@ namespace bc2000dl
         velocity += diff * spring;
         velocity *= (1.0f - damping);
         current  += velocity;
+
+        // ---- Peak-hold needle: chase up instantly, hold ~1.5s, then decay ----
+        if (current > peakHoldDb)
+        {
+            peakHoldDb     = current;
+            peakHoldFrames = 0;
+        }
+        else
+        {
+            ++peakHoldFrames;
+            if (peakHoldFrames > 45)              // 1.5s hold @ 30Hz
+                peakHoldDb -= 20.0f / 30.0f;       // -20 dB/s decay
+            peakHoldDb = juce::jmax (peakHoldDb, current);
+        }
 
         const bool nowPeaking = current > 0.0f;
         if (nowPeaking != peaking) { peaking = nowPeaking; }
@@ -140,6 +171,25 @@ namespace bc2000dl
     void AnalogVU::paint (juce::Graphics& g)
     {
         ui::InstructionCardLnF::drawAnalogVU (g, getLocalBounds(), current, peaking, channel);
+        // Overlay: amber peak-hold needle
+        if (peakHoldDb > -19.0f && std::abs (peakHoldDb - current) > 0.5f)
+        {
+            const auto bf = getLocalBounds().toFloat().reduced (1.0f);
+            const float screwBuffer = juce::jmax (1.8f, juce::jmin (bf.getWidth(), bf.getHeight()) * 0.018f) * 2.0f + 6.0f;
+            const auto face = bf.reduced (screwBuffer, screwBuffer * 0.7f);
+            const float pivotX = face.getCentreX();
+            const float pivotY = face.getBottom() + face.getHeight() * 0.35f;
+            const float arcR   = face.getHeight() * 1.05f;
+            const float ang0 = -juce::MathConstants<float>::pi * 0.21f;
+            const float ang1 =  juce::MathConstants<float>::pi * 0.21f;
+            const float vuNorm = juce::jlimit (0.0f, 1.0f, (peakHoldDb + 20.0f) / 23.0f);
+            const float a = ang0 + vuNorm * (ang1 - ang0);
+            const float r1 = arcR;
+            const float r2 = arcR - 6.0f;
+            g.setColour (juce::Colour (0xFFC2A050).withAlpha (0.85f));
+            g.drawLine (pivotX + r1 * std::sin (a), pivotY - r1 * std::cos (a),
+                        pivotX + r2 * std::sin (a), pivotY - r2 * std::cos (a), 1.4f);
+        }
     }
 
     // (Old VUBar removed — replaced by AnalogVU above.)
@@ -408,7 +458,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v38.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v39.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -480,6 +530,63 @@ void NativeEditor::paint (juce::Graphics& g)
     drawEngraved ("INPUT",       { kTeakW + 8, lblY, kLeftColW - 12, 12 });
     drawEngraved ("FADERS",      { leftEnd + 8, lblY, 80, 12 });
     drawEngraved ("TONE · TAPE", { centerEnd + 8, lblY, 130, 12 });
+
+    // ===== Soundboys brand medallion (engraved on the black metal deck) =====
+    // Small chrome-rimmed circular badge, just under the title text on the left.
+    {
+        const float bx = (float) kTeakW + 138.0f;
+        const float by = 6.0f;
+        const float br = 13.0f;
+
+        // Recess shadow
+        g.setColour (juce::Colours::black.withAlpha (0.7f));
+        g.fillEllipse (bx - br - 1.0f, by - 1.0f, (br + 1.0f) * 2, (br + 1.0f) * 2);
+
+        // Chrome bezel ring
+        juce::ColourGradient bezel (
+            juce::Colour (0xFFE8E8EC), bx, by - br * 0.5f,
+            juce::Colour (0xFF50505A), bx, by + br * 0.7f, false);
+        bezel.addColour (0.5, juce::Colour (0xFFA8A8AC));
+        g.setGradientFill (bezel);
+        g.fillEllipse (bx - br, by, br * 2, br * 2);
+
+        // Inner deep medallion face
+        const float ir = br - 2.5f;
+        juce::ColourGradient face (
+            juce::Colour (0xFF202024), bx, by + br - ir,
+            juce::Colour (0xFF050507), bx, by + br + ir, false);
+        g.setGradientFill (face);
+        g.fillEllipse (bx - ir, by + br - ir + (br - ir) * 0.0f, ir * 2, ir * 2);
+
+        // Engraved "S" mark + "SBYS" microtext
+        g.setColour (juce::Colour (0xFF8A8A92));
+        g.setFont (LnF::logoFont (12.0f));
+        g.drawText ("S",
+            juce::Rectangle<float> (bx - ir, by + br - ir - 1.0f, ir * 2, ir * 2)
+                .toNearestInt(),
+            juce::Justification::centred, false);
+        // small ring text
+        g.setColour (juce::Colour (0xFFB0B0B6).withAlpha (0.55f));
+        g.setFont (LnF::sectionFont (5.5f));
+        g.drawText ("SOUNDBOYS",
+            juce::Rectangle<float> (bx - br + 1.0f, by + br + br * 0.3f, (br - 1) * 2, 7.0f)
+                .toNearestInt(),
+            juce::Justification::centred, false);
+        // tiny highlight glint on bezel
+        g.setColour (juce::Colours::white.withAlpha (0.55f));
+        g.fillEllipse (bx - br * 0.4f, by + br * 0.05f, br * 0.4f, br * 0.18f);
+    }
+
+    // ===== Window vignette (last layer — sells "professional product photo") =====
+    {
+        const auto bf = getLocalBounds().toFloat();
+        // Radial dim from a point above the window (suggests overhead studio light)
+        juce::ColourGradient v (
+            juce::Colours::transparentBlack, bf.getCentreX(), bf.getCentreY() * 0.6f,
+            juce::Colours::black.withAlpha (0.32f), bf.getX(), bf.getBottom(), true);
+        g.setGradientFill (v);
+        g.fillRect (bf);
+    }
 
     // Status bar (preset row) — dark ink on cream
     if (statusText.isNotEmpty())

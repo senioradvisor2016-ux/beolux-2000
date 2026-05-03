@@ -50,16 +50,26 @@ namespace bc2000dl
     };
 
     /** Analog VU meter with curved scale + needle on cream face.
-        Authentic 2nd-order ballistics — 300ms attack/decay with overshoot. */
+        - Authentic 2nd-order ballistics (300ms attack/decay + overshoot)
+        - Boot calibration sweep on first 1.5s (premium "device awakens" feel)
+        - Amber peak-hold marker that holds for 1.5s then decays at -20dB/s */
     class AnalogVU : public juce::Component
     {
     public:
-        explicit AnalogVU (const juce::String& chLabel = "L") : channel (chLabel) {}
+        explicit AnalogVU (const juce::String& chLabel = "L") : channel (chLabel)
+        {
+            bootStart = juce::Time::getMillisecondCounter();
+        }
         void setLevel (float dbfs);              // smoothed
         void paint (juce::Graphics&) override;
+        float getCurrentDb()  const { return current; }
+        float getPeakHoldDb() const { return peakHoldDb; }
     private:
-        float current  { -20.0f };
-        float velocity { 0.0f };
+        float current     { -20.0f };
+        float velocity    { 0.0f };
+        float peakHoldDb  { -20.0f };
+        int   peakHoldFrames { 0 };
+        juce::uint32 bootStart { 0 };
         bool  peaking  { false };
         juce::String channel;
     };
