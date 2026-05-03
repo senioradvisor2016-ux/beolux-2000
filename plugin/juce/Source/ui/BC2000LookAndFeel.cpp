@@ -491,6 +491,64 @@ namespace bc2000dl::ui
                 g.fillEllipse (pgX - pgR, pgY - pgR, pgR * 2, pgR * 2);
             }
 
+            // ---- ROTATING KNURLING — 48 thin radial teeth at the rim ----
+            // This is what sells "real physical knob" — when you drag, the
+            // teeth visibly rotate. UAD 1176 / Pultec / Soundtoys all do this.
+            {
+                const float toothInnerR = bodyR * 0.84f;
+                const float toothOuterR = bodyR * 0.99f;
+                const int   numTeeth = 48;
+                const float twoPi = juce::MathConstants<float>::twoPi;
+                for (int i = 0; i < numTeeth; ++i)
+                {
+                    const float ta = angle + (float) i * twoPi / (float) numTeeth;
+                    const float sn = std::sin (ta);
+                    const float cs = std::cos (ta);
+                    // Top-lit teeth (catching light from upper-left) draw
+                    // brighter; bottom teeth darker. Half the perimeter has
+                    // bright highlight, half has shadow.
+                    const float lightDot = (-sn) * 0.7f + cs * 0.7f;     // dot product with light dir
+                    const float litAlpha = juce::jlimit (0.05f, 0.55f, 0.30f + lightDot * 0.30f);
+                    const float darkAlpha = juce::jlimit (0.10f, 0.65f, 0.45f - lightDot * 0.30f);
+
+                    // alternating bright/dark gives the knurled-metal look
+                    const float ix = cx + toothInnerR * sn;
+                    const float iy = cy - toothInnerR * cs;
+                    const float ox = cx + toothOuterR * sn;
+                    const float oy = cy - toothOuterR * cs;
+
+                    if (i % 2 == 0)
+                    {
+                        // bright tooth
+                        g.setColour (juce::Colour (0xFFB0B0B6).withAlpha (litAlpha));
+                        g.drawLine (ix, iy, ox, oy, 0.9f);
+                    }
+                    else
+                    {
+                        // dark groove between teeth
+                        g.setColour (juce::Colours::black.withAlpha (darkAlpha));
+                        g.drawLine (ix, iy, ox, oy, 0.9f);
+                    }
+                }
+            }
+
+            // ---- SUBTLE RADIAL MATERIAL STRIATIONS (rotating with knob) ----
+            // 12 thin radial lines that suggest moulded plastic grain —
+            // they rotate with the knob, so when you turn it, the whole
+            // surface texture rotates as one piece (photoreal).
+            {
+                const float twoPi = juce::MathConstants<float>::twoPi;
+                for (int i = 0; i < 12; ++i)
+                {
+                    const float ta = angle + (float) i * twoPi / 12.0f;
+                    const float sn = std::sin (ta);
+                    const float cs = std::cos (ta);
+                    g.setColour (juce::Colours::white.withAlpha (0.025f));
+                    g.drawLine (cx + bodyR * 0.20f * sn, cy - bodyR * 0.20f * cs,
+                                cx + bodyR * 0.80f * sn, cy - bodyR * 0.80f * cs, 0.5f);
+                }
+            }
+
             // ---- Body inner-edge shadow (depth) ----
             juce::Path bodyPath;
             bodyPath.addEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
@@ -501,22 +559,39 @@ namespace bc2000dl::ui
         }
 
         // -------------------------------------------------------------------
-        // 5. RECESSED INDICATOR NUB at the outer rim (the iconic UAD pointer)
+        // 5. RECESSED INDICATOR — twin marker (dot + nub) like UAD 1176
         // -------------------------------------------------------------------
         {
             const float nubBaseR = bodyR * 0.92f;
             const float nubTipR  = bodyR * 1.02f;
-            // Position: at body rim
             const float bx = cx + nubBaseR * std::sin (angle);
             const float by = cy - nubBaseR * std::cos (angle);
             const float tx = cx + nubTipR * std::sin (angle);
             const float ty = cy - nubTipR * std::cos (angle);
 
-            // Recessed groove shadow first
+            // ---- 5a: Recessed white-painted dot (the inner-rim mark) ----
+            const float dotR  = bodyR * 0.10f;
+            const float dotXR = bodyR * 0.62f;             // distance from centre
+            const float dx = cx + dotXR * std::sin (angle);
+            const float dy = cy - dotXR * std::cos (angle);
+            // recess shadow under dot
+            g.setColour (juce::Colours::black.withAlpha (0.85f));
+            g.fillEllipse (dx - dotR - 0.6f, dy - dotR - 0.6f,
+                           (dotR + 0.6f) * 2, (dotR + 0.6f) * 2);
+            // bright white painted dot
+            juce::ColourGradient dotGrad (
+                juce::Colour (0xFFFFFFFF), dx - dotR * 0.3f, dy - dotR * 0.5f,
+                juce::Colour (0xFFC0C0C2), dx + dotR * 0.3f, dy + dotR * 0.5f, false);
+            g.setGradientFill (dotGrad);
+            g.fillEllipse (dx - dotR, dy - dotR, dotR * 2, dotR * 2);
+            // tiny specular on the dot
+            g.setColour (juce::Colours::white);
+            g.fillEllipse (dx - dotR * 0.35f, dy - dotR * 0.55f,
+                           dotR * 0.45f, dotR * 0.30f);
+
+            // ---- 5b: Outer pointer line + red tip ----
             g.setColour (juce::Colours::black.withAlpha (0.95f));
             g.drawLine (bx + 0.5f, by + 0.5f, tx + 0.5f, ty + 0.5f, 4.5f);
-
-            // Bright white pointer (recessed indicator paint)
             g.setColour (juce::Colour (0xFFF6F6F0));
             g.drawLine (bx, by, tx, ty, 3.2f);
 
