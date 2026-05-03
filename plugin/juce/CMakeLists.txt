@@ -137,6 +137,9 @@ juce_add_binary_data(BC2000DL_Assets SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/teac_deck_bg.png
 )
 
+# melatonin_blur — fast CPU blur + drop shadows (UAD/Soundtoys-grade visuals)
+juce_add_module(${CMAKE_CURRENT_SOURCE_DIR}/vendor/melatonin_blur)
+
 target_link_libraries(BC2000DL PRIVATE
     BC2000DL_Assets
     juce::juce_audio_utils
@@ -144,6 +147,7 @@ target_link_libraries(BC2000DL PRIVATE
     juce::juce_dsp
     juce::juce_gui_basics
     juce::juce_gui_extra
+    melatonin_blur
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags

@@ -1,6 +1,7 @@
 /*  BC2000LookAndFeel implementation — hardware-accurate Beocord 2000 DL aesthetic. */
 
 #include "BC2000LookAndFeel.h"
+#include <melatonin_blur/melatonin_blur.h>
 
 namespace bc2000dl::ui
 {
@@ -179,6 +180,16 @@ namespace bc2000dl::ui
         g.setColour (juce::Colour (0xFF000000));
         g.fillRoundedRectangle (ch, 1.2f);
 
+        // Real Gaussian inner shadow (sells the milled-channel depth)
+        {
+            juce::Path slot;
+            slot.addRoundedRectangle (ch, 1.2f);
+            static thread_local melatonin::InnerShadow channelInner {
+                { juce::Colours::black.withAlpha (0.85f), 4, { 0, 1 }, 0 }
+            };
+            channelInner.render (g, slot);
+        }
+
         // Inner-edge highlight
         g.setColour (juce::Colour (0xFF383840).withAlpha (0.7f));
         g.drawLine (ch.getX() + 0.5f, ch.getY() + 2, ch.getX() + 0.5f, ch.getBottom() - 2, 0.7f);
@@ -217,12 +228,14 @@ namespace bc2000dl::ui
         // PREMIUM MATTE-ALU FADER CAP — anodised silver-grey body with subtle
         // top sheen, brushed grain, recessed red marker, deep drop shadow.
 
-        // ---- Premium drop shadow (multi-step) ----
-        for (int i = 0; i < 3; ++i)
+        // ---- Real Gaussian drop-shadow (melatonin) ----
         {
-            g.setColour (juce::Colours::black.withAlpha (0.18f - (float) i * 0.04f));
-            g.fillRoundedRectangle (r.translated (0, 1.0f + i * 0.5f)
-                                       .expanded ((float) i * 0.3f), 3.0f);
+            juce::Path capPath;
+            capPath.addRoundedRectangle (r, 2.5f);
+            static thread_local melatonin::DropShadow capShadow {
+                { juce::Colours::black.withAlpha (0.55f), 6, { 0, 3 }, 0 }
+            };
+            capShadow.render (g, capPath);
         }
 
         // ---- Anodised aluminium body (multi-stop satin gradient) ----
@@ -322,17 +335,27 @@ namespace bc2000dl::ui
 
         const auto inkCol = juce::Colour (0xFF181408);
 
-        // ---- Drop shadow ----
-        g.setColour (juce::Colours::black.withAlpha (0.45f));
-        g.fillEllipse (cx - radius * 0.94f, cy - radius * 0.94f + 2.0f,
-                        radius * 1.88f, radius * 1.88f);
+        // ---- Real Gaussian drop-shadow (melatonin) ----
+        {
+            juce::Path bodyPath;
+            const float bodyR = radius * 0.82f;
+            bodyPath.addEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
+            static thread_local melatonin::DropShadow knobShadow {
+                { juce::Colours::black.withAlpha (0.65f), 10, { 0, 4 }, 0 }
+            };
+            knobShadow.render (g, bodyPath);
+        }
 
-        // ---- Hover halo ----
+        // ---- Hover halo (warm glow expanded) ----
         if (hot)
         {
-            g.setColour (juce::Colour (0xFFC2A050).withAlpha (0.25f));
-            g.fillEllipse (cx - radius - 3, cy - radius - 3,
-                           (radius + 3) * 2, (radius + 3) * 2);
+            juce::Path haloPath;
+            haloPath.addEllipse (cx - radius - 1, cy - radius - 1,
+                                  (radius + 1) * 2, (radius + 1) * 2);
+            static thread_local melatonin::DropShadow knobHotHalo {
+                { juce::Colour (0xFFC2A050).withAlpha (0.45f), 18, { 0, 0 }, 4 }
+            };
+            knobHotHalo.render (g, haloPath);
         }
 
         // ---- Tick marks at min/max (printed on cream paper) ----
@@ -1030,15 +1053,15 @@ namespace bc2000dl::ui
         const float keyOffset = down ? 1.5f : 0.0f;
         const auto keyRect = bf.translated (0, keyOffset);
 
-        // ---- Premium drop shadow (multi-step) ----
+        // ---- Real Gaussian drop-shadow (melatonin) ----
         if (! down)
         {
-            for (int i = 0; i < 2; ++i)
-            {
-                g.setColour (juce::Colours::black.withAlpha (0.22f - (float) i * 0.08f));
-                g.fillRoundedRectangle (bf.translated (0, 1.0f + i * 0.8f)
-                                            .expanded ((float) i * 0.3f), 3.0f);
-            }
+            juce::Path keyPath;
+            keyPath.addRoundedRectangle (bf, 3.0f);
+            static thread_local melatonin::DropShadow keyShadow {
+                { juce::Colours::black.withAlpha (0.65f), 7, { 0, 3 }, 0 }
+            };
+            keyShadow.render (g, keyPath);
         }
 
         // ---- Body fill ----
@@ -1169,11 +1192,14 @@ namespace bc2000dl::ui
         //  PREMIUM BEZEL — heavy black anodised housing with chrome trim
         // ===================================================================
 
-        // Outer drop shadow
-        for (int i = 0; i < 3; ++i)
+        // Outer drop shadow (real Gaussian via melatonin)
         {
-            g.setColour (juce::Colours::black.withAlpha (0.18f - (float) i * 0.04f));
-            g.fillRoundedRectangle (bf.expanded ((float) i + 0.5f).translated (0, 1.0f), 5.0f);
+            juce::Path bezelPath;
+            bezelPath.addRoundedRectangle (bf, 5.0f);
+            static thread_local melatonin::DropShadow vuOuterShadow {
+                { juce::Colours::black.withAlpha (0.70f), 12, { 0, 5 }, 1 }
+            };
+            vuOuterShadow.render (g, bezelPath);
         }
 
         // Heavy black bezel — multi-stop gradient for depth
@@ -1228,12 +1254,15 @@ namespace bc2000dl::ui
         g.setGradientFill (faceGrad);
         g.fillRoundedRectangle (face, 3.0f);
 
-        // Face inner shadow at top (recessed look)
-        juce::ColourGradient shadow (
-            juce::Colours::black.withAlpha (0.45f), face.getCentreX(), face.getY(),
-            juce::Colours::transparentBlack,         face.getCentreX(), face.getY() + 8.0f, false);
-        g.setGradientFill (shadow);
-        g.fillRoundedRectangle (face, 3.0f);
+        // Face inner shadow at top (real Gaussian, gives true recess feel)
+        {
+            juce::Path facePath;
+            facePath.addRoundedRectangle (face, 3.0f);
+            static thread_local melatonin::InnerShadow vuInner {
+                { juce::Colours::black.withAlpha (0.65f), 8, { 0, 3 }, 0 }
+            };
+            vuInner.render (g, facePath);
+        }
 
         // ---- Needle pivot (bottom-centre, well below the visible face) ----
         const float pivotX = face.getCentreX();
