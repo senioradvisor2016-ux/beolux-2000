@@ -98,6 +98,7 @@ namespace bc2000dl::dsp
                 // Agfa PEM468 — mid-forward, warm, balanced (referens)
                 // Lite extra LF-bump för "Visconti '74 Berlin"-känslan
                 headBumpGainDb += 0.8;  // mer bass-warmth
+                hysteresis.setParams (JilesAtherton::presetAgfa());
                 break;
             case TapeFormula::BASF:
                 // BASF SPR50LH — bright, clean, modern. Mer HF-extension,
@@ -105,6 +106,7 @@ namespace bc2000dl::dsp
                 hfCorner *= 1.40;       // markant brighter (var 1.15)
                 headBumpGainDb -= 1.5;  // tighter low (var -0.5)
                 noiseDb -= 3.5;         // tystare (var -2)
+                hysteresis.setParams (JilesAtherton::presetBASF());
                 break;
             case TapeFormula::Scotch:
                 // Scotch 111/202 — dark, compressed, grungy. Markant
@@ -112,6 +114,7 @@ namespace bc2000dl::dsp
                 hfCorner *= 0.65;       // markant mörkare (var 0.88)
                 headBumpGainDb += 2.5;  // fatter low (var +0.5)
                 noiseDb += 3.0;         // mer brus (var +1.5)
+                hysteresis.setParams (JilesAtherton::presetScotch());
                 break;
         }
 
