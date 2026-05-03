@@ -196,13 +196,12 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setSize (kEditorW, kEditorH);
     setResizable (false, false);
 
-    // Helper: cream label on dark panel — never intercepts mouse, so sliders
-    // beneath always receive drag events.
+    // Helper: dark-ink label on cream paper — never intercepts mouse.
     auto creamLbl = [&] (juce::Label& l, const juce::String& text)
     {
         l.setText (text, juce::dontSendNotification);
         l.setFont (LnF::sectionFont (9.0f));
-        l.setColour (juce::Label::textColourId, LnF::creamLabel());
+        l.setColour (juce::Label::textColourId, LnF::ink());
         l.setJustificationType (juce::Justification::centred);
         l.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (l);
@@ -250,8 +249,8 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         sAtts.push_back (std::make_unique<SAtt> (processor.apvts, idR, f.r));
 
         f.caption.setText (cap, juce::dontSendNotification);
-        f.caption.setFont (LnF::sectionFont (9.5f));
-        f.caption.setColour (juce::Label::textColourId, LnF::creamLabel());
+        f.caption.setFont (LnF::sectionFont (10.5f));
+        f.caption.setColour (juce::Label::textColourId, LnF::ink());
         f.caption.setJustificationType (juce::Justification::centred);
         f.caption.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (f.caption);
@@ -302,7 +301,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
 
         l.setText (cap, juce::dontSendNotification);
         l.setFont (LnF::sectionFont (8.5f));
-        l.setColour (juce::Label::textColourId, LnF::creamDim());
+        l.setColour (juce::Label::textColourId, LnF::ink().withAlpha (0.75f));
         l.setJustificationType (juce::Justification::centredLeft);
         l.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (l);
@@ -405,7 +404,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("BC2000DL · v30.0 HARDWARE")
+                .withTitle ("BC2000DL · v31.0 INSTRUCTION-CARD")
                 .withMessage ("Bang & Olufsen Beocord 2000 De Luxe (1968-69)\n\n"
                               "DSP: Jiles-Atherton hysteresis · 8× oversampling\n"
                               "21/21 PASS vs Studio-Sound + Service Manual\n\n"
@@ -445,7 +444,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (20, 10).removeFromTop (28),
-                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v30.0");
+                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v31.0");
 
     // Counter (bottom-centre of alu zone, between the reels)
     {
@@ -469,27 +468,27 @@ void NativeEditor::paint (juce::Graphics& g)
                          .withHeight (bounds.getHeight() - kAluH - kDivH);
     LnF::drawBlackPanel (g, blackZone);
 
-    // Column dividers
+    // Column dividers — thin black ink lines on cream paper
     const int leftEnd   = kTeakW + kLeftColW;
     const int centerEnd = leftEnd + kCenterColW;
     const int divTop    = kAluH + kDivH + kPresetH + 14;
     const int divBot    = bounds.getBottom() - 8;
-    g.setColour (juce::Colour (0xFF2C2C34));
+    g.setColour (LnF::ink().withAlpha (0.45f));
     g.drawVerticalLine (leftEnd,   (float) divTop, (float) divBot);
     g.drawVerticalLine (centerEnd, (float) divTop, (float) divBot);
 
-    // Section labels
+    // Section labels in dark ink
     const int lblY = kAluH + kDivH + kPresetH + 4;
-    g.setFont (LnF::sectionFont (8.0f));
-    g.setColour (LnF::creamDim());
+    g.setFont (LnF::sectionFont (8.5f));
+    g.setColour (LnF::ink().withAlpha (0.75f));
     g.drawText ("INPUT",    juce::Rectangle<int> (kTeakW + 8, lblY, kLeftColW - 12, 12), juce::Justification::left);
     g.drawText ("FADERS",   juce::Rectangle<int> (leftEnd + 8, lblY, 80, 12), juce::Justification::left);
     g.drawText ("TONE · TAPE", juce::Rectangle<int> (centerEnd + 8, lblY, 130, 12), juce::Justification::left);
 
-    // Status bar (preset row, right side)
+    // Status bar (preset row) — dark ink on cream
     if (statusText.isNotEmpty())
     {
-        g.setColour (LnF::amber().withAlpha (0.55f));
+        g.setColour (LnF::ink().withAlpha (0.65f));
         g.setFont (LnF::monoFont (9.0f));
         g.drawText (statusText,
                     juce::Rectangle<int> (centerEnd - 220, kAluH + kDivH + 4, 210, kPresetH - 8),
