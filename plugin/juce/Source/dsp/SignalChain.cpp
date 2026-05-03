@@ -164,8 +164,9 @@ namespace bc2000dl::dsp
         }
 
         // Input-trim — efter gain-cascaden reducerats till ~11 dB (var 72 dB)
-        // behöver vi mindre pad. 0.5 = -6 dB, ger användbar fader-rörelse.
-        constexpr float kInputPad = 0.5f;
+        // behöver vi mindre pad. 0.7 = -3 dB, ger fader 50% en mer intuitiv
+        // ~unity-nivå. (Tidigare 0.5 = -6 dB gjorde default-output för tyst.)
+        constexpr float kInputPad = 0.7f;
 
         // Bypass-tape eller Monitor=Source: hoppa över tape-blocket men kör input-preamp
         // (manual #22 "medhør"; manual #23 bypass-läge). I detta läge använder vi mic-vägen

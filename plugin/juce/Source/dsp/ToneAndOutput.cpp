@@ -79,8 +79,9 @@ namespace bc2000dl::dsp
         const float lGain = std::cos (angle);
         const float rGain = std::sin (angle);
 
-        // Square-law master fade
-        const float masterLin = master * master;
+        // Linear master fade — fader-position matchar dB-respons mer intuitivt.
+        // (Tidigare master*master gjorde 0.75 = -5 dB; nu 0.75 = -2.5 dB.)
+        const float masterLin = master;
 
         const int n = buffer.getNumSamples();
         buffer.applyGain (0, 0, n, lGain * masterLin);

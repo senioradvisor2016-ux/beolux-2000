@@ -102,7 +102,7 @@ BC2000DLProcessor::createParameterLayout()
         juce::NormalisableRange<float> { -1.0f, 1.0f, 0.01f }, 0.0f));
     layout.add (std::make_unique<P> (
         juce::ParameterID { kP_Master, 1 }, "Master Volume",
-        juce::NormalisableRange<float> { 0.0f, 1.0f }, 0.75f));
+        juce::NormalisableRange<float> { 0.0f, 1.0f }, 0.85f));
 
     // Tape parameters
     layout.add (std::make_unique<P> (
