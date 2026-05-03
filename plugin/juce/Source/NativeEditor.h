@@ -155,6 +155,7 @@ private:
     juce::String       counterText { "0000" };
     double             counterSeconds { 0.0 };  // animated tape counter
     bool               recLedOn { false };       // record-LED state
+    int                prevSpeedIdx { -1 };      // for speed-LED repaint detection
 
     // ---- 5 dual-faders (10 sliders) — instruction-card slide-faders ----
     struct DualFader

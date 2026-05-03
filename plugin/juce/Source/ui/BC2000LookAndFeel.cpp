@@ -346,6 +346,22 @@ namespace bc2000dl::ui
         const auto  amberHi = juce::Colour (0xFFFFD080);
 
         // -------------------------------------------------------------------
+        // 0. HOVER OUTER GLOW — the entire knob "comes alive" on mouse-over.
+        //    A subtle amber halo behind the skirt, rendered first so it sits
+        //    under every other layer.
+        // -------------------------------------------------------------------
+        if (hot)
+        {
+            juce::Path hoverRing;
+            hoverRing.addEllipse (cx - radius * 1.10f, cy - radius * 1.10f,
+                                   radius * 2.20f, radius * 2.20f);
+            static thread_local melatonin::DropShadow hoverHalo {
+                { juce::Colour (0xFFE8B040).withAlpha (0.30f), 12, { 0, 0 }, 2 }
+            };
+            hoverHalo.render (g, hoverRing);
+        }
+
+        // -------------------------------------------------------------------
         // 1. RECESSED SKIRT (knob sits in a milled depression in the panel)
         // -------------------------------------------------------------------
         {
@@ -374,12 +390,34 @@ namespace bc2000dl::ui
         // 2. VALUE-ARC TRACK (the always-visible UAD signature)
         // -------------------------------------------------------------------
         {
-            // Background track (dark, slightly recessed)
+            // Background track (dark; slightly lighter when hot so active state
+            // is immediately visible even before moving the control).
             juce::Path bgArc;
             bgArc.addCentredArc (cx, cy, trackR, trackR, 0, angleStart, angleEnd, true);
-            g.setColour (juce::Colour (0xFF202024));
+            g.setColour (hot ? juce::Colour (0xFF30303A) : juce::Colour (0xFF202024));
             g.strokePath (bgArc, juce::PathStrokeType (4.0f, juce::PathStrokeType::curved,
                                                         juce::PathStrokeType::rounded));
+
+            // Default-value detent mark — white dot on the track at the
+            // double-click return position (the "noon" / centre position).
+            // Gives the same visual reference as the Fairchild's centre notch.
+            if (s.isDoubleClickReturnEnabled())
+            {
+                const float minV    = (float) s.getMinimum();
+                const float maxV    = (float) s.getMaximum();
+                const float defN    = (maxV > minV)
+                    ? juce::jlimit (0.0f, 1.0f,
+                          (float) ((s.getDoubleClickReturnValue() - minV) / (maxV - minV)))
+                    : 0.5f;
+                const float defAng  = angleStart + defN * (angleEnd - angleStart);
+                const float detentX = cx + trackR * std::sin (defAng);
+                const float detentY = cy - trackR * std::cos (defAng);
+                g.setColour (juce::Colour (0xFFFFFFFF).withAlpha (0.55f));
+                g.fillEllipse (detentX - 2.0f, detentY - 2.0f, 4.0f, 4.0f);
+                // thin outline so it reads on both amber arc and dark track
+                g.setColour (juce::Colours::black.withAlpha (0.35f));
+                g.drawEllipse (detentX - 2.0f, detentY - 2.0f, 4.0f, 4.0f, 0.6f);
+            }
 
             // Filled value-arc — amber, with melatonin glow when hot
             juce::Path valArc;

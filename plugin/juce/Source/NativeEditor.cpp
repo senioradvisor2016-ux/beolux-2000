@@ -310,6 +310,28 @@ namespace bc2000dl
         // Crisp top line
         g.setColour (juce::Colour (0xFFFFD080));
         g.strokePath (stroke, juce::PathStrokeType (1.2f));
+
+        // Frequency ruler — three amber tick-labels at bottom edge.
+        // Positions assume 44.1 kHz SR (log scale 86 Hz .. 22 kHz);
+        // they read well at 48 kHz too (shift is < 5 % visual).
+        {
+            struct FLbl { float t; const char* text; };
+            constexpr FLbl freqLbls[] = { { 0.03f, "100" }, { 0.44f, "1k" }, { 0.86f, "10k" } };
+            g.setFont (bc2000dl::ui::InstructionCardLnF::sectionFont (5.5f));
+            for (const auto& fl : freqLbls)
+            {
+                const float x = r.getX() + r.getWidth() * fl.t;
+                // faint tick
+                g.setColour (juce::Colour (0xFFE8B040).withAlpha (0.28f));
+                g.drawLine (x, r.getBottom() - 4.0f, x, r.getBottom(), 0.6f);
+                // amber label
+                g.setColour (juce::Colour (0xFFE8B040).withAlpha (0.48f));
+                g.drawText (fl.text,
+                    juce::Rectangle<float> (x - 7.0f, r.getBottom() - 8.5f, 14.0f, 8.0f)
+                        .toNearestInt(),
+                    juce::Justification::centred, false);
+            }
+        }
     }
 }
 
@@ -420,13 +442,49 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         creamLbl (l, cap);
         l.setInterceptsMouseClicks (false, false);
     };
-    setupKnob (knob_treble,  lbl_treble,  "treble_db",      "TREBLE");
-    setupKnob (knob_bass,    lbl_bass,    "bass_db",        "BASS");
-    setupKnob (knob_balance, lbl_balance, "balance",        "BAL");
-    setupKnob (knob_bias,    lbl_bias,    "bias_amount",    "BIAS");
-    setupKnob (knob_wow,     lbl_wow,     "wow_flutter",    "WOW");
-    setupKnob (knob_mult,    lbl_mult,    "multiplay_gen",  "MULT");
-    setupKnob (knob_master,  lbl_master,  "master_volume",  "VOL");
+    setupKnob (knob_treble,  lbl_treble,  "treble_db",      "TREBLE dB");
+    setupKnob (knob_bass,    lbl_bass,    "bass_db",        "BASS dB");
+    setupKnob (knob_balance, lbl_balance, "balance",        "BAL L\xe2\x86\x94R");
+    setupKnob (knob_bias,    lbl_bias,    "bias_amount",    "BIAS %");
+    setupKnob (knob_wow,     lbl_wow,     "wow_flutter",    "WOW %");
+    setupKnob (knob_mult,    lbl_mult,    "multiplay_gen",  "MULT x");
+    setupKnob (knob_master,  lbl_master,  "master_volume",  "VOL dB");
+
+    // Engineering-unit popup readout for every knob.
+    // textFromValueFunction is a public std::function on juce::Slider (JUCE 7+).
+    knob_treble.textFromValueFunction  = [] (double v)
+        { return (v >= 0 ? "+" : "") + juce::String (v, 1) + " dB"; };
+    knob_bass.textFromValueFunction    = [] (double v)
+        { return (v >= 0 ? "+" : "") + juce::String (v, 1) + " dB"; };
+    knob_balance.textFromValueFunction = [] (double v)
+    {
+        if (std::abs (v) < 0.01)  return juce::String ("Centre");
+        return juce::String (int (std::abs (v) * 100.0 + 0.5)) + (v < 0.0 ? "% L" : "% R");
+    };
+    knob_bias.textFromValueFunction    = [] (double v)
+    {
+        const double pct = (v - 1.0) * 100.0;
+        if (std::abs (pct) < 0.5)  return juce::String ("nominal");
+        return (pct >= 0 ? "+" : "") + juce::String (pct, 0) + "% bias";
+    };
+    knob_wow.textFromValueFunction     = [] (double v)
+        { return juce::String (v * 100.0, 0) + "% W+F"; };
+    knob_mult.textFromValueFunction    = [] (double v)
+        { return "gen " + juce::String (juce::roundToInt (v)); };
+    knob_master.textFromValueFunction  = [] (double v)
+    {
+        if (v < 0.001)  return juce::String ("-inf dB");
+        return juce::String (20.0 * std::log10 (v), 1) + " dBFS";
+    };
+
+    // Double-click resets to the hardware-default position + marks the detent.
+    knob_treble.setDoubleClickReturnValue  (true, 0.0);
+    knob_bass.setDoubleClickReturnValue    (true, 0.0);
+    knob_balance.setDoubleClickReturnValue (true, 0.0);
+    knob_bias.setDoubleClickReturnValue    (true, 1.0);
+    knob_wow.setDoubleClickReturnValue     (true, 0.3);
+    knob_mult.setDoubleClickReturnValue    (true, 1.0);
+    knob_master.setDoubleClickReturnValue  (true, 0.85);
 
     // ---- 5 selectors ----
     auto setupCombo = [&] (juce::ComboBox& c, juce::Label& l, const juce::String& id,
@@ -544,7 +602,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("Beolux 2000 · v33.0")
+                .withTitle ("Beolux 2000 · v55.0")
                 .withMessage ("BEOLUX 2000 — Danish Tape Emulation\n"
                               "by SOUNDBOYS\n\n"
                               "Inspired by the Bang & Olufsen Beocord 2000\n"
@@ -646,7 +704,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v54.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v55.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -715,6 +773,58 @@ void NativeEditor::paint (juce::Graphics& g)
             g.drawText (h.text, h.r.translated (0, 1), juce::Justification::centred, false);
             g.setColour (juce::Colour (0xFFE0E0E4));
             g.drawText (h.text, h.r, juce::Justification::centred, false);
+        }
+    }
+
+    // ===== Tape-speed indicator LEDs (3 amber dots next to TAPE SPEED label) =====
+    // Positions derived from the layout constants; stable across repaints.
+    {
+        const int speedIdx = (int) processor.apvts.getRawParameterValue ("speed")->load();
+
+        // lbl_speed sits at y = kAluH+kDivH+kPresetH+11+3, h=10  →  centre ≈ y+5
+        constexpr int lcdY   = kAluH + kDivH + kPresetH + 11 + 3 + 5;
+        constexpr int dotsX0 = kTeakW + kLeftColW - 14;   // right side of left column
+        constexpr float dotR = 2.5f, dotGap = 8.0f;
+
+        for (int i = 0; i < 3; ++i)
+        {
+            const float dx = (float) dotsX0 - (float) (2 - i) * dotGap;
+            const float dy = (float) lcdY;
+            const bool  on = (i == speedIdx);
+            if (on)
+            {
+                // amber glow halo
+                g.setColour (juce::Colour (0xFFE8B040).withAlpha (0.32f));
+                g.fillEllipse (dx - dotR * 2.4f, dy - dotR * 2.4f, dotR * 4.8f, dotR * 4.8f);
+                // LED body
+                juce::ColourGradient ledGrad (
+                    juce::Colour (0xFFFFD070), dx - dotR * 0.4f, dy - dotR * 0.5f,
+                    juce::Colour (0xFFA07018), dx + dotR * 0.4f, dy + dotR * 0.5f, false);
+                g.setGradientFill (ledGrad);
+                g.fillEllipse (dx - dotR, dy - dotR, dotR * 2, dotR * 2);
+                // specular
+                g.setColour (juce::Colours::white.withAlpha (0.80f));
+                g.fillEllipse (dx - dotR * 0.40f, dy - dotR * 0.65f, dotR * 0.60f, dotR * 0.40f);
+            }
+            else
+            {
+                g.setColour (juce::Colour (0xFF1E1A10));
+                g.fillEllipse (dx - dotR, dy - dotR, dotR * 2, dotR * 2);
+                g.setColour (juce::Colour (0xFF3A3020).withAlpha (0.7f));
+                g.drawEllipse (dx - dotR, dy - dotR, dotR * 2, dotR * 2, 0.5f);
+            }
+        }
+        // Speed-value captions below each dot (4.75 / 9.5 / 19)
+        g.setFont (LnF::sectionFont (5.0f));
+        g.setColour (juce::Colour (0xFF907850).withAlpha (0.65f));
+        const char* spLbls[] = { "4.75", "9.5", "19" };
+        for (int i = 0; i < 3; ++i)
+        {
+            const float dx = (float) dotsX0 - (float) (2 - i) * dotGap;
+            g.drawText (spLbls[i],
+                juce::Rectangle<float> (dx - 8.0f, (float) lcdY + dotR + 1.5f, 16.0f, 7.0f)
+                    .toNearestInt(),
+                juce::Justification::centred, false);
         }
     }
 
@@ -1073,6 +1183,14 @@ void NativeEditor::timerCallback()
 
     const int speedIdx = (int) processor.apvts.getRawParameterValue ("speed")->load();
     reelDeck.setSpeed (speedIdx);
+
+    // Repaint the speed-indicator LED strip whenever the selected speed changes.
+    if (speedIdx != prevSpeedIdx)
+    {
+        prevSpeedIdx = speedIdx;
+        // Repaint the left-column region that contains the three speed LEDs.
+        repaint (juce::Rectangle<int> (kTeakW, kAluH + kDivH, kLeftColW, kPresetH + 60));
+    }
 
     // Counter: ticks up while tape "runs" — speed-aware (faster speed = faster
     // playback time consumed). Display: 0000 = quarters of a second since start
