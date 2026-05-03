@@ -51,6 +51,36 @@ namespace bc2000dl
         bool recording { false };
     };
 
+    /** Live spectrum analyser — pulls samples from SignalChain FIFO,
+        runs FFT, renders a glowing amber curve on a black background. */
+    class SpectrumAnalyser : public juce::Component, private juce::Timer
+    {
+    public:
+        SpectrumAnalyser() : forwardFFT (kFftOrder), window (kFftSize, juce::dsp::WindowingFunction<float>::hann)
+        {
+            startTimerHz (30);
+        }
+        void setSource (const float* buffer, std::atomic<int>* writeIdx, int bufSize)
+        {
+            srcBuffer = buffer;
+            srcWriteIdx = writeIdx;
+            srcSize = bufSize;
+        }
+        void paint (juce::Graphics&) override;
+    private:
+        void timerCallback() override;
+        static constexpr int kFftOrder = 11;       // 2^11 = 2048
+        static constexpr int kFftSize  = 1 << kFftOrder;
+        static constexpr int kNumBins  = 96;
+        juce::dsp::FFT forwardFFT;
+        juce::dsp::WindowingFunction<float> window;
+        float fftData[kFftSize * 2] {};
+        float magnitudes[kNumBins] {};
+        const float* srcBuffer { nullptr };
+        std::atomic<int>* srcWriteIdx { nullptr };
+        int srcSize { 0 };
+    };
+
     /** Analog VU meter with curved scale + needle on cream face.
         - Authentic 2nd-order ballistics (300ms attack/decay + overshoot)
         - Boot calibration sweep on first 1.5s (premium "device awakens" feel)
@@ -101,11 +131,12 @@ private:
     // melatonin_inspector — Cmd+Shift+I toggles the live component inspector
     melatonin::Inspector inspector { *this };
 
-    // ---- Top deck zone: reels + 3 analog VU meters (Left, Right, Output) ----
+    // ---- Top deck zone: reels + 3 analog VU meters + spectrum strip ----
     bc2000dl::ReelDeck reelDeck;
     bc2000dl::AnalogVU vuInL { "VU" };
     bc2000dl::AnalogVU vuInR { "VU" };
     bc2000dl::AnalogVU vuOut { "VU" };
+    bc2000dl::SpectrumAnalyser spectrum;
     juce::String       counterText { "0000" };
     double             counterSeconds { 0.0 };  // animated tape counter
     bool               recLedOn { false };       // record-LED state

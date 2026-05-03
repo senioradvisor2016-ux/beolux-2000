@@ -22,6 +22,7 @@
 */
 
 #include "NativeEditor.h"
+#include <melatonin_blur/melatonin_blur.h>
 
 namespace
 {
@@ -193,6 +194,93 @@ namespace bc2000dl
     }
 
     // (Old VUBar removed — replaced by AnalogVU above.)
+
+    //=========================================================================
+    //  Spectrum analyser — pulls samples from chain FIFO, FFT, smooth render
+    //=========================================================================
+    void SpectrumAnalyser::timerCallback()
+    {
+        if (srcBuffer == nullptr || srcWriteIdx == nullptr || srcSize <= 0)
+            return;
+
+        // Copy the most recent kFftSize samples (in chronological order) into
+        // fftData, applying a Hann window.
+        const int writeIdx = srcWriteIdx->load (std::memory_order_acquire);
+        const int start = (writeIdx - kFftSize + srcSize) & (srcSize - 1);
+        for (int i = 0; i < kFftSize; ++i)
+            fftData[i] = srcBuffer[(start + i) & (srcSize - 1)];
+
+        std::fill (fftData + kFftSize, fftData + kFftSize * 2, 0.0f);
+        window.multiplyWithWindowingTable (fftData, kFftSize);
+        forwardFFT.performFrequencyOnlyForwardTransform (fftData);
+
+        // Map FFT bins to our N display bins logarithmically (50 Hz - 20 kHz).
+        const int halfFFT = kFftSize / 2;
+        for (int b = 0; b < kNumBins; ++b)
+        {
+            const float t = (float) b / (float) (kNumBins - 1);
+            const float minIdx = std::log10 (4.0f);                  // ~50 Hz
+            const float maxIdx = std::log10 ((float) halfFFT);
+            const float idx = std::pow (10.0f, minIdx + t * (maxIdx - minIdx));
+            const int   i0  = juce::jlimit (0, halfFFT - 1, (int) std::floor (idx));
+            const int   i1  = juce::jlimit (0, halfFFT - 1, i0 + 1);
+            const float frac = idx - (float) i0;
+            const float mag = juce::jmap (fftData[i0] + frac * (fftData[i1] - fftData[i0]),
+                                            0.0f, (float) kFftSize, 0.0f, 1.0f);
+            // Convert to dB and smooth (peak-hold style)
+            const float db = juce::Decibels::gainToDecibels (mag, -90.0f);
+            const float v  = juce::jlimit (0.0f, 1.0f, (db + 80.0f) / 80.0f);
+            // Smooth attack-fast / release-slow
+            magnitudes[b] = v > magnitudes[b]
+                              ? magnitudes[b] + (v - magnitudes[b]) * 0.50f
+                              : magnitudes[b] + (v - magnitudes[b]) * 0.10f;
+        }
+        repaint();
+    }
+
+    void SpectrumAnalyser::paint (juce::Graphics& g)
+    {
+        const auto r = getLocalBounds().toFloat();
+
+        // Build a smooth path from bin magnitudes
+        juce::Path curve;
+        curve.startNewSubPath (r.getX(), r.getBottom());
+        for (int b = 0; b < kNumBins; ++b)
+        {
+            const float x = r.getX() + (r.getWidth() * (float) b / (float) (kNumBins - 1));
+            const float y = r.getBottom() - r.getHeight() * magnitudes[b];
+            curve.lineTo (x, y);
+        }
+        curve.lineTo (r.getRight(), r.getBottom());
+        curve.closeSubPath();
+
+        // Filled glow gradient (amber, fades down)
+        juce::ColourGradient grad (
+            juce::Colour (0xFFE8B040).withAlpha (0.55f), r.getCentreX(), r.getY(),
+            juce::Colour (0xFFE8B040).withAlpha (0.05f), r.getCentreX(), r.getBottom(), false);
+        g.setGradientFill (grad);
+        g.fillPath (curve);
+
+        // Stroke the curve on top with brighter amber
+        juce::Path stroke;
+        stroke.startNewSubPath (r.getX(), r.getBottom());
+        for (int b = 0; b < kNumBins; ++b)
+        {
+            const float x = r.getX() + (r.getWidth() * (float) b / (float) (kNumBins - 1));
+            const float y = r.getBottom() - r.getHeight() * magnitudes[b];
+            if (b == 0) stroke.startNewSubPath (x, y);
+            else        stroke.lineTo (x, y);
+        }
+        // Real Gaussian glow under the line (melatonin)
+        static thread_local melatonin::DropShadow specGlow {
+            { juce::Colour (0xFFE8B040).withAlpha (0.85f), 6, { 0, 0 }, 1 }
+        };
+        specGlow.render (g, stroke, juce::PathStrokeType (1.4f));
+
+        // Crisp top line
+        g.setColour (juce::Colour (0xFFFFD080));
+        g.strokePath (stroke, juce::PathStrokeType (1.2f));
+    }
 }
 
 //=============================================================================
@@ -233,6 +321,13 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     addAndMakeVisible (vuInL);
     addAndMakeVisible (vuInR);
     addAndMakeVisible (vuOut);
+
+    // ---- Spectrum analyser (live FFT strip on deck) ----
+    spectrum.setSource (processor.getChain().spectrumBuffer,
+                         &processor.getChain().spectrumWriteIdx,
+                         bc2000dl::dsp::SignalChain::kSpecBufSize);
+    spectrum.setInterceptsMouseClicks (false, false);
+    addAndMakeVisible (spectrum);
 
     // ---- 5 dual-faders ----
     // Bulletproof drag config: snap to mouse, no velocity-mode (predictable),
@@ -461,7 +556,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v44.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v45.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -683,9 +778,16 @@ void NativeEditor::resized()
     const auto bounds = getLocalBounds();
     auto inner = bounds.withTrimmedLeft (kTeakW).withTrimmedRight (kTeakW);
 
-    // ===== Top deck zone: reel deck + analog VU pair =====
+    // ===== Top deck zone: reel deck + analog VU pair + spectrum strip =====
     auto deckZone = inner.withHeight (kAluH).withTrimmedTop (20).reduced (4, 1);
     reelDeck.setBounds (deckZone);
+
+    // Spectrum strip — thin glowing band at the bottom of the deck zone,
+    // spans full inner width, just above the chrome divider line.
+    {
+        const int strH = 18;
+        spectrum.setBounds (kTeakW + 4, kAluH - strH - 1, kInnerW - 8, strH);
+    }
 
     // 3 analog VU meters in a single horizontal row, with engraved headers
     // above (LEFT / RIGHT / OUTPUT) and counter below.

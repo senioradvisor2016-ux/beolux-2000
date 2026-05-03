@@ -97,6 +97,12 @@ namespace bc2000dl::dsp
         std::atomic<bool>  isRecordingL { false };
         std::atomic<bool>  isRecordingR { false };
 
+        // ---- Spectrum-analyser FIFO (UI-thread reads, audio-thread writes) ----
+        // Lock-free ring buffer of recent post-processing samples (mono mix).
+        static constexpr int kSpecBufSize = 2048;
+        float spectrumBuffer[kSpecBufSize] {};
+        std::atomic<int> spectrumWriteIdx { 0 };
+
     private:
         double sampleRate { 48000.0 };
         Parameters params;

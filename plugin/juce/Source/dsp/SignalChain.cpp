@@ -366,5 +366,21 @@ namespace bc2000dl::dsp
             meterLevelR_dBFS.store (lvl);
             isRecordingR.store (params.micGain > 0.05f && ! params.bypassTape);
         }
+
+        // ---- Push mono mix into spectrum FIFO (UI thread reads via FFT) ----
+        {
+            const auto* lPtr = numCh >= 1 ? buffer.getReadPointer (0) : nullptr;
+            const auto* rPtr = numCh >= 2 ? buffer.getReadPointer (1) : lPtr;
+            const int n = buffer.getNumSamples();
+            int w = spectrumWriteIdx.load (std::memory_order_relaxed);
+            for (int i = 0; i < n; ++i)
+            {
+                const float s = (lPtr ? lPtr[i] : 0.0f) * 0.5f
+                              + (rPtr ? rPtr[i] : 0.0f) * 0.5f;
+                spectrumBuffer[w] = s;
+                w = (w + 1) & (kSpecBufSize - 1);
+            }
+            spectrumWriteIdx.store (w, std::memory_order_release);
+        }
     }
 }
