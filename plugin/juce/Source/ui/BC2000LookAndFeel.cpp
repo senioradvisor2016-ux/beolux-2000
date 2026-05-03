@@ -500,11 +500,15 @@ namespace bc2000dl::ui
         const auto bounds = b.getLocalBounds().toFloat().reduced (1.0f);
         const bool on = b.getToggleState();
 
-        // ---- Drop shadow under raised key ----
+        // ---- Real Gaussian drop-shadow (melatonin) ----
         if (! down)
         {
-            g.setColour (juce::Colours::black.withAlpha (0.55f));
-            g.fillRoundedRectangle (bounds.translated (0, 1.0f), 2.5f);
+            juce::Path keyPath;
+            keyPath.addRoundedRectangle (bounds, 2.5f);
+            static thread_local melatonin::DropShadow toggleShadow {
+                { juce::Colours::black.withAlpha (0.65f), 5, { 0, 2 }, 0 }
+            };
+            toggleShadow.render (g, keyPath);
         }
 
         // ---- WHITE PLASTIC KEY FACE ----
@@ -519,6 +523,16 @@ namespace bc2000dl::ui
                 juce::Colour (0xFF989898), bounds.getCentreX(), bounds.getBottom(), false);
         g.setGradientFill (body);
         g.fillRoundedRectangle (bounds, 2.5f);
+
+        // ---- Inner shadow on top edge (sells moulded plastic curvature) ----
+        {
+            juce::Path keyPath;
+            keyPath.addRoundedRectangle (bounds, 2.5f);
+            static thread_local melatonin::InnerShadow toggleInner {
+                { juce::Colours::black.withAlpha (0.18f), 3, { 0, -1 }, 0 }
+            };
+            toggleInner.render (g, keyPath);
+        }
 
         // Top hairline highlight (sells "moulded plastic" look)
         g.setColour (juce::Colours::white.withAlpha (0.85f));
@@ -538,9 +552,13 @@ namespace bc2000dl::ui
         const float ledY = bounds.getCentreY();
         if (on)
         {
-            // Glow halo
-            g.setColour (juce::Colour (0xFFFFA090).withAlpha (0.55f));
-            g.fillEllipse (ledX - ledR * 2.5f, ledY - ledR * 2.5f, ledR * 5.0f, ledR * 5.0f);
+            // Real Gaussian glow halo
+            juce::Path ledPath;
+            ledPath.addEllipse (ledX - ledR, ledY - ledR, ledR * 2, ledR * 2);
+            static thread_local melatonin::DropShadow ledGlow {
+                { juce::Colour (0xFFFF6050).withAlpha (0.85f), 10, { 0, 0 }, 1 }
+            };
+            ledGlow.render (g, ledPath);
             // LED body
             juce::ColourGradient lg (
                 juce::Colour (0xFFFFE070), ledX - ledR * 0.4f, ledY - ledR * 0.5f,
@@ -601,12 +619,15 @@ namespace bc2000dl::ui
         g.setGradientFill (grad);
         g.fillRoundedRectangle (box, 2.5f);
 
-        // Top inner shadow (recessed feel)
-        juce::ColourGradient innerShadow (
-            juce::Colours::black.withAlpha (0.55f), box.getCentreX(), box.getY(),
-            juce::Colours::transparentBlack,         box.getCentreX(), box.getY() + 4.0f, false);
-        g.setGradientFill (innerShadow);
-        g.fillRoundedRectangle (box, 2.5f);
+        // Real Gaussian inner shadow — true recessed look
+        {
+            juce::Path boxPath;
+            boxPath.addRoundedRectangle (box, 2.5f);
+            static thread_local melatonin::InnerShadow comboInner {
+                { juce::Colours::black.withAlpha (0.85f), 5, { 0, 2 }, 0 }
+            };
+            comboInner.render (g, boxPath);
+        }
 
         // Bottom edge highlight (catches light)
         g.setColour (juce::Colour (0xFF6A6A72).withAlpha (0.55f));
@@ -842,13 +863,14 @@ namespace bc2000dl::ui
         const float cy = bf.getCentreY();
         const float radius = juce::jmin (bf.getWidth(), bf.getHeight()) * 0.5f - 3.0f;
 
-        // ---- Drop shadow ----
-        for (int i = 0; i < 3; ++i)
+        // ---- Real Gaussian drop-shadow (melatonin) ----
         {
-            g.setColour (juce::Colours::black.withAlpha (0.20f));
-            const float pad = (float) (i + 1) * 1.6f;
-            g.fillEllipse (cx - radius - pad, cy - radius - pad + 2,
-                           (radius + pad) * 2, (radius + pad) * 2);
+            juce::Path reelPath;
+            reelPath.addEllipse (cx - radius, cy - radius, radius * 2, radius * 2);
+            static thread_local melatonin::DropShadow reelShadow {
+                { juce::Colours::black.withAlpha (0.75f), 18, { 0, 6 }, 0 }
+            };
+            reelShadow.render (g, reelPath);
         }
 
         // ---- 1. Outer dark rim (the metal edge of the flange) ----
@@ -1067,9 +1089,13 @@ namespace bc2000dl::ui
         // ---- Body fill ----
         if (active)
         {
-            // Glow halo
-            g.setColour (accent.withAlpha (0.45f));
-            g.fillRoundedRectangle (keyRect.expanded (1.5f), 4.0f);
+            // Real Gaussian glow halo (melatonin)
+            juce::Path keyPath;
+            keyPath.addRoundedRectangle (keyRect, 3.0f);
+            static thread_local melatonin::DropShadow keyGlow {
+                { juce::Colour (0xFFE03828).withAlpha (0.55f), 14, { 0, 0 }, 2 }
+            };
+            keyGlow.render (g, keyPath);
 
             juce::ColourGradient g1 (
                 accent.brighter (0.30f), keyRect.getCentreX(), keyRect.getY(),
