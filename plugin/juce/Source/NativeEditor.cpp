@@ -605,13 +605,13 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("Beolux 2000 · v56.1")
+                .withTitle ("Beolux 2000 · v56.9")
                 .withMessage ("BEOLUX 2000 — Danish Tape Emulation\n"
                               "by SOUNDBOYS\n\n"
                               "Inspired by the Bang & Olufsen Beocord 2000\n"
                               "De Luxe reel-to-reel (1968-69).\n\n"
                               "DSP: Jiles-Atherton tape hysteresis · 8× oversampling\n"
-                              "21/21 PASS vs Studio-Sound + Service Manual\n\n"
+                              "22/22 PASS vs Studio-Sound + Service Manual\n\n"
                               "UI: native JUCE · hardware-accurate aesthetic\n"
                               "Teak frame · black-metal deck · 3D bullseye reels\n"
                               "Analog VU meters · cream instruction-card panel")
@@ -707,7 +707,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v56.1");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v56.9");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
