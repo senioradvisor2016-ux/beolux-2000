@@ -592,12 +592,12 @@
     position: relative;
     overflow: hidden;
   }
-  /* Inner chrome ring (between bezel and glass) — adds the layered jewel-look */
+  /* Inner chrome bevel — pure outline, no fill (must not obscure the cream face) */
   .vu-meter .bezel {
     position: absolute;
     inset: 3px;
     border-radius: 4px;
-    background: linear-gradient(135deg, #2a2620 0%, #14110e 50%, #2a2620 100%);
+    background: transparent;
     box-shadow:
       0 0 0 1px rgba(255,255,255,0.12) inset,
       0 0 0 2px rgba(0,0,0,0.85) inset,
