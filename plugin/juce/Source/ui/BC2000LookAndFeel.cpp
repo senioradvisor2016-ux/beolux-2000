@@ -1080,15 +1080,23 @@ namespace bc2000dl::ui
     //=========================================================================
     void InstructionCardLnF::drawReel (juce::Graphics& g, juce::Rectangle<int> r,
                                          float rotationRad, bool active,
-                                         float tapeFillRatio, float motionAmount)
+                                         float tapeFillRatio, float motionAmount,
+                                         float wowWobble)
     {
         // AUTHENTIC PRO REEL — brushed aluminium flange, dark tape visible
         // through 3 spoke windows, black hub with chrome screws. No bright
         // colours — the way a real Studer/Revox/Otari spool actually looks.
         const auto bf = r.toFloat();
-        const float cx = bf.getCentreX();
-        const float cy = bf.getCentreY();
         const float radius = juce::jmin (bf.getWidth(), bf.getHeight()) * 0.5f - 3.0f;
+
+        // Eccentric-hub wobble: centre shifts slightly with rotation, simulating
+        // a reel that isn't perfectly concentric on the drive spindle.
+        // wowWobble = 0 → static  |  wowWobble = 1 → ~1.5 px shift at nominal size
+        const float wobbleAmp = wowWobble * radius * 0.016f;
+        const float cx = bf.getCentreX()
+                         + wobbleAmp * std::sin (rotationRad);
+        const float cy = bf.getCentreY()
+                         + wobbleAmp * std::cos (rotationRad * 0.87f + 0.55f);
 
         // ---- Real Gaussian drop-shadow (melatonin) ----
         {

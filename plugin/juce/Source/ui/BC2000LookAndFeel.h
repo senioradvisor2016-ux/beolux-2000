@@ -124,7 +124,8 @@ namespace bc2000dl::ui
             @param motionAmount   0..1 — how much motion-blur to apply (0 = static) */
         static void drawReel (juce::Graphics&, juce::Rectangle<int>,
                               float rotationRad = 0.0f, bool active = false,
-                              float tapeFillRatio = 1.0f, float motionAmount = 0.0f);
+                              float tapeFillRatio = 1.0f, float motionAmount = 0.0f,
+                              float wowWobble = 0.0f);
 
         /** Tape head/erase-head pictogram. */
         static void drawHeadAssembly (juce::Graphics&, juce::Rectangle<int>);

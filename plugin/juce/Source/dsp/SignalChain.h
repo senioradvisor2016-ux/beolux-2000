@@ -82,6 +82,11 @@ namespace bc2000dl::dsp
 
             // Tape-formel (plan §7): 0=Agfa, 1=BASF, 2=Scotch
             int   tapeFormula       { 0 };
+
+            // Radio AUX input sensitivity (hardware sensitivity switch)
+            // 0 = L (3 mV ceramic/low-level) → high preamp gain → more character
+            // 1 = H (100 mV line/tuner)      → lower preamp gain → cleaner
+            int   radioMode         { 0 };
         };
 
         void prepare (double sampleRate, int maximumBlockSize);

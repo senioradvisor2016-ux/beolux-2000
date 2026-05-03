@@ -132,6 +132,11 @@ namespace bc2000dl::dsp
         L.phono.setMode (p.phonoMode == 0 ? PhonoMode::L : PhonoMode::H);
         R.phono.setMode (p.phonoMode == 0 ? PhonoMode::L : PhonoMode::H);
 
+        // Radio input sensitivity: L → high preamp gain, H → backed-off (cleaner)
+        const float radioPreampGainDb = (p.radioMode == 1) ? -2.0f : 4.0f;
+        L.radioUw0029.setGain (radioPreampGainDb);
+        R.radioUw0029.setGain (radioPreampGainDb);
+
         // Tape-formel (plan §7)
         const auto tf = (p.tapeFormula == 1 ? TapeFormula::BASF :
                         p.tapeFormula == 2 ? TapeFormula::Scotch : TapeFormula::Agfa);

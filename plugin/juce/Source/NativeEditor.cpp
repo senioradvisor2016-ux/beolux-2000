@@ -140,8 +140,8 @@ namespace bc2000dl
         const float motionL = juce::jlimit (0.0f, 1.0f, angVelL * 18.0f);
         const float motionR = juce::jlimit (0.0f, 1.0f, angVelR * 18.0f);
 
-        ui::InstructionCardLnF::drawReel (g, leftReel,  angleL,        isActive, supplyFill, motionL);
-        ui::InstructionCardLnF::drawReel (g, rightReel, -angleR * 1.0f, isActive, takeupFill, motionR);
+        ui::InstructionCardLnF::drawReel (g, leftReel,  angleL,         isActive, supplyFill, motionL, wowIntensity);
+        ui::InstructionCardLnF::drawReel (g, rightReel, -angleR * 1.0f, isActive, takeupFill, motionR, wowIntensity);
 
         // Tape path: thin metallic line between reel rims (the actual tape)
         const float tapeY = (float) bounds.getCentreY();

@@ -56,7 +56,8 @@ namespace bc2000dl::dsp
             noiseSigma = kNoiseVrms_AC126 * std::sqrt ((sr / 2.0) / bandwidthAudio);
         }
 
-        rng.seed (noiseSeed != 0 ? noiseSeed : std::random_device {} ());
+        lcgState = noiseSeed != 0 ? noiseSeed
+                                  : static_cast<std::uint32_t> (std::random_device {} ());
     }
 
     void GeLowNoiseStage::reset()
@@ -77,7 +78,8 @@ namespace bc2000dl::dsp
 
     float GeLowNoiseStage::processSample (float x)
     {
-        const double noise = noiseDist (rng) * noiseSigma;
+        const float noise = bc2000dl::dsp::detail::fastGaussNoise (lcgState)
+                            * static_cast<float> (noiseSigma);
         const double xNoisy = static_cast<double> (x) + noise;
         const double clipped = softClipShared (xNoisy * gainLinear, asymmetry, kVT_25C);
         return static_cast<float> (clipped);

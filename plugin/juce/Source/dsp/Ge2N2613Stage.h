@@ -52,8 +52,7 @@ namespace bc2000dl::dsp
         double asymmetry  { kAsymmetryPNP };
         double noiseSigma { 0.0 };
 
-        std::mt19937 rng;
-        std::normal_distribution<double> noiseDist { 0.0, 1.0 };
+        std::uint32_t lcgState { 0u };   // fast LCG state (replaces mt19937)
 
         /** Ebers-Moll-derived asymmetric soft-clip. */
         static double softClip (double x, double asymmetry, double Vt);

@@ -255,6 +255,7 @@ void BC2000DLProcessor::updateChainParameters()
     p.monitorMode      = static_cast<int> (getF (kP_MonitorMode));
     p.phonoMode        = static_cast<int> (getF (kP_PhonoMode));
     p.tapeFormula      = static_cast<int> (getF (kP_TapeFormula));
+    p.radioMode        = static_cast<int> (getF (kP_RadioMode));
 
     // P.A. mode — duckar phono+radio när mic aktiv (-12 dB)
     if (p.publicAddress && (p.micGain > 0.05f || p.micGainR > 0.05f))

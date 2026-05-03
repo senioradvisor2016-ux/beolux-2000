@@ -20,7 +20,8 @@ namespace bc2000dl::dsp
         const double bandwidthNyquist  = sr / 2.0;
         noiseSigma = kNoiseVrms_2N2613 * std::sqrt (bandwidthNyquist / bandwidthAudio);
 
-        rng.seed (noiseSeed != 0 ? noiseSeed : std::random_device {} ());
+        lcgState = noiseSeed != 0 ? noiseSeed
+                                  : static_cast<std::uint32_t> (std::random_device {} ());
     }
 
     void Ge2N2613Stage::reset()
@@ -62,7 +63,8 @@ namespace bc2000dl::dsp
     float Ge2N2613Stage::processSample (float x)
     {
         // 1. Lägg till input-refererat brus
-        const double noise = noiseDist (rng) * noiseSigma;
+        const float noise = bc2000dl::dsp::detail::fastGaussNoise (lcgState)
+                            * static_cast<float> (noiseSigma);
         const double xNoisy = static_cast<double> (x) + noise;
 
         // 2. Soft-clip med PNP-asymmetri (efter gain)
