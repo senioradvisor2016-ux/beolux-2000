@@ -978,10 +978,13 @@ void NativeEditor::paint (juce::Graphics& g)
     // ===== Soundboys brand medallion (engraved on the black metal deck) =====
     // Small chrome-rimmed circular badge, just under the title text on the left.
     {
-        // Positioned past "BEOLUX 2000" title end (~x 206) + small gap
-        const float bx = (float) kTeakW + 258.0f;
-        const float by = 6.0f;
+        // Positioned dynamically: measure the actual title font width so the
+        // badge always lands 20 px clear of the last glyph, regardless of
+        // platform font metrics.
         const float br = 13.0f;
+        const float titleTextW = lnf.logoFont (22.0f).getStringWidthFloat ("BEOLUX 2000");
+        const float bx = (float)(kTeakW + 14) + titleTextW + 20.0f + br;
+        const float by = 6.0f;
 
         // Recess shadow
         g.setColour (juce::Colours::black.withAlpha (0.7f));
