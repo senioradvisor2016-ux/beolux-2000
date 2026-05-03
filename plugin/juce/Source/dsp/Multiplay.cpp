@@ -1,14 +1,16 @@
 /*  Multiplay implementation. */
 
 #include "Multiplay.h"
+#include "Constants.h"
 #include <cmath>
+#include <random>
 
 namespace bc2000dl::dsp
 {
     void Multiplay::prepare (double sr, std::uint32_t seed)
     {
         sampleRate = sr;
-        rng.seed (seed != 0 ? seed : std::random_device {} ());
+        lcgState = (seed != 0) ? seed : static_cast<std::uint32_t> (std::random_device {} ());
         updateForGeneration();
     }
 
@@ -43,8 +45,8 @@ namespace bc2000dl::dsp
         if (! enabled || generation <= 1) return x;
         // 1. HF-roll-off per generation
         float y = hfFilter.processSample (x);
-        // 2. Adderat brus
-        y += noiseDist (rng) * noiseAmpLin;
+        // 2. Adderat brus (LCG Gaussian)
+        y += detail::fastGaussNoise (lcgState) * noiseAmpLin;
         return y;
     }
 

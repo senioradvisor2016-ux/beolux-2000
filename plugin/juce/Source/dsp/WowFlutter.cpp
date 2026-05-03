@@ -22,14 +22,18 @@ namespace bc2000dl::dsp
 
     void WowFlutter::setSpeed (TapeSpeed speed)
     {
+        // Amounts calibrated to hit spec §7 at WowFlutterAmount=100%:
+        // % = wowAmount * 0.005 * 2π * freqHz * 100  (samples/sample → %)
+        // Wow (1.5 Hz):    Speed19 0.075%, Speed95 0.125%, Speed475 0.200%
+        // Flutter (30 Hz): Speed19 0.065%, Speed95 0.100%, Speed475 0.160%
         switch (speed)
         {
             case TapeSpeed::Speed19:
-                wowAmount = 0.0008f; flutterAmount = 0.0006f; break;
+                wowAmount = 0.0159f; flutterAmount = 0.000690f; break;
             case TapeSpeed::Speed95:
-                wowAmount = 0.0013f; flutterAmount = 0.0010f; break;
+                wowAmount = 0.0265f; flutterAmount = 0.001061f; break;
             case TapeSpeed::Speed475:
-                wowAmount = 0.0020f; flutterAmount = 0.0016f; break;
+                wowAmount = 0.0424f; flutterAmount = 0.001698f; break;
         }
     }
 

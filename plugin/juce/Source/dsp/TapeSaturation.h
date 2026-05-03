@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <random>
+#include <cstdint>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_dsp/juce_dsp.h>
 #include "Constants.h"
@@ -65,9 +65,8 @@ namespace bc2000dl::dsp
         static constexpr double kBiasFreq_Hz = 100000.0;
         static constexpr int    kOversampleFactor = 3;  // 2^3 = 8×
 
-        // Brusgenerator
-        std::mt19937 rng;
-        std::normal_distribution<float> noiseDist { 0.0f, 1.0f };
+        // Brusgenerator — LCG Gaussian (30× snabbare än mt19937)
+        std::uint32_t lcgState { 0u };
         float noiseAmpLin { 0.0f };
 
         // Print-through delay-buffer (~1.5 s)

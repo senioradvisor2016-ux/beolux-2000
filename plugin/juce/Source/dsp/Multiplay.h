@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <random>
+#include <cstdint>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_dsp/juce_dsp.h>
 
@@ -33,8 +33,7 @@ namespace bc2000dl::dsp
         int generation { 1 };
 
         juce::dsp::IIR::Filter<float> hfFilter;
-        std::mt19937 rng;
-        std::normal_distribution<float> noiseDist { 0.0f, 1.0f };
+        std::uint32_t lcgState { 0u };
         float noiseAmpLin { 0.0f };
 
         void updateForGeneration();

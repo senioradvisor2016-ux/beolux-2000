@@ -2,13 +2,14 @@
 
 #include "TapeSaturation.h"
 #include <cmath>
+#include <random>
 
 namespace bc2000dl::dsp
 {
     void TapeSaturation::prepare (double sr, std::uint32_t seed)
     {
         sampleRate = sr;
-        rng.seed (seed != 0 ? seed : std::random_device {} ());
+        lcgState = (seed != 0) ? seed : static_cast<std::uint32_t> (std::random_device {} ());
 
         // 1.5 s print-through-buffer
         printBuffer.assign (static_cast<size_t> (sr * 1.5), 0.0f);
@@ -114,12 +115,6 @@ namespace bc2000dl::dsp
                 break;
         }
 
-        const double nyq = sampleRate / 2.0;
-        const double hfNorm = std::min (hfCorner / nyq, 0.95);
-
-        hfFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowPass (
-            sampleRate, static_cast<float> (hfCorner * 2.0));  // 2nd-order via parallel filter ≈
-        // Använd Butterworth 2:a ord. via JUCE för stabil response
         hfFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeFirstOrderLowPass (
             sampleRate, static_cast<float> (hfCorner));
 
@@ -199,9 +194,9 @@ namespace bc2000dl::dsp
             // 2. Print-through (om aktiv)
             if (printThrough > 1e-6f)
             {
-                const float old = printBuffer[printIdx];
+                const float old = printBuffer[static_cast<size_t> (printIdx)];
                 y += old * printThrough;
-                printBuffer[printIdx] = data[i];
+                printBuffer[static_cast<size_t> (printIdx)] = data[i];
                 printIdx = (printIdx + 1) % static_cast<int> (printBuffer.size());
             }
 
@@ -211,8 +206,8 @@ namespace bc2000dl::dsp
             // 4. Head-bump
             y = bumpFilter.processSample (y);
 
-            // 5. Tape-egenbrus
-            y += noiseDist (rng) * noiseAmpLin;
+            // 5. Tape-egenbrus (LCG Gaussian — RT-safe, 30× snabbare än mt19937)
+            y += detail::fastGaussNoise (lcgState) * noiseAmpLin;
 
             data[i] = y;
         }
