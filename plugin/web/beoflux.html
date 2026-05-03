@@ -671,24 +671,25 @@
     overflow: visible;
     z-index: 1;
   }
-  /* Needle */
+  /* Needle — pivot below face so the tip can travel a wide arc.
+     The lower portion of the needle is hidden by face overflow:hidden. */
   .vu-meter .needle {
     position: absolute;
-    bottom: 2px;
+    bottom: -32px;
     left: 50%;
     width: 0;
-    height: 34px;
+    height: 80px;
     z-index: 2;
-    transform-origin: 50% calc(100% - 2px);
+    transform-origin: 50% 100%;  /* pivot at element bottom (below face) */
     transition: transform 0.18s cubic-bezier(.4,0,.6,1);
     pointer-events: none;
   }
   .vu-meter .needle .shaft {
     position: absolute;
-    bottom: 2px;
+    bottom: 0;          /* shaft starts at pivot */
     left: 50%;
     width: 2px;
-    height: 32px;
+    height: 78px;       /* full needle length so tip reaches face top */
     background: linear-gradient(180deg, #0a0402 0%, #1a0a04 60%, #2a1408 100%);
     transform: translateX(-50%);
     box-shadow:
@@ -1730,67 +1731,69 @@
   <div class="bezel"></div>
   <div class="face">
     <div class="scale">
-      <svg viewBox="0 0 200 50" preserveAspectRatio="xMidYMax meet">
-        <!-- Pivot at (100, 50). Arc radius 36 (matches needle tip travel).
-             Sweep -45° (-20 dB) to +45° (max), with red zone after 0 dB. -->
+      <svg viewBox="0 0 220 48" preserveAspectRatio="xMidYMax meet">
+        <!-- Geometry: pivot at (110, 80) (32 units below viewBox bottom),
+             needle radius 80, sweep -60° (-20 dB) to +60° (max).
+             Real VU meters have pivot far below the face — only the
+             upper portion of a much larger circle is visible. -->
 
-        <!-- Major scale arc (black, heavy weight) -->
-        <path d="M 74.5 24.5 Q 100 3.5 125.5 24.5"
-              fill="none" stroke="rgba(20,10,4,0.92)" stroke-width="1.0"
+        <!-- Major scale arc (heavy black) — circular A-arc -->
+        <path d="M 40.7 40 A 80 80 0 0 1 179.3 40"
+              fill="none" stroke="rgba(20,10,4,0.92)" stroke-width="1.05"
               stroke-linecap="round"/>
 
-        <!-- Red zone arc (from 0 dB onward) -->
-        <path d="M 100 14 Q 116 12 125.5 24.5"
-              fill="none" stroke="#c42820" stroke-width="2.2"
+        <!-- Red zone arc (from 0 dB to max) -->
+        <path d="M 110 0 A 80 80 0 0 1 179.3 40"
+              fill="none" stroke="#c42820" stroke-width="2.4"
               stroke-linecap="round"/>
 
-        <!-- MAJOR tick marks — outward strokes from arc tip, length 4 -->
+        <!-- MAJOR tick marks — short inward strokes, 4 units long toward pivot -->
         <g stroke="rgba(20,10,4,0.92)" stroke-width="1.0" stroke-linecap="round">
-          <!-- -20 dB at -45° -->  <line x1="74.5"  y1="24.5" x2="71.7"  y2="21.7"/>
-          <!-- -10 dB at -28° -->  <line x1="83.1"  y1="18.2" x2="81.2"  y2="14.7"/>
-          <!--  -5 dB at -15° -->  <line x1="90.7"  y1="15.2" x2="89.7"  y2="11.3"/>
-          <!--  -3 dB at  -7° -->  <line x1="95.1"  y1="14.3" x2="94.6"  y2="10.4"/>
-          <!--   0 dB at   0° -->  <line x1="100"   y1="14"   x2="100"   y2="10"/>
+          <!-- -20 dB at -60° -->  <line x1="40.7"  y1="40"  x2="44.2"  y2="42"/>
+          <!-- -10 dB at -38° -->  <line x1="60.7"  y1="17"  x2="62.7"  y2="20"/>
+          <!--  -5 dB at -20° -->  <line x1="82.6"  y1="4.8" x2="83.9"  y2="8.6"/>
+          <!--  -3 dB at -10° -->  <line x1="96.1"  y1="1.2" x2="96.8"  y2="5.0"/>
+          <!--   0 dB at   0° -->  <line x1="110"   y1="0"   x2="110"   y2="4"/>
         </g>
         <!-- RED major ticks -->
-        <g stroke="#c42820" stroke-width="1.1" stroke-linecap="round">
-          <!--  +1 dB at +12° -->  <line x1="107.5" y1="14.8" x2="108.3" y2="10.9"/>
-          <!--  +3 dB at +27° -->  <line x1="116.3" y1="17.9" x2="118.1" y2="14.4"/>
-          <!--  max  at +45° -->   <line x1="125.5" y1="24.5" x2="128.3" y2="21.7"/>
+        <g stroke="#c42820" stroke-width="1.15" stroke-linecap="round">
+          <!--  +1 dB at +13° -->  <line x1="128"   y1="2"   x2="127.1" y2="5.9"/>
+          <!--  +3 dB at +35° -->  <line x1="155.9" y1="14.5" x2="153.9" y2="18.0"/>
+          <!--  max  at +60° -->   <line x1="179.3" y1="40"   x2="175.8" y2="42"/>
         </g>
 
-        <!-- MINOR ticks between majors (subtle) -->
-        <g stroke="rgba(20,10,4,0.55)" stroke-width="0.55" stroke-linecap="round">
-          <line x1="78.8"  y1="21.0" x2="77.5"  y2="19.0"/>
-          <line x1="86.9"  y1="16.4" x2="85.7"  y2="14.6"/>
-          <line x1="92.9"  y1="14.7" x2="92.4"  y2="12.7"/>
-          <line x1="97.6"  y1="14.1" x2="97.4"  y2="12.0"/>
-          <line x1="103.5" y1="14.2" x2="103.7" y2="12.1"/>
-          <line x1="111.9" y1="16.0" x2="113.0" y2="14.1"/>
-          <line x1="120.9" y1="20.6" x2="122.5" y2="18.8"/>
+        <!-- MINOR ticks (between majors, subtle) -->
+        <g stroke="rgba(20,10,4,0.5)" stroke-width="0.55" stroke-linecap="round">
+          <line x1="50"    y1="28.5" x2="52" y2="30.5"/>
+          <line x1="71.5"  y1="10.5" x2="73" y2="12.7"/>
+          <line x1="89.5"  y1="2.4"  x2="90" y2="6.4"/>
+          <line x1="103"   y1="0.3"  x2="103" y2="4.3"/>
+          <line x1="117"   y1="0.5"  x2="116.5" y2="4.5"/>
+          <line x1="142"   y1="8"    x2="140"   y2="11.5"/>
+          <line x1="167"   y1="26"   x2="164.5" y2="28.5"/>
         </g>
 
-        <!-- Numerals — placed INSIDE arc at radius ~30, font Helvetica 7px bold -->
+        <!-- Numerals — placed INSIDE arc at radius ~70, large readable font -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
-           fill="rgba(20,10,4,0.92)" text-anchor="middle" font-size="6.5">
-          <text x="78.8"  y="32.1">-20</text>
-          <text x="86.0"  y="26.9">-10</text>
-          <text x="92.3"  y="24.3">-5</text>
-          <text x="96.4"  y="23.4">-3</text>
-          <text x="100"   y="23">0</text>
+           fill="rgba(20,10,4,0.92)" text-anchor="middle" font-size="7.5">
+          <text x="50"  y="48">-20</text>
+          <text x="68"  y="28">-10</text>
+          <text x="87"  y="17.5">-5</text>
+          <text x="98"  y="14">-3</text>
+          <text x="110" y="13">0</text>
         </g>
         <!-- Red numerals -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
-           fill="#c42820" text-anchor="middle" font-size="6.5">
-          <text x="106.2" y="23.7">+1</text>
-          <text x="113.3" y="26.5">+3</text>
+           fill="#c42820" text-anchor="middle" font-size="7.5">
+          <text x="125" y="14.5">+1</text>
+          <text x="148" y="25">+3</text>
         </g>
 
-        <!-- VU brand text — italic serif, lower-center, between numerals and pivot -->
-        <text x="100" y="42"
+        <!-- VU brand text — italic serif, between scale and pivot -->
+        <text x="110" y="40"
               font-family="Georgia, 'Times New Roman', serif"
               font-style="italic" font-weight="700"
-              fill="rgba(20,10,4,0.65)" text-anchor="middle" font-size="9">VU</text>
+              fill="rgba(20,10,4,0.6)" text-anchor="middle" font-size="9.5">VU</text>
       </svg>
       <div class="needle-shadow" id="vu-l-shadow"></div>
       <div class="needle" id="vu-l"><div class="shaft"></div><div class="weight"></div></div>
@@ -1805,67 +1808,69 @@
   <div class="bezel"></div>
   <div class="face">
     <div class="scale">
-      <svg viewBox="0 0 200 50" preserveAspectRatio="xMidYMax meet">
-        <!-- Pivot at (100, 50). Arc radius 36 (matches needle tip travel).
-             Sweep -45° (-20 dB) to +45° (max), with red zone after 0 dB. -->
+      <svg viewBox="0 0 220 48" preserveAspectRatio="xMidYMax meet">
+        <!-- Geometry: pivot at (110, 80) (32 units below viewBox bottom),
+             needle radius 80, sweep -60° (-20 dB) to +60° (max).
+             Real VU meters have pivot far below the face — only the
+             upper portion of a much larger circle is visible. -->
 
-        <!-- Major scale arc (black, heavy weight) -->
-        <path d="M 74.5 24.5 Q 100 3.5 125.5 24.5"
-              fill="none" stroke="rgba(20,10,4,0.92)" stroke-width="1.0"
+        <!-- Major scale arc (heavy black) — circular A-arc -->
+        <path d="M 40.7 40 A 80 80 0 0 1 179.3 40"
+              fill="none" stroke="rgba(20,10,4,0.92)" stroke-width="1.05"
               stroke-linecap="round"/>
 
-        <!-- Red zone arc (from 0 dB onward) -->
-        <path d="M 100 14 Q 116 12 125.5 24.5"
-              fill="none" stroke="#c42820" stroke-width="2.2"
+        <!-- Red zone arc (from 0 dB to max) -->
+        <path d="M 110 0 A 80 80 0 0 1 179.3 40"
+              fill="none" stroke="#c42820" stroke-width="2.4"
               stroke-linecap="round"/>
 
-        <!-- MAJOR tick marks — outward strokes from arc tip, length 4 -->
+        <!-- MAJOR tick marks — short inward strokes, 4 units long toward pivot -->
         <g stroke="rgba(20,10,4,0.92)" stroke-width="1.0" stroke-linecap="round">
-          <!-- -20 dB at -45° -->  <line x1="74.5"  y1="24.5" x2="71.7"  y2="21.7"/>
-          <!-- -10 dB at -28° -->  <line x1="83.1"  y1="18.2" x2="81.2"  y2="14.7"/>
-          <!--  -5 dB at -15° -->  <line x1="90.7"  y1="15.2" x2="89.7"  y2="11.3"/>
-          <!--  -3 dB at  -7° -->  <line x1="95.1"  y1="14.3" x2="94.6"  y2="10.4"/>
-          <!--   0 dB at   0° -->  <line x1="100"   y1="14"   x2="100"   y2="10"/>
+          <!-- -20 dB at -60° -->  <line x1="40.7"  y1="40"  x2="44.2"  y2="42"/>
+          <!-- -10 dB at -38° -->  <line x1="60.7"  y1="17"  x2="62.7"  y2="20"/>
+          <!--  -5 dB at -20° -->  <line x1="82.6"  y1="4.8" x2="83.9"  y2="8.6"/>
+          <!--  -3 dB at -10° -->  <line x1="96.1"  y1="1.2" x2="96.8"  y2="5.0"/>
+          <!--   0 dB at   0° -->  <line x1="110"   y1="0"   x2="110"   y2="4"/>
         </g>
         <!-- RED major ticks -->
-        <g stroke="#c42820" stroke-width="1.1" stroke-linecap="round">
-          <!--  +1 dB at +12° -->  <line x1="107.5" y1="14.8" x2="108.3" y2="10.9"/>
-          <!--  +3 dB at +27° -->  <line x1="116.3" y1="17.9" x2="118.1" y2="14.4"/>
-          <!--  max  at +45° -->   <line x1="125.5" y1="24.5" x2="128.3" y2="21.7"/>
+        <g stroke="#c42820" stroke-width="1.15" stroke-linecap="round">
+          <!--  +1 dB at +13° -->  <line x1="128"   y1="2"   x2="127.1" y2="5.9"/>
+          <!--  +3 dB at +35° -->  <line x1="155.9" y1="14.5" x2="153.9" y2="18.0"/>
+          <!--  max  at +60° -->   <line x1="179.3" y1="40"   x2="175.8" y2="42"/>
         </g>
 
-        <!-- MINOR ticks between majors (subtle) -->
-        <g stroke="rgba(20,10,4,0.55)" stroke-width="0.55" stroke-linecap="round">
-          <line x1="78.8"  y1="21.0" x2="77.5"  y2="19.0"/>
-          <line x1="86.9"  y1="16.4" x2="85.7"  y2="14.6"/>
-          <line x1="92.9"  y1="14.7" x2="92.4"  y2="12.7"/>
-          <line x1="97.6"  y1="14.1" x2="97.4"  y2="12.0"/>
-          <line x1="103.5" y1="14.2" x2="103.7" y2="12.1"/>
-          <line x1="111.9" y1="16.0" x2="113.0" y2="14.1"/>
-          <line x1="120.9" y1="20.6" x2="122.5" y2="18.8"/>
+        <!-- MINOR ticks (between majors, subtle) -->
+        <g stroke="rgba(20,10,4,0.5)" stroke-width="0.55" stroke-linecap="round">
+          <line x1="50"    y1="28.5" x2="52" y2="30.5"/>
+          <line x1="71.5"  y1="10.5" x2="73" y2="12.7"/>
+          <line x1="89.5"  y1="2.4"  x2="90" y2="6.4"/>
+          <line x1="103"   y1="0.3"  x2="103" y2="4.3"/>
+          <line x1="117"   y1="0.5"  x2="116.5" y2="4.5"/>
+          <line x1="142"   y1="8"    x2="140"   y2="11.5"/>
+          <line x1="167"   y1="26"   x2="164.5" y2="28.5"/>
         </g>
 
-        <!-- Numerals — placed INSIDE arc at radius ~30, font Helvetica 7px bold -->
+        <!-- Numerals — placed INSIDE arc at radius ~70, large readable font -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
-           fill="rgba(20,10,4,0.92)" text-anchor="middle" font-size="6.5">
-          <text x="78.8"  y="32.1">-20</text>
-          <text x="86.0"  y="26.9">-10</text>
-          <text x="92.3"  y="24.3">-5</text>
-          <text x="96.4"  y="23.4">-3</text>
-          <text x="100"   y="23">0</text>
+           fill="rgba(20,10,4,0.92)" text-anchor="middle" font-size="7.5">
+          <text x="50"  y="48">-20</text>
+          <text x="68"  y="28">-10</text>
+          <text x="87"  y="17.5">-5</text>
+          <text x="98"  y="14">-3</text>
+          <text x="110" y="13">0</text>
         </g>
         <!-- Red numerals -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
-           fill="#c42820" text-anchor="middle" font-size="6.5">
-          <text x="106.2" y="23.7">+1</text>
-          <text x="113.3" y="26.5">+3</text>
+           fill="#c42820" text-anchor="middle" font-size="7.5">
+          <text x="125" y="14.5">+1</text>
+          <text x="148" y="25">+3</text>
         </g>
 
-        <!-- VU brand text — italic serif, lower-center, between numerals and pivot -->
-        <text x="100" y="42"
+        <!-- VU brand text — italic serif, between scale and pivot -->
+        <text x="110" y="40"
               font-family="Georgia, 'Times New Roman', serif"
               font-style="italic" font-weight="700"
-              fill="rgba(20,10,4,0.65)" text-anchor="middle" font-size="9">VU</text>
+              fill="rgba(20,10,4,0.6)" text-anchor="middle" font-size="9.5">VU</text>
       </svg>
       <div class="needle-shadow" id="vu-r-shadow"></div>
       <div class="needle" id="vu-r"><div class="shaft"></div><div class="weight"></div></div>
@@ -1880,67 +1885,69 @@
   <div class="bezel"></div>
   <div class="face">
     <div class="scale">
-      <svg viewBox="0 0 200 50" preserveAspectRatio="xMidYMax meet">
-        <!-- Pivot at (100, 50). Arc radius 36 (matches needle tip travel).
-             Sweep -45° (-20 dB) to +45° (max), with red zone after 0 dB. -->
+      <svg viewBox="0 0 220 48" preserveAspectRatio="xMidYMax meet">
+        <!-- Geometry: pivot at (110, 80) (32 units below viewBox bottom),
+             needle radius 80, sweep -60° (-20 dB) to +60° (max).
+             Real VU meters have pivot far below the face — only the
+             upper portion of a much larger circle is visible. -->
 
-        <!-- Major scale arc (black, heavy weight) -->
-        <path d="M 74.5 24.5 Q 100 3.5 125.5 24.5"
-              fill="none" stroke="rgba(20,10,4,0.92)" stroke-width="1.0"
+        <!-- Major scale arc (heavy black) — circular A-arc -->
+        <path d="M 40.7 40 A 80 80 0 0 1 179.3 40"
+              fill="none" stroke="rgba(20,10,4,0.92)" stroke-width="1.05"
               stroke-linecap="round"/>
 
-        <!-- Red zone arc (from 0 dB onward) -->
-        <path d="M 100 14 Q 116 12 125.5 24.5"
-              fill="none" stroke="#c42820" stroke-width="2.2"
+        <!-- Red zone arc (from 0 dB to max) -->
+        <path d="M 110 0 A 80 80 0 0 1 179.3 40"
+              fill="none" stroke="#c42820" stroke-width="2.4"
               stroke-linecap="round"/>
 
-        <!-- MAJOR tick marks — outward strokes from arc tip, length 4 -->
+        <!-- MAJOR tick marks — short inward strokes, 4 units long toward pivot -->
         <g stroke="rgba(20,10,4,0.92)" stroke-width="1.0" stroke-linecap="round">
-          <!-- -20 dB at -45° -->  <line x1="74.5"  y1="24.5" x2="71.7"  y2="21.7"/>
-          <!-- -10 dB at -28° -->  <line x1="83.1"  y1="18.2" x2="81.2"  y2="14.7"/>
-          <!--  -5 dB at -15° -->  <line x1="90.7"  y1="15.2" x2="89.7"  y2="11.3"/>
-          <!--  -3 dB at  -7° -->  <line x1="95.1"  y1="14.3" x2="94.6"  y2="10.4"/>
-          <!--   0 dB at   0° -->  <line x1="100"   y1="14"   x2="100"   y2="10"/>
+          <!-- -20 dB at -60° -->  <line x1="40.7"  y1="40"  x2="44.2"  y2="42"/>
+          <!-- -10 dB at -38° -->  <line x1="60.7"  y1="17"  x2="62.7"  y2="20"/>
+          <!--  -5 dB at -20° -->  <line x1="82.6"  y1="4.8" x2="83.9"  y2="8.6"/>
+          <!--  -3 dB at -10° -->  <line x1="96.1"  y1="1.2" x2="96.8"  y2="5.0"/>
+          <!--   0 dB at   0° -->  <line x1="110"   y1="0"   x2="110"   y2="4"/>
         </g>
         <!-- RED major ticks -->
-        <g stroke="#c42820" stroke-width="1.1" stroke-linecap="round">
-          <!--  +1 dB at +12° -->  <line x1="107.5" y1="14.8" x2="108.3" y2="10.9"/>
-          <!--  +3 dB at +27° -->  <line x1="116.3" y1="17.9" x2="118.1" y2="14.4"/>
-          <!--  max  at +45° -->   <line x1="125.5" y1="24.5" x2="128.3" y2="21.7"/>
+        <g stroke="#c42820" stroke-width="1.15" stroke-linecap="round">
+          <!--  +1 dB at +13° -->  <line x1="128"   y1="2"   x2="127.1" y2="5.9"/>
+          <!--  +3 dB at +35° -->  <line x1="155.9" y1="14.5" x2="153.9" y2="18.0"/>
+          <!--  max  at +60° -->   <line x1="179.3" y1="40"   x2="175.8" y2="42"/>
         </g>
 
-        <!-- MINOR ticks between majors (subtle) -->
-        <g stroke="rgba(20,10,4,0.55)" stroke-width="0.55" stroke-linecap="round">
-          <line x1="78.8"  y1="21.0" x2="77.5"  y2="19.0"/>
-          <line x1="86.9"  y1="16.4" x2="85.7"  y2="14.6"/>
-          <line x1="92.9"  y1="14.7" x2="92.4"  y2="12.7"/>
-          <line x1="97.6"  y1="14.1" x2="97.4"  y2="12.0"/>
-          <line x1="103.5" y1="14.2" x2="103.7" y2="12.1"/>
-          <line x1="111.9" y1="16.0" x2="113.0" y2="14.1"/>
-          <line x1="120.9" y1="20.6" x2="122.5" y2="18.8"/>
+        <!-- MINOR ticks (between majors, subtle) -->
+        <g stroke="rgba(20,10,4,0.5)" stroke-width="0.55" stroke-linecap="round">
+          <line x1="50"    y1="28.5" x2="52" y2="30.5"/>
+          <line x1="71.5"  y1="10.5" x2="73" y2="12.7"/>
+          <line x1="89.5"  y1="2.4"  x2="90" y2="6.4"/>
+          <line x1="103"   y1="0.3"  x2="103" y2="4.3"/>
+          <line x1="117"   y1="0.5"  x2="116.5" y2="4.5"/>
+          <line x1="142"   y1="8"    x2="140"   y2="11.5"/>
+          <line x1="167"   y1="26"   x2="164.5" y2="28.5"/>
         </g>
 
-        <!-- Numerals — placed INSIDE arc at radius ~30, font Helvetica 7px bold -->
+        <!-- Numerals — placed INSIDE arc at radius ~70, large readable font -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
-           fill="rgba(20,10,4,0.92)" text-anchor="middle" font-size="6.5">
-          <text x="78.8"  y="32.1">-20</text>
-          <text x="86.0"  y="26.9">-10</text>
-          <text x="92.3"  y="24.3">-5</text>
-          <text x="96.4"  y="23.4">-3</text>
-          <text x="100"   y="23">0</text>
+           fill="rgba(20,10,4,0.92)" text-anchor="middle" font-size="7.5">
+          <text x="50"  y="48">-20</text>
+          <text x="68"  y="28">-10</text>
+          <text x="87"  y="17.5">-5</text>
+          <text x="98"  y="14">-3</text>
+          <text x="110" y="13">0</text>
         </g>
         <!-- Red numerals -->
         <g font-family="Helvetica Neue, Arial, sans-serif" font-weight="700"
-           fill="#c42820" text-anchor="middle" font-size="6.5">
-          <text x="106.2" y="23.7">+1</text>
-          <text x="113.3" y="26.5">+3</text>
+           fill="#c42820" text-anchor="middle" font-size="7.5">
+          <text x="125" y="14.5">+1</text>
+          <text x="148" y="25">+3</text>
         </g>
 
-        <!-- VU brand text — italic serif, lower-center, between numerals and pivot -->
-        <text x="100" y="42"
+        <!-- VU brand text — italic serif, between scale and pivot -->
+        <text x="110" y="40"
               font-family="Georgia, 'Times New Roman', serif"
               font-style="italic" font-weight="700"
-              fill="rgba(20,10,4,0.65)" text-anchor="middle" font-size="9">VU</text>
+              fill="rgba(20,10,4,0.6)" text-anchor="middle" font-size="9.5">VU</text>
       </svg>
       <div class="needle-shadow" id="vu-out-shadow"></div>
       <div class="needle" id="vu-out"><div class="shaft"></div><div class="weight"></div></div>
