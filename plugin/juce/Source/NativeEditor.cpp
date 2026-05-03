@@ -84,37 +84,67 @@ namespace bc2000dl
 
     void ReelDeck::timerCallback()
     {
-        if (isActive)
+        if (! isActive)
         {
-            const float delta = 0.09f * speedFactor;
-            angleL += delta;
-            angleR += delta;
-            if (angleL > juce::MathConstants<float>::twoPi) angleL -= juce::MathConstants<float>::twoPi;
-            if (angleR > juce::MathConstants<float>::twoPi) angleR -= juce::MathConstants<float>::twoPi;
+            // Decay angular velocity for motion-blur falloff
+            angVelL *= 0.85f;
+            angVelR *= 0.85f;
+            if (angVelL < 0.001f && angVelR < 0.001f) return;
             repaint();
+            return;
         }
+
+        // Real tape physics:
+        //  - linearSpeed (cm/s) is constant for a given tape speed
+        //  - angularSpeed = linearSpeed / currentRadius
+        //  - so as supply reel shrinks → it spins faster
+        //    and as takeup reel grows → it spins slower
+        const float linearSpeed = 0.02f * speedFactor;       // arbitrary unit
+        const float minR = 0.32f, maxR = 1.0f;               // normalised reel radii
+        const float supplyR = juce::jmap (1.0f - tapeAmount, minR, maxR);
+        const float takeupR = juce::jmap (tapeAmount, minR, maxR);
+
+        angVelL = linearSpeed / supplyR;        // supply reel — feeds tape (CW)
+        angVelR = linearSpeed / takeupR;        // takeup reel — winds tape (CCW visually)
+
+        angleL += angVelL;
+        angleR += angVelR;
+        const auto twoPi = juce::MathConstants<float>::twoPi;
+        if (angleL > twoPi)  angleL -= twoPi;
+        if (angleR > twoPi)  angleR -= twoPi;
+
+        // tapeAmount slowly grows; "auto-rewind" wraps at 1.0
+        tapeAmount += 0.0008f * speedFactor;
+        if (tapeAmount > 1.0f) tapeAmount = 0.0f;
+
+        repaint();
     }
 
     void ReelDeck::paint (juce::Graphics& g)
     {
         auto bounds = getLocalBounds();
 
-        // Reels are ~40% of total width each. Centre gap is reserved for the
-        // analog VU meters (placed by the editor as separate components).
         const int reelDiam = juce::jmin (bounds.getHeight() - 6, (int) (bounds.getWidth() * 0.36f));
         const int reelY    = bounds.getCentreY() - reelDiam / 2;
 
         const juce::Rectangle<int> leftReel  (bounds.getX(),                  reelY, reelDiam, reelDiam);
         const juce::Rectangle<int> rightReel (bounds.getRight() - reelDiam,   reelY, reelDiam, reelDiam);
 
-        ui::InstructionCardLnF::drawReel (g, leftReel,  angleL, isActive);
-        ui::InstructionCardLnF::drawReel (g, rightReel, -angleR * 0.7f, isActive);
+        // Motion-blur scales with angular velocity (peaks at small reels)
+        // typical max angVel ≈ 0.06 → motionAmount ≈ 1.0
+        const float supplyFill = 1.0f - tapeAmount;
+        const float takeupFill = tapeAmount;
+        const float motionL = juce::jlimit (0.0f, 1.0f, angVelL * 18.0f);
+        const float motionR = juce::jlimit (0.0f, 1.0f, angVelR * 18.0f);
 
-        // Tape path: thin metallic line spanning the gap (passing behind the VU pair)
+        ui::InstructionCardLnF::drawReel (g, leftReel,  angleL,        isActive, supplyFill, motionL);
+        ui::InstructionCardLnF::drawReel (g, rightReel, -angleR * 1.0f, isActive, takeupFill, motionR);
+
+        // Tape path: thin metallic line between reel rims (the actual tape)
         const float tapeY = (float) bounds.getCentreY();
-        g.setColour (juce::Colour (0xFFA0A0A8).withAlpha (0.45f));
+        g.setColour (juce::Colour (0xFF807870).withAlpha (0.55f));
         g.drawLine ((float) leftReel.getRight() - reelDiam * 0.05f, tapeY,
-                    (float) rightReel.getX()    + reelDiam * 0.05f, tapeY, 0.8f);
+                    (float) rightReel.getX()    + reelDiam * 0.05f, tapeY, 1.0f);
     }
 
     //=========================================================================
@@ -556,7 +586,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v45.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v46.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {

@@ -19,8 +19,11 @@
 
 namespace bc2000dl
 {
-    /** Reel-pair component — the two big circles at top of the card.
-        Driven by the timer when input gain > threshold. */
+    /** Reel-pair component — two photoreal tape reels with dynamic winding.
+        - Supply (left) shrinks as audio plays; takeup (right) grows.
+        - Rotation speed is angular-velocity = linearSpeed / currentRadius
+          → smaller reel spins FASTER, just like real tape.
+        - Motion blur applied at higher angular velocities.  */
     class ReelDeck : public juce::Component, private juce::Timer
     {
     public:
@@ -36,6 +39,10 @@ namespace bc2000dl
         bool isActive { false };
         float speedFactor { 1.0f };
         float angleL { 0.0f }, angleR { 0.0f };
+        // tapeAmount: 0 = all on supply (full left reel), 1 = all on takeup
+        float tapeAmount { 0.0f };
+        // current angular velocity per reel (used for motion-blur intensity)
+        float angVelL { 0.0f }, angVelR { 0.0f };
     };
 
     /** Horisontal VU-bar with calibrated -60..+6 dBFS range. */

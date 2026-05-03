@@ -853,7 +853,8 @@ namespace bc2000dl::ui
     //    Rings (outside → in):  black rim | cream band | red ring | cream | hub | red dot
     //=========================================================================
     void InstructionCardLnF::drawReel (juce::Graphics& g, juce::Rectangle<int> r,
-                                         float rotationRad, bool active)
+                                         float rotationRad, bool active,
+                                         float tapeFillRatio, float motionAmount)
     {
         // AUTHENTIC PRO REEL — brushed aluminium flange, dark tape visible
         // through 3 spoke windows, black hub with chrome screws. No bright
@@ -895,67 +896,83 @@ namespace bc2000dl::ui
         for (float rr = flangeR * 0.93f; rr > flangeR * 0.45f; rr -= flangeR * 0.025f)
             g.drawEllipse (cx - rr, cy - rr, rr * 2, rr * 2, 0.3f);
 
-        // ---- 3. Wound-tape disc behind the spoke windows ----
-        // This is the dark band of magnetic tape spooled on the hub.
-        const float tapeOuterR = radius * 0.62f;
-        juce::ColourGradient tapeGrad (
-            juce::Colour (0xFF2A2620), cx - tapeOuterR * 0.4f, cy - tapeOuterR * 0.4f,
-            juce::Colour (0xFF080604), cx + tapeOuterR * 0.4f, cy + tapeOuterR * 0.4f, false);
-        tapeGrad.addColour (0.5, juce::Colour (0xFF181410));
-        g.setGradientFill (tapeGrad);
-        g.fillEllipse (cx - tapeOuterR, cy - tapeOuterR, tapeOuterR * 2, tapeOuterR * 2);
+        // ---- 3. WOUND-TAPE DISC — dynamic radius based on tapeFillRatio ----
+        // This is the magnetic tape spooled on the hub. Supply reel shrinks
+        // as audio plays back; takeup reel grows. Real Studer A800 behaviour.
+        const float maxTapeR = flangeR * 0.92f;
+        const float minTapeR = radius * 0.32f;        // empty hub diameter
+        const float tapeOuterR = juce::jmap (juce::jlimit (0.0f, 1.0f, tapeFillRatio),
+                                              minTapeR, maxTapeR);
 
-        // Tape-wind concentric rings (sells the wound-spool texture)
-        g.setColour (juce::Colour (0xFF3E342A).withAlpha (0.40f));
-        for (float rr = tapeOuterR * 0.97f; rr > tapeOuterR * 0.30f; rr -= tapeOuterR * 0.04f)
-            g.drawEllipse (cx - rr, cy - rr, rr * 2, rr * 2, 0.4f);
-
-        // ---- 4. THREE SPOKE WINDOWS cut through the flange ----
-        // The aluminium flange has 3 large openings — they show the dark tape
-        // beneath, and rotate with the reel. We re-paint the flange OVER the
-        // tape disc (above), then "cut" the spoke windows by drawing the tape
-        // colour back through. To do that cleanly we instead drew the tape
-        // first, then the flange covers it — and now we draw the spoke windows
-        // by clipping the flange.
-        // (We achieve the cut visually by repainting the spoke region as tape.)
-        const float spokeOuterR = flangeR * 0.92f;
-        const float spokeInnerR = radius * 0.30f;
-        for (int i = 0; i < 3; ++i)
+        if (tapeFillRatio > 0.001f)
         {
-            const float a = rotationRad + (float) i * juce::MathConstants<float>::twoPi / 3.0f;
-            const float halfW = juce::MathConstants<float>::pi * 0.13f;
+            juce::ColourGradient tapeGrad (
+                juce::Colour (0xFF2A2620), cx - tapeOuterR * 0.4f, cy - tapeOuterR * 0.4f,
+                juce::Colour (0xFF080604), cx + tapeOuterR * 0.4f, cy + tapeOuterR * 0.4f, false);
+            tapeGrad.addColour (0.5, juce::Colour (0xFF181410));
+            g.setGradientFill (tapeGrad);
+            g.fillEllipse (cx - tapeOuterR, cy - tapeOuterR, tapeOuterR * 2, tapeOuterR * 2);
 
-            juce::Path spoke;
-            spoke.addPieSegment (cx - spokeOuterR, cy - spokeOuterR,
-                                  spokeOuterR * 2, spokeOuterR * 2,
-                                  a - halfW, a + halfW, spokeInnerR / spokeOuterR);
+            // Concentric tape-wind rings (sells the spooled-tape texture)
+            g.setColour (juce::Colour (0xFF3E342A).withAlpha (0.40f));
+            const float ringStep = juce::jmax (1.5f, tapeOuterR * 0.04f);
+            for (float rr = tapeOuterR * 0.97f; rr > minTapeR * 0.95f; rr -= ringStep)
+                g.drawEllipse (cx - rr, cy - rr, rr * 2, rr * 2, 0.4f);
 
-            // Repaint with tape gradient to "cut through" the flange
-            juce::ColourGradient sg (
-                juce::Colour (0xFF1E1A14), cx, cy - spokeOuterR,
-                juce::Colour (0xFF050402), cx, cy + spokeOuterR, false);
-            g.setGradientFill (sg);
-            g.fillPath (spoke);
-
-            // Inner edge shadow (gives depth to the cut-out)
-            g.setColour (juce::Colours::black.withAlpha (0.55f));
-            g.strokePath (spoke, juce::PathStrokeType (0.8f));
-
-            // Top-edge highlight on the flange side of the cut (catches light)
-            juce::Path edgeHi;
-            edgeHi.addCentredArc (cx, cy, spokeOuterR, spokeOuterR, 0,
-                                   a - halfW, a + halfW, true);
-            g.setColour (juce::Colour (0xFFEFEFE8).withAlpha (0.35f));
-            g.strokePath (edgeHi, juce::PathStrokeType (0.6f));
+            // Soft outer-edge highlight on the tape (catches light)
+            g.setColour (juce::Colour (0xFF504030).withAlpha (0.50f));
+            g.drawEllipse (cx - tapeOuterR, cy - tapeOuterR, tapeOuterR * 2, tapeOuterR * 2, 0.7f);
         }
 
-        // Re-stamp tape concentric rings so they show through the windows
-        g.setColour (juce::Colour (0xFF3E342A).withAlpha (0.30f));
-        for (float rr = spokeOuterR * 0.95f; rr > spokeInnerR; rr -= spokeOuterR * 0.05f)
+        // ---- 4. THREE SPOKE WINDOWS — with optional MOTION BLUR ----
+        const float spokeOuterR = flangeR * 0.92f;
+        const float spokeInnerR = juce::jmax (radius * 0.30f, tapeOuterR + 1.0f);
+
+        // Motion-blur: draw spokes at multiple angular offsets when reel
+        // spins fast. Each pass at reduced alpha — composite gives a smeared
+        // look identical to long-shutter photography.
+        const int blurSteps = motionAmount > 0.05f ? 4 : 1;
+        const float blurSpan = motionAmount * 0.13f;          // radians
+        for (int s = 0; s < blurSteps; ++s)
         {
-            // Draw only inside spoke windows: simple approach — semi-transparent
-            // rings that read against tape but vanish into the flange shading.
-            g.drawEllipse (cx - rr, cy - rr, rr * 2, rr * 2, 0.35f);
+            const float t = (blurSteps == 1) ? 0.0f
+                                              : (float) s / (float) (blurSteps - 1) - 0.5f;
+            const float angOffset = t * blurSpan;
+            const float pathAlpha = (blurSteps == 1) ? 1.0f
+                                                      : 1.0f / (float) blurSteps + 0.10f;
+
+            for (int i = 0; i < 3; ++i)
+            {
+                const float a = rotationRad + angOffset
+                                + (float) i * juce::MathConstants<float>::twoPi / 3.0f;
+                const float halfW = juce::MathConstants<float>::pi * 0.13f;
+
+                juce::Path spoke;
+                spoke.addPieSegment (cx - spokeOuterR, cy - spokeOuterR,
+                                      spokeOuterR * 2, spokeOuterR * 2,
+                                      a - halfW, a + halfW, spokeInnerR / spokeOuterR);
+
+                juce::ColourGradient sg (
+                    juce::Colour (0xFF1E1A14).withAlpha (pathAlpha),
+                    cx, cy - spokeOuterR,
+                    juce::Colour (0xFF050402).withAlpha (pathAlpha),
+                    cx, cy + spokeOuterR, false);
+                g.setGradientFill (sg);
+                g.fillPath (spoke);
+
+                // Edge highlights on the sharp (final) layer only
+                if (s == blurSteps - 1)
+                {
+                    g.setColour (juce::Colours::black.withAlpha (0.55f));
+                    g.strokePath (spoke, juce::PathStrokeType (0.8f));
+
+                    juce::Path edgeHi;
+                    edgeHi.addCentredArc (cx, cy, spokeOuterR, spokeOuterR, 0,
+                                           a - halfW, a + halfW, true);
+                    g.setColour (juce::Colour (0xFFEFEFE8).withAlpha (0.35f));
+                    g.strokePath (edgeHi, juce::PathStrokeType (0.6f));
+                }
+            }
         }
 
         // ---- 5. Black hub ring (separates hub from tape) ----

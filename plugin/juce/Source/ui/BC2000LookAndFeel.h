@@ -118,9 +118,13 @@ namespace bc2000dl::ui
         static void drawSectionBox (juce::Graphics&, juce::Rectangle<int>,
                                     const juce::String& title = {});
 
-        /** Beocord bullseye reel: black rim → cream → red ring → cream → red dot. */
+        /** Authentic photoreal tape reel — chrome flange, brushed alu hub, spokes,
+            wound tape that grows/shrinks, motion-blur on fast rotation.
+            @param tapeFillRatio  0..1 — how much tape is wound on this reel
+            @param motionAmount   0..1 — how much motion-blur to apply (0 = static) */
         static void drawReel (juce::Graphics&, juce::Rectangle<int>,
-                              float rotationRad = 0.0f, bool active = false);
+                              float rotationRad = 0.0f, bool active = false,
+                              float tapeFillRatio = 1.0f, float motionAmount = 0.0f);
 
         /** Tape head/erase-head pictogram. */
         static void drawHeadAssembly (juce::Graphics&, juce::Rectangle<int>);
