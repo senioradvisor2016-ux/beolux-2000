@@ -632,112 +632,129 @@ namespace bc2000dl::ui
     void InstructionCardLnF::drawReel (juce::Graphics& g, juce::Rectangle<int> r,
                                          float rotationRad, bool active)
     {
-        // PHOTOREAL 3D REEL — built up like the real Beocord 2000 DL bullseye:
-        // raised cream/red flange with depth shading, dark spoke openings (3),
-        // chrome hub with screws, and tape wound on the centre.
+        // AUTHENTIC PRO REEL — brushed aluminium flange, dark tape visible
+        // through 3 spoke windows, black hub with chrome screws. No bright
+        // colours — the way a real Studer/Revox/Otari spool actually looks.
         const auto bf = r.toFloat();
         const float cx = bf.getCentreX();
         const float cy = bf.getCentreY();
         const float radius = juce::jmin (bf.getWidth(), bf.getHeight()) * 0.5f - 3.0f;
 
-        // ---- Drop shadow (sells separation from black metal) ----
+        // ---- Drop shadow ----
         for (int i = 0; i < 3; ++i)
         {
-            g.setColour (juce::Colours::black.withAlpha (0.18f));
-            const float pad = (float) (i + 1) * 1.5f;
+            g.setColour (juce::Colours::black.withAlpha (0.20f));
+            const float pad = (float) (i + 1) * 1.6f;
             g.fillEllipse (cx - radius - pad, cy - radius - pad + 2,
                            (radius + pad) * 2, (radius + pad) * 2);
         }
 
-        // ---- 1. Black outer rim (rubber tape-edge guard) ----
-        juce::ColourGradient rimGrad (
-            juce::Colour (0xFF1A1A1C), cx - radius * 0.4f, cy - radius * 0.4f,
-            juce::Colour (0xFF050507), cx + radius * 0.4f, cy + radius * 0.4f, false);
-        g.setGradientFill (rimGrad);
+        // ---- 1. Outer dark rim (the metal edge of the flange) ----
+        g.setColour (juce::Colour (0xFF1A1A1C));
         g.fillEllipse (cx - radius, cy - radius, radius * 2, radius * 2);
 
-        // Outer rim soft highlight (top-left light source)
-        g.setColour (juce::Colour (0xFF505058).withAlpha (0.55f));
-        g.drawEllipse (cx - radius, cy - radius, radius * 2, radius * 2, 1.2f);
+        // ---- 2. Brushed aluminium FLANGE — single solid metallic disc ----
+        const float flangeR = radius * 0.96f;
+        juce::ColourGradient flangeGrad (
+            juce::Colour (0xFFD8D8D4), cx - flangeR * 0.45f, cy - flangeR * 0.45f,
+            juce::Colour (0xFF6E6E6A), cx + flangeR * 0.45f, cy + flangeR * 0.45f, false);
+        flangeGrad.addColour (0.30, juce::Colour (0xFFBABAB6));
+        flangeGrad.addColour (0.65, juce::Colour (0xFF8E8E8A));
+        g.setGradientFill (flangeGrad);
+        g.fillEllipse (cx - flangeR, cy - flangeR, flangeR * 2, flangeR * 2);
 
-        // ---- 2. Cream/silver outer flange band (raised) ----
-        const float creamR = radius * 0.88f;
-        juce::ColourGradient creamGrad (
-            juce::Colour (0xFFF0E8C6), cx - creamR * 0.4f, cy - creamR * 0.4f,
-            juce::Colour (0xFFB8B098), cx + creamR * 0.4f, cy + creamR * 0.4f, false);
-        creamGrad.addColour (0.55, juce::Colour (0xFFD8D0B0));
-        g.setGradientFill (creamGrad);
-        g.fillEllipse (cx - creamR, cy - creamR, creamR * 2, creamR * 2);
+        // Concentric brush-grain rings (rotate with reel for subtle motion)
+        g.setColour (juce::Colour (0xFFFFFFFF).withAlpha (0.05f));
+        for (float rr = flangeR * 0.94f; rr > flangeR * 0.45f; rr -= flangeR * 0.025f)
+            g.drawEllipse (cx - rr, cy - rr, rr * 2, rr * 2, 0.4f);
+        g.setColour (juce::Colour (0xFF000000).withAlpha (0.06f));
+        for (float rr = flangeR * 0.93f; rr > flangeR * 0.45f; rr -= flangeR * 0.025f)
+            g.drawEllipse (cx - rr, cy - rr, rr * 2, rr * 2, 0.3f);
 
-        // ---- 3. RED ring (the iconic bullseye band) ----
-        const float redR = radius * 0.72f;
-        juce::ColourGradient redGrad (
-            juce::Colour (0xFFE85040), cx - redR * 0.3f, cy - redR * 0.3f,
-            juce::Colour (0xFF8C2018), cx + redR * 0.3f, cy + redR * 0.3f, false);
-        redGrad.addColour (0.55, juce::Colour (0xFFC23A2A));
-        g.setGradientFill (redGrad);
-        g.fillEllipse (cx - redR, cy - redR, redR * 2, redR * 2);
+        // ---- 3. Wound-tape disc behind the spoke windows ----
+        // This is the dark band of magnetic tape spooled on the hub.
+        const float tapeOuterR = radius * 0.62f;
+        juce::ColourGradient tapeGrad (
+            juce::Colour (0xFF2A2620), cx - tapeOuterR * 0.4f, cy - tapeOuterR * 0.4f,
+            juce::Colour (0xFF080604), cx + tapeOuterR * 0.4f, cy + tapeOuterR * 0.4f, false);
+        tapeGrad.addColour (0.5, juce::Colour (0xFF181410));
+        g.setGradientFill (tapeGrad);
+        g.fillEllipse (cx - tapeOuterR, cy - tapeOuterR, tapeOuterR * 2, tapeOuterR * 2);
 
-        // ---- 4. Inner cream/silver flange (concentric, raised) ----
-        const float innerR = radius * 0.54f;
-        juce::ColourGradient innerGrad (
-            juce::Colour (0xFFE8DEBE), cx - innerR * 0.3f, cy - innerR * 0.3f,
-            juce::Colour (0xFFB0A888), cx + innerR * 0.3f, cy + innerR * 0.3f, false);
-        innerGrad.addColour (0.5, juce::Colour (0xFFD0C8A8));
-        g.setGradientFill (innerGrad);
-        g.fillEllipse (cx - innerR, cy - innerR, innerR * 2, innerR * 2);
+        // Tape-wind concentric rings (sells the wound-spool texture)
+        g.setColour (juce::Colour (0xFF3E342A).withAlpha (0.40f));
+        for (float rr = tapeOuterR * 0.97f; rr > tapeOuterR * 0.30f; rr -= tapeOuterR * 0.04f)
+            g.drawEllipse (cx - rr, cy - rr, rr * 2, rr * 2, 0.4f);
 
-        // ---- 5. Three SPOKE WINDOWS (the dark openings showing tape behind) ----
-        // These rotate with the reel — the iconic "3 holes" look.
-        const float spokeOuterR = innerR * 0.92f;
-        const float spokeInnerR = radius * 0.34f;
+        // ---- 4. THREE SPOKE WINDOWS cut through the flange ----
+        // The aluminium flange has 3 large openings — they show the dark tape
+        // beneath, and rotate with the reel. We re-paint the flange OVER the
+        // tape disc (above), then "cut" the spoke windows by drawing the tape
+        // colour back through. To do that cleanly we instead drew the tape
+        // first, then the flange covers it — and now we draw the spoke windows
+        // by clipping the flange.
+        // (We achieve the cut visually by repainting the spoke region as tape.)
+        const float spokeOuterR = flangeR * 0.92f;
+        const float spokeInnerR = radius * 0.30f;
         for (int i = 0; i < 3; ++i)
         {
             const float a = rotationRad + (float) i * juce::MathConstants<float>::twoPi / 3.0f;
-            const float halfW = juce::MathConstants<float>::pi * 0.10f;
+            const float halfW = juce::MathConstants<float>::pi * 0.13f;
 
             juce::Path spoke;
             spoke.addPieSegment (cx - spokeOuterR, cy - spokeOuterR,
                                   spokeOuterR * 2, spokeOuterR * 2,
                                   a - halfW, a + halfW, spokeInnerR / spokeOuterR);
-            // Dark wound-tape colour visible through opening
-            juce::ColourGradient tapeColour (
-                juce::Colour (0xFF1A1812), cx, cy - spokeOuterR,
-                juce::Colour (0xFF0A0808), cx, cy + spokeOuterR, false);
-            g.setGradientFill (tapeColour);
+
+            // Repaint with tape gradient to "cut through" the flange
+            juce::ColourGradient sg (
+                juce::Colour (0xFF1E1A14), cx, cy - spokeOuterR,
+                juce::Colour (0xFF050402), cx, cy + spokeOuterR, false);
+            g.setGradientFill (sg);
             g.fillPath (spoke);
-            // Subtle outline so the spoke reads as a window
-            g.setColour (juce::Colours::black.withAlpha (0.6f));
-            g.strokePath (spoke, juce::PathStrokeType (0.7f));
+
+            // Inner edge shadow (gives depth to the cut-out)
+            g.setColour (juce::Colours::black.withAlpha (0.55f));
+            g.strokePath (spoke, juce::PathStrokeType (0.8f));
+
+            // Top-edge highlight on the flange side of the cut (catches light)
+            juce::Path edgeHi;
+            edgeHi.addCentredArc (cx, cy, spokeOuterR, spokeOuterR, 0,
+                                   a - halfW, a + halfW, true);
+            g.setColour (juce::Colour (0xFFEFEFE8).withAlpha (0.35f));
+            g.strokePath (edgeHi, juce::PathStrokeType (0.6f));
         }
 
-        // ---- 6. Wound-tape disc at centre (visible inside hub area) ----
-        const float tapeR = radius * 0.34f;
-        juce::ColourGradient tGrad (
-            juce::Colour (0xFF2A241C), cx - tapeR * 0.4f, cy - tapeR * 0.4f,
-            juce::Colour (0xFF080604), cx + tapeR * 0.4f, cy + tapeR * 0.4f, false);
-        g.setGradientFill (tGrad);
-        g.fillEllipse (cx - tapeR, cy - tapeR, tapeR * 2, tapeR * 2);
+        // Re-stamp tape concentric rings so they show through the windows
+        g.setColour (juce::Colour (0xFF3E342A).withAlpha (0.30f));
+        for (float rr = spokeOuterR * 0.95f; rr > spokeInnerR; rr -= spokeOuterR * 0.05f)
+        {
+            // Draw only inside spoke windows: simple approach — semi-transparent
+            // rings that read against tape but vanish into the flange shading.
+            g.drawEllipse (cx - rr, cy - rr, rr * 2, rr * 2, 0.35f);
+        }
 
-        // Subtle tape-wind concentric rings (visible "spool" look)
-        g.setColour (juce::Colour (0xFF3A3024).withAlpha (0.45f));
-        for (float rr = tapeR * 0.95f; rr > tapeR * 0.5f; rr -= tapeR * 0.07f)
-            g.drawEllipse (cx - rr, cy - rr, rr * 2, rr * 2, 0.4f);
+        // ---- 5. Black hub ring (separates hub from tape) ----
+        const float hubOuterR = radius * 0.30f;
+        juce::ColourGradient hubRingGrad (
+            juce::Colour (0xFF1E1E20), cx, cy - hubOuterR,
+            juce::Colour (0xFF050507), cx, cy + hubOuterR, false);
+        g.setGradientFill (hubRingGrad);
+        g.fillEllipse (cx - hubOuterR, cy - hubOuterR, hubOuterR * 2, hubOuterR * 2);
 
-        // ---- 7. Chrome hub (the central drive cap) ----
-        const float hubR = radius * 0.20f;
+        // ---- 6. Brushed aluminium central hub ----
+        const float hubR = radius * 0.22f;
         juce::ColourGradient hubGrad (
-            juce::Colour (0xFFE8E8EC), cx - hubR * 0.4f, cy - hubR * 0.5f,
-            juce::Colour (0xFF40404A), cx + hubR * 0.4f, cy + hubR * 0.5f, false);
-        hubGrad.addColour (0.5, juce::Colour (0xFF9A9AA0));
+            juce::Colour (0xFFE0E0DC), cx - hubR * 0.4f, cy - hubR * 0.5f,
+            juce::Colour (0xFF6A6A66), cx + hubR * 0.4f, cy + hubR * 0.5f, false);
+        hubGrad.addColour (0.5, juce::Colour (0xFFA8A8A4));
         g.setGradientFill (hubGrad);
         g.fillEllipse (cx - hubR, cy - hubR, hubR * 2, hubR * 2);
+        g.setColour (juce::Colour (0xFF101012));
+        g.drawEllipse (cx - hubR, cy - hubR, hubR * 2, hubR * 2, 0.9f);
 
-        g.setColour (juce::Colour (0xFF1A1A1C));
-        g.drawEllipse (cx - hubR, cy - hubR, hubR * 2, hubR * 2, 1.0f);
-
-        // ---- 8. Three small SCREWS on the hub (Phillips heads, rotate with reel) ----
-        const float screwR = juce::jmax (1.2f, hubR * 0.18f);
+        // ---- 7. Three Phillips screws on the hub (rotate with reel) ----
+        const float screwR = juce::jmax (1.4f, hubR * 0.20f);
         const float screwOrbit = hubR * 0.55f;
         for (int i = 0; i < 3; ++i)
         {
@@ -747,30 +764,34 @@ namespace bc2000dl::ui
             const float sy = cy - screwOrbit * std::cos (a);
 
             juce::ColourGradient sGrad (
-                juce::Colour (0xFFE8E8EC), sx - screwR * 0.5f, sy - screwR * 0.5f,
-                juce::Colour (0xFF505058), sx + screwR * 0.5f, sy + screwR * 0.5f, false);
+                juce::Colour (0xFFE0E0DC), sx - screwR * 0.5f, sy - screwR * 0.5f,
+                juce::Colour (0xFF404042), sx + screwR * 0.5f, sy + screwR * 0.5f, false);
             g.setGradientFill (sGrad);
             g.fillEllipse (sx - screwR, sy - screwR, screwR * 2, screwR * 2);
-            g.setColour (juce::Colour (0xFF1A1A1C));
-            g.drawEllipse (sx - screwR, sy - screwR, screwR * 2, screwR * 2, 0.5f);
+            g.setColour (juce::Colour (0xFF101012));
+            g.drawEllipse (sx - screwR, sy - screwR, screwR * 2, screwR * 2, 0.4f);
             // Phillips slot (cross)
-            g.drawLine (sx - screwR * 0.6f, sy, sx + screwR * 0.6f, sy, 0.8f);
-            g.drawLine (sx, sy - screwR * 0.6f, sx, sy + screwR * 0.6f, 0.8f);
+            g.drawLine (sx - screwR * 0.65f, sy, sx + screwR * 0.65f, sy, 0.7f);
+            g.drawLine (sx, sy - screwR * 0.65f, sx, sy + screwR * 0.65f, 0.7f);
         }
 
-        // ---- 9. Concentric separator outlines (subtle, sells depth) ----
-        g.setColour (juce::Colours::black.withAlpha (0.35f));
-        g.drawEllipse (cx - creamR, cy - creamR, creamR * 2, creamR * 2, 0.6f);
-        g.drawEllipse (cx - redR,   cy - redR,   redR * 2,   redR * 2,   0.5f);
-        g.drawEllipse (cx - innerR, cy - innerR, innerR * 2, innerR * 2, 0.5f);
+        // ---- 8. Centre drive-pin hole ----
+        const float pinR = hubR * 0.16f;
+        g.setColour (juce::Colour (0xFF080808));
+        g.fillEllipse (cx - pinR, cy - pinR, pinR * 2, pinR * 2);
 
-        // ---- 10. Specular highlight (top-left, sells curvature) ----
+        // ---- 9. Concentric separator outlines (subtle depth cues) ----
+        g.setColour (juce::Colours::black.withAlpha (0.45f));
+        g.drawEllipse (cx - flangeR, cy - flangeR, flangeR * 2, flangeR * 2, 0.7f);
+        g.drawEllipse (cx - hubOuterR, cy - hubOuterR, hubOuterR * 2, hubOuterR * 2, 0.6f);
+
+        // ---- 10. Specular highlight (top-left arc, sells the metal curvature) ----
         juce::Path glint;
-        glint.addCentredArc (cx, cy, radius * 0.95f, radius * 0.95f, 0,
-                              -juce::MathConstants<float>::pi * 0.6f,
-                              -juce::MathConstants<float>::pi * 0.15f, true);
-        g.setColour (juce::Colours::white.withAlpha (0.18f));
-        g.strokePath (glint, juce::PathStrokeType (3.0f));
+        glint.addCentredArc (cx, cy, radius * 0.94f, radius * 0.94f, 0,
+                              -juce::MathConstants<float>::pi * 0.55f,
+                              -juce::MathConstants<float>::pi * 0.18f, true);
+        g.setColour (juce::Colours::white.withAlpha (0.22f));
+        g.strokePath (glint, juce::PathStrokeType (2.2f));
     }
 
     //=========================================================================
