@@ -7,10 +7,14 @@ namespace bc2000dl::dsp
     void PhonoPreamp::prepare (double sr, float asym, std::uint32_t baseSeed)
     {
         sampleRate = sr;
-        // H-läge: hög gain (~50 dB total)
-        // L-läge: lägre gain (~25 dB total)
-        const double gainUw = (mode == PhonoMode::H) ? 30.0 : 15.0;
-        const double gain2n = 20.0;
+        // Plugin-kontext: input är redan line-level (DAW), inte phono-cartridge
+        // 2 mV. Reducerar gain-cascaden från fysisk-hårdvara-värdena (70 dB i H,
+        // 35 dB i L) till plugin-värden som balanserar mot mic/radio (6 dB).
+        // Behåller RIAA-shape för phono-karaktär utan att överamplifiera.
+        // H-läge: ~9 dB midband + 6 dB LF-shelf = ~15 dB @ LF
+        // L-läge: ~6 dB total (matchar mic/radio)
+        const double gainUw = (mode == PhonoMode::H) ?  6.0 : 4.0;
+        const double gain2n = (mode == PhonoMode::H) ?  3.0 : 2.0;
         uw0029.prepare (sr, GeStageType::UW0029, gainUw, asym, baseSeed + 500);
         n2613.prepare (sr, gain2n, asym, baseSeed + 501);
         updateRIAA();
@@ -34,9 +38,11 @@ namespace bc2000dl::dsp
     {
         if (mode == PhonoMode::H)
         {
-            // RIAA-approximation: LF-shelf @ 50 Hz +20 dB, HF-shelf @ 12 kHz -2 dB
+            // RIAA-approximation reducerad till plugin-skala: behåller phono-färg
+            // (LF-warmth, slight HF roll-off) utan att över-boosta.
+            // LF-shelf @ 50 Hz +6 dB (var +20), HF-shelf @ 12 kHz -2 dB.
             riaaLf.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (
-                sampleRate, 50.0f, 0.707f, juce::Decibels::decibelsToGain (20.0f));
+                sampleRate, 50.0f, 0.707f, juce::Decibels::decibelsToGain (6.0f));
             riaaHf.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (
                 sampleRate, 12000.0f, 0.707f, juce::Decibels::decibelsToGain (-2.0f));
         }
