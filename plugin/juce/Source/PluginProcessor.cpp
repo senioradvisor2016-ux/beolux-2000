@@ -288,6 +288,20 @@ void BC2000DLProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
     updateChainParameters();
     chain.process (buffer);
+
+    // Sync tape-transport counter to DAW playhead when available.
+    // This makes the UI counter track the actual session time rather than
+    // accumulated processing time — rewind in the DAW rewinds the reel counter.
+    // In standalone / when no host time is available the chain's own accumulator
+    // (advanced in chain.process) is used instead.
+    if (auto* ph = getPlayHead())
+    {
+        if (const auto pos = ph->getPosition())
+        {
+            if (const auto t = pos->getTimeInSeconds())
+                chain.tapePositionSeconds.store (*t, std::memory_order_relaxed);
+        }
+    }
 }
 
 juce::AudioProcessorEditor* BC2000DLProcessor::createEditor()

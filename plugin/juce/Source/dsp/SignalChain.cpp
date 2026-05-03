@@ -97,6 +97,10 @@ namespace bc2000dl::dsp
         echoL.reset(); echoR.reset();
         phonoScratch.clear();
         radioScratch.clear();
+
+        // Reset tape-transport counters so the UI counter returns to 0000
+        // when the DAW transport rewinds or the processor is re-initialised.
+        tapePositionSeconds.store (0.0, std::memory_order_relaxed);
     }
 
     void SignalChain::setParameters (const Parameters& p)

@@ -4,6 +4,7 @@
 #include "Ge2N2613Stage.h"  // för softClip-funktionen
 #include <cmath>
 #include <algorithm>
+#include <random>   // std::random_device
 
 namespace bc2000dl::dsp
 {
