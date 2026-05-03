@@ -45,5 +45,10 @@ namespace bc2000dl::dsp
 
         // HF-loss per pass (LP-filter)
         juce::dsp::IIR::Filter<float> hfLossFilter;
+
+        // Wow modulation of delay-readback (authentic tape-echo pitch-wander)
+        float echoWowPhase  { 0.0f };
+        float echoWowDepth  { 0.0f };  // samples — set per speed in setSpeed()
+        float echoWowFreqHz { 1.5f };  // Hz — dominant wow fundamental
     };
 }

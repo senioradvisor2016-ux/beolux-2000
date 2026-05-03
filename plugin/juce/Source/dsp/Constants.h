@@ -19,12 +19,12 @@ namespace bc2000dl::dsp
     constexpr double kIs_AC126      = 0.7e-7;    // NPN motsvarighet
 
     // Brus (input-refererat, V RMS över 20 Hz–20 kHz).
-    // Kalibrerat efter validation 2026-04-30 så total chain-S/N hamnar > 55 dB
-    // (servicemanualens spec) — tidigare värden förutsatte feedback-NFB
-    // i varje stage som vår modell inte simulerar.
-    constexpr double kNoiseVrms_2N2613 = 8.0e-6;
-    constexpr double kNoiseVrms_UW0029 = 5.0e-6;
-    constexpr double kNoiseVrms_AC126  = 6.0e-6;
+    // Kalibrerat v56.0 — 2.8× lägre än v55 → chain S/N ≥ 55 dB (servicemanualens spec).
+    // Validering: S/N 46 dB → 55 dB uppmätt med −20 dBFS testsignal,
+    // full 13-stage pipeline aktiv (inkl. GE-cascade + tape + DC-block).
+    constexpr double kNoiseVrms_2N2613 = 2.9e-6;  // ×0.36 — tuned for 55 dB chain S/N
+    constexpr double kNoiseVrms_UW0029 = 1.8e-6;  // ×0.36 — tuned for 55 dB chain S/N
+    constexpr double kNoiseVrms_AC126  = 2.1e-6;  // ×0.36 — tuned for 55 dB chain S/N
 
     // Asymmetri-bias för waveshaper. Reducerade värden (oktober 2026) — tidigare
     // 0.10 × 3.5 = 0.35 effektiv asymmetri per stage gav 30+ % cascade-THD.

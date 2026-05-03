@@ -103,6 +103,10 @@ namespace bc2000dl::dsp
         float spectrumBuffer[kSpecBufSize] {};
         std::atomic<int> spectrumWriteIdx { 0 };
 
+        // ---- ReelDeck / UI animation state (UI-thread reads, audio-thread writes) ----
+        std::atomic<double> tapePositionSeconds { 0.0 };
+        std::atomic<float>  wowCurrentAmp       { 0.0f };
+
     private:
         double sampleRate { 48000.0 };
         Parameters params;
@@ -136,6 +140,11 @@ namespace bc2000dl::dsp
             ToneControl         tone;
             PowerAmp8004014     powerAmp;
             juce::dsp::IIR::Filter<float> dcBlock;
+
+            // Per-source noise generators (RT-safe, no allocation, no init cost)
+            float        radioHumPhase    { 0.0f };
+            float        phonoRumbleState { 0.0f };
+            std::uint32_t noiseSeed       { 0u };
         };
 
         ChannelChain L, R;

@@ -38,7 +38,7 @@ namespace bc2000dl::dsp
                 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
         else
             bassFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (
-                sampleRate, 100.0f, 0.707f,
+                sampleRate, 300.0f, 0.56f,
                 juce::Decibels::decibelsToGain (bassDb));
     }
 
@@ -49,7 +49,7 @@ namespace bc2000dl::dsp
                 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
         else
             trebleFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (
-                sampleRate, 10000.0f, 0.707f,
+                sampleRate, 3500.0f, 0.56f,
                 juce::Decibels::decibelsToGain (trebleDb));
     }
 

@@ -24,25 +24,27 @@ namespace bc2000dl
         - Rotation speed is angular-velocity = linearSpeed / currentRadius
           → smaller reel spins FASTER, just like real tape.
         - Motion blur applied at higher angular velocities.  */
-    class ReelDeck : public juce::Component, private juce::Timer
+    class ReelDeck : public juce::Component
     {
     public:
-        ReelDeck();
-        ~ReelDeck() override;
+        ReelDeck() = default;
 
         void setActive (bool active) { isActive = active; }
-        void setSpeed (int speedIdx)  { speedFactor = (speedIdx == 0 ? 0.5f : speedIdx == 1 ? 1.0f : 2.0f); }
+        void setSpeed  (int speedIdx) { speedFactor = (speedIdx == 0 ? 0.5f : speedIdx == 1 ? 1.0f : 2.0f); }
+        void setTapePosition (double posSeconds);   // DSP-coupled: drives tapeAmount from real time
+        void setWowIntensity (float w) { wowIntensity = w; }
         void paint (juce::Graphics&) override;
 
     private:
-        void timerCallback() override;
-        bool isActive { false };
+        void onVBlank();
+        juce::VBlankAttachment vblank { this, [this]{ onVBlank(); } };
+
+        bool  isActive    { false };
         float speedFactor { 1.0f };
-        float angleL { 0.0f }, angleR { 0.0f };
-        // tapeAmount: 0 = all on supply (full left reel), 1 = all on takeup
-        float tapeAmount { 0.0f };
-        // current angular velocity per reel (used for motion-blur intensity)
-        float angVelL { 0.0f }, angVelR { 0.0f };
+        float angleL      { 0.0f }, angleR { 0.0f };
+        float tapeAmount  { 0.0f };
+        float angVelL     { 0.0f }, angVelR { 0.0f };
+        float wowIntensity { 0.0f };
     };
 
     /** Horisontal VU-bar with calibrated -60..+6 dBFS range. */
@@ -153,7 +155,6 @@ private:
     bc2000dl::AnalogVU vuOut { "VU" };
     bc2000dl::SpectrumAnalyser spectrum;
     juce::String       counterText { "0000" };
-    double             counterSeconds { 0.0 };  // animated tape counter
     bool               recLedOn { false };       // record-LED state
     int                prevSpeedIdx { -1 };      // for speed-LED repaint detection
 

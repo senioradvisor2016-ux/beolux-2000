@@ -43,6 +43,11 @@ namespace bc2000dl::dsp
         const auto coef = juce::dsp::IIR::Coefficients<float>::makeHighPass (sr, 20.0f);
         ch.dcBlock.coefficients = coef;
         ch.dcBlock.reset();
+
+        // Per-source noise init (different seeds for L/R to decorrelate noise floors)
+        ch.radioHumPhase    = 0.0f;
+        ch.phonoRumbleState = 0.0f;
+        ch.noiseSeed        = baseSeed ^ 0xDEADBEEFu;
     }
 
     void SignalChain::prepare (double sr, int maxBlock)
@@ -214,6 +219,21 @@ namespace bc2000dl::dsp
             phonoScratch.applyGain (channel, 0, n, phonoG * kInputPad);
             ch.phono.process (phonoScratch, channel);
 
+            // Phono subsonic rumble — LP-filtered noise from platter bearing (<5 Hz)
+            {
+                auto* psd = phonoScratch.getWritePointer (channel);
+                constexpr float kAlpha     = 0.00060f;  // 1-pole LP ≈ 4.6 Hz @ 48 kHz
+                constexpr float kNoiseScale = 0.058f;   // calibrated → ≈ −65 dBFS
+                for (int i = 0; i < n; ++i)
+                {
+                    ch.noiseSeed = ch.noiseSeed * 1664525u + 1013904223u;
+                    const float noise = static_cast<float> (static_cast<int32_t> (ch.noiseSeed))
+                                        * (kNoiseScale / 2147483648.0f);
+                    ch.phonoRumbleState += (noise - ch.phonoRumbleState) * kAlpha;
+                    psd[i] += ch.phonoRumbleState;
+                }
+            }
+
             // Summera in i huvudbufferten
             buffer.addFrom (channel, 0, phonoScratch, channel, 0, n);
         }
@@ -222,6 +242,21 @@ namespace bc2000dl::dsp
         if (radioG > 1e-6f)
         {
             radioScratch.applyGain (channel, 0, n, radioG * kInputPad);
+
+            // Radio 50 Hz power-line hum (−58 dBFS, electromagnetic induction artefact)
+            {
+                auto* rsd = radioScratch.getWritePointer (channel);
+                constexpr float kHumAmp = 0.00126f;  // −58 dBFS
+                for (int i = 0; i < n; ++i)
+                {
+                    ch.radioHumPhase += juce::MathConstants<float>::twoPi * 50.0f
+                                        / static_cast<float> (sampleRate);
+                    if (ch.radioHumPhase >= juce::MathConstants<float>::twoPi)
+                        ch.radioHumPhase -= juce::MathConstants<float>::twoPi;
+                    rsd[i] += std::sin (ch.radioHumPhase) * kHumAmp;
+                }
+            }
+
             ch.radioUw0029.process (radioScratch, channel);
             ch.radioN2613.process (radioScratch, channel);
 
@@ -352,6 +387,13 @@ namespace bc2000dl::dsp
         }
 
         balanceMaster.processStereo (buffer);
+
+        // Tape transport time accumulation (drives ReelDeck + counter display in UI)
+        const double dt = static_cast<double> (buffer.getNumSamples()) / sampleRate;
+        tapePositionSeconds.store (
+            tapePositionSeconds.load (std::memory_order_relaxed) + dt,
+            std::memory_order_relaxed);
+        wowCurrentAmp.store (params.wowFlutterAmount, std::memory_order_relaxed);
 
         // Uppdatera VU-meter atomiskt (UI läser)
         if (numCh >= 1)

@@ -37,6 +37,14 @@ namespace bc2000dl::dsp
         delaySamples = std::min (
             static_cast<int> (sampleRate * delayMs / 1000.0f),
             static_cast<int> (buf.size()) - 1);
+
+        // Wow depth: slower tape → less mechanical stability → more pitch-wander in echo
+        switch (speed)
+        {
+            case TapeSpeed::Speed19:  echoWowDepth = delaySamples * 0.00050f; break;
+            case TapeSpeed::Speed95:  echoWowDepth = delaySamples * 0.00080f; break;
+            case TapeSpeed::Speed475: echoWowDepth = delaySamples * 0.00120f; break;
+        }
     }
 
     float Echo::processSample (float x)
@@ -53,10 +61,24 @@ namespace bc2000dl::dsp
         const float fbCurve = amount * (0.92f + 0.12f * amount);  // mjuk ramp till ~1.04
         const float feedback = juce::jmin (fbCurve, 1.04f);
 
-        // Read-pointer
-        int readIdx = writeIdx - delaySamples;
-        if (readIdx < 0) readIdx += static_cast<int> (buf.size());
-        const float delayed = buf[static_cast<size_t> (readIdx)];
+        // Wow-modulated read pointer — tape echo tails pitch-wander at ~1.5 Hz
+        echoWowPhase += juce::MathConstants<float>::twoPi * echoWowFreqHz
+                        / static_cast<float> (sampleRate);
+        if (echoWowPhase >= juce::MathConstants<float>::twoPi)
+            echoWowPhase -= juce::MathConstants<float>::twoPi;
+
+        const float wowOffset  = echoWowDepth * std::sin (echoWowPhase);
+        const float fracDelay  = static_cast<float> (delaySamples) + wowOffset;
+        const int   delayInt   = static_cast<int> (std::floor (fracDelay));
+        const float delayFrac  = fracDelay - static_cast<float> (delayInt);
+
+        const int bufLen = static_cast<int> (buf.size());
+        int r0 = writeIdx - delayInt;
+        int r1 = writeIdx - delayInt - 1;
+        if (r0 < 0) r0 += bufLen;  if (r0 >= bufLen) r0 -= bufLen;
+        if (r1 < 0) r1 += bufLen;  if (r1 >= bufLen) r1 -= bufLen;
+        const float delayed = buf[static_cast<size_t> (r0)] * (1.0f - delayFrac)
+                            + buf[static_cast<size_t> (r1)] * delayFrac;
 
         // Output = input + feedback × delayed (våt + torr)
         const float y = x + delayed * feedback;

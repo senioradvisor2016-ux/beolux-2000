@@ -79,10 +79,7 @@ namespace
 //=============================================================================
 namespace bc2000dl
 {
-    ReelDeck::ReelDeck() { startTimerHz (30); }
-    ReelDeck::~ReelDeck() = default;
-
-    void ReelDeck::timerCallback()
+    void ReelDeck::onVBlank()
     {
         if (! isActive)
         {
@@ -113,11 +110,17 @@ namespace bc2000dl
         if (angleL > twoPi)  angleL -= twoPi;
         if (angleR > twoPi)  angleR -= twoPi;
 
-        // tapeAmount slowly grows; "auto-rewind" wraps at 1.0
-        tapeAmount += 0.0008f * speedFactor;
-        if (tapeAmount > 1.0f) tapeAmount = 0.0f;
-
         repaint();
+    }
+
+    void ReelDeck::setTapePosition (double posSeconds)
+    {
+        // Standard C60 tape at 19 cm/s fills 1800 s (30 min per side).
+        // We model the reel as cycling every 90 minutes so the visual never
+        // "stalls" at the end — matches real-world session workflow.
+        constexpr double kCycleSecs = 5400.0;   // 90 min
+        const double wrapped = std::fmod (posSeconds, kCycleSecs);
+        tapeAmount = static_cast<float> (wrapped / kCycleSecs);
     }
 
     void ReelDeck::paint (juce::Graphics& g)
@@ -602,7 +605,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("Beolux 2000 · v55.0")
+                .withTitle ("Beolux 2000 · v56.0")
                 .withMessage ("BEOLUX 2000 — Danish Tape Emulation\n"
                               "by SOUNDBOYS\n\n"
                               "Inspired by the Bang & Olufsen Beocord 2000\n"
@@ -704,7 +707,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v55.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v56.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -766,7 +769,6 @@ void NativeEditor::paint (juce::Graphics& g)
         };
         for (auto& h : hs)
         {
-            const auto rr = h.r.toFloat();
             g.setFont (LnF::sectionFont (10.5f));
             // engraved-into-metal effect: dark shadow below, bright silver on top
             g.setColour (juce::Colours::black.withAlpha (0.85f));
@@ -1172,6 +1174,10 @@ void NativeEditor::timerCallback()
     const bool tapeRunning = (inputAny > 0.05f) || outLvl > -40.0f;
     reelDeck.setActive (tapeRunning);
 
+    // Sync ReelDeck tape position directly from the DSP pipeline
+    reelDeck.setTapePosition (chain.tapePositionSeconds.load (std::memory_order_relaxed));
+    reelDeck.setWowIntensity (chain.wowCurrentAmp.load (std::memory_order_relaxed));
+
     // Record LED — blinks at 2 Hz when tape is running
     const bool ledTarget = tapeRunning &&
         (((juce::Time::getMillisecondCounter() / 250) & 1) != 0);
@@ -1197,14 +1203,13 @@ void NativeEditor::timerCallback()
     // (rolls at 9999 ≈ 41 minutes — same look as the real Beocord 4-digit drum).
     if (tapeRunning)
     {
-        const double rate = (speedIdx == 0 ? 1.0 : speedIdx == 1 ? 2.0 : 4.0);  // 4.75/9.5/19
-        counterSeconds += (1.0 / 30.0) * rate;
-        const int counts = ((int) (counterSeconds * 4.0)) % 10000;
+        // Counter driven directly by DSP tape-transport time — perfectly synced
+        const double tapePos = chain.tapePositionSeconds.load (std::memory_order_relaxed);
+        const int counts = static_cast<int> (tapePos * 4.0) % 10000;
         juce::String c = juce::String (counts).paddedLeft ('0', 4);
         if (c != counterText)
         {
             counterText = c;
-            // Repaint just the counter band (small region, near deck bottom)
             repaint (juce::Rectangle<int> (kTeakW, kAluH - 28, kInnerW, 28));
         }
     }
