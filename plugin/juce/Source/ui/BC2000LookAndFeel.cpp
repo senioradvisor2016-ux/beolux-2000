@@ -452,20 +452,26 @@ namespace bc2000dl::ui
             g.setColour (juce::Colours::black.withAlpha (0.85f));
             g.drawEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2, 1.0f);
 
-            // ---- FACETED PHENOLIC BODY — 16-sided subtle polygon ----
-            // Real Fairchild 670 knobs have visible facets — subtle flat sides
-            // moulded into the phenolic. Catches light differentially at every
-            // angle, gives the knob its iconic "industrial" feel rather than
-            // soft-round.
-            const int numFacets = 16;
+            // ---- FLUTED PHENOLIC BODY — Fairchild 670 star-profile ----
+            // Real Fairchild knobs have visible vertical flutes around the
+            // perimeter. From above this looks like a 12-pointed star: small
+            // peaks alternate with valleys, ~5% radial difference.
+            // Each flute catches light brightly on its lit side and shadows on
+            // its dark side, giving the iconic "fluted column" appearance.
+            const int numFlutes = 12;
+            const int numVerts = numFlutes * 2;
             const float twoPi = juce::MathConstants<float>::twoPi;
+            const float peakR   = bodyR;
+            const float valleyR = bodyR * 0.93f;
 
             juce::Path bodyShape;
-            for (int i = 0; i < numFacets; ++i)
+            for (int i = 0; i < numVerts; ++i)
             {
-                const float a = angle + (float) i * twoPi / (float) numFacets;
-                const float vx = cx + bodyR * std::sin (a);
-                const float vy = cy - bodyR * std::cos (a);
+                const bool isPeak = (i % 2 == 0);
+                const float r = isPeak ? peakR : valleyR;
+                const float a = angle + (float) i * twoPi / (float) numVerts;
+                const float vx = cx + r * std::sin (a);
+                const float vy = cy - r * std::cos (a);
                 if (i == 0) bodyShape.startNewSubPath (vx, vy);
                 else        bodyShape.lineTo (vx, vy);
             }
@@ -480,36 +486,44 @@ namespace bc2000dl::ui
             g.setGradientFill (bodyGrad);
             g.fillPath (bodyShape);
 
-            // ---- PER-FACET DIFFERENTIAL LIGHTING ----
-            // Each facet's normal points outward at its centre angle. Compute
-            // dot-product against light direction (upper-left) and add a thin
-            // bright/dark stroke at each facet edge.
-            for (int i = 0; i < numFacets; ++i)
+            // ---- PER-FLUTE DIFFERENTIAL LIGHTING ----
+            // Each flute has a "lit side" (peak edge facing the light) and a
+            // "dark side" (peak edge facing away). Draw bright/dark strokes
+            // along each peak-to-valley edge to sell the 3D fluted geometry.
+            for (int i = 0; i < numVerts; ++i)
             {
-                const float a0 = angle + (float) i * twoPi / (float) numFacets;
-                const float a1 = angle + (float) (i + 1) * twoPi / (float) numFacets;
-                const float midA = (a0 + a1) * 0.5f;
-                const float lightDot = (-std::sin (midA)) * 0.6f + std::cos (midA) * 0.8f;
+                const int next = (i + 1) % numVerts;
+                const bool currentIsPeak = (i % 2 == 0);
 
-                const float v0x = cx + bodyR * std::sin (a0);
-                const float v0y = cy - bodyR * std::cos (a0);
-                const float v1x = cx + bodyR * std::sin (a1);
-                const float v1y = cy - bodyR * std::cos (a1);
+                const float a0 = angle + (float) i * twoPi / (float) numVerts;
+                const float a1 = angle + (float) next * twoPi / (float) numVerts;
+                const float midA = (a0 + a1) * 0.5f;
+                // Light direction: upper-left
+                const float lightDot = (-std::sin (midA)) * 0.6f + std::cos (midA) * 0.8f;
+                // Side normal: peak→valley going clockwise faces "this side"
+                // direction. If lightDot > 0 → this edge is lit; else shadowed.
+                const float r0 = currentIsPeak ? peakR : valleyR;
+                const float r1 = currentIsPeak ? valleyR : peakR;
+                const float v0x = cx + r0 * std::sin (a0);
+                const float v0y = cy - r0 * std::cos (a0);
+                const float v1x = cx + r1 * std::sin (a1);
+                const float v1y = cy - r1 * std::cos (a1);
 
                 if (lightDot > 0.0f)
                 {
-                    g.setColour (juce::Colours::white.withAlpha (lightDot * 0.18f));
-                    g.drawLine (v0x, v0y, v1x, v1y, 0.7f);
+                    // Lit side — bright crisp white edge
+                    g.setColour (juce::Colours::white.withAlpha (juce::jmin (0.55f, lightDot * 0.65f)));
+                    g.drawLine (v0x, v0y, v1x, v1y, 1.0f);
                 }
                 else
                 {
-                    g.setColour (juce::Colours::black.withAlpha (-lightDot * 0.30f));
-                    g.drawLine (v0x, v0y, v1x, v1y, 0.7f);
+                    // Shadow side — deep black edge
+                    g.setColour (juce::Colours::black.withAlpha (juce::jmin (0.65f, -lightDot * 0.75f)));
+                    g.drawLine (v0x, v0y, v1x, v1y, 1.0f);
                 }
             }
 
-            // ---- BEVEL HIGHLIGHT — bright thin ring just inside chrome rim ----
-            // Sells the sharp transition from chrome bezel into the phenolic body
+            // ---- BEVEL HIGHLIGHT just inside chrome rim ----
             g.setColour (juce::Colour (0xFF8A8A92).withAlpha (0.85f));
             g.drawEllipse (cx - bodyR + 0.5f, cy - bodyR + 0.5f,
                            (bodyR - 0.5f) * 2, (bodyR - 0.5f) * 2, 0.8f);
@@ -578,57 +592,8 @@ namespace bc2000dl::ui
                                pgR * 2, pgR * 2);
             }
 
-            // ---- SUBTLE FAIRCHILD RIDGES — softer, fewer ridges (~24) ----
-            // Fairchild bakelite knobs aren't aggressively knurled. They have
-            // gentle moulded ridges/flutes — softer texture than UAD 1176.
-            {
-                const float ridgeInnerR = bodyR * 0.88f;
-                const float ridgeOuterR = bodyR * 0.99f;
-                const int   numRidges = 24;
-                const float twoPi = juce::MathConstants<float>::twoPi;
-                for (int i = 0; i < numRidges; ++i)
-                {
-                    const float ta = angle + (float) i * twoPi / (float) numRidges;
-                    const float sn = std::sin (ta);
-                    const float cs = std::cos (ta);
-                    // Light-dot-product to vary brightness around the rim
-                    const float lightDot = (-sn) * 0.7f + cs * 0.7f;
-                    const float litAlpha  = juce::jlimit (0.04f, 0.30f, 0.16f + lightDot * 0.18f);
-                    const float darkAlpha = juce::jlimit (0.08f, 0.40f, 0.22f - lightDot * 0.18f);
-
-                    const float ix = cx + ridgeInnerR * sn;
-                    const float iy = cy - ridgeInnerR * cs;
-                    const float ox = cx + ridgeOuterR * sn;
-                    const float oy = cy - ridgeOuterR * cs;
-
-                    if (i % 2 == 0)
-                    {
-                        g.setColour (juce::Colour (0xFFC08050).withAlpha (litAlpha));
-                        g.drawLine (ix, iy, ox, oy, 0.7f);
-                    }
-                    else
-                    {
-                        g.setColour (juce::Colour (0xFF180806).withAlpha (darkAlpha));
-                        g.drawLine (ix, iy, ox, oy, 0.7f);
-                    }
-                }
-            }
-
-            // ---- SUBTLE BAKELITE MOULDED-RADIAL FLOW LINES ----
-            // Phenolic resin has visible flow patterns from its mould —
-            // tiny radial striations that rotate with the knob.
-            {
-                const float twoPi = juce::MathConstants<float>::twoPi;
-                for (int i = 0; i < 8; ++i)
-                {
-                    const float ta = angle + (float) i * twoPi / 8.0f;
-                    const float sn = std::sin (ta);
-                    const float cs = std::cos (ta);
-                    g.setColour (juce::Colour (0xFFFFE0A0).withAlpha (0.025f));
-                    g.drawLine (cx + bodyR * 0.20f * sn, cy - bodyR * 0.20f * cs,
-                                cx + bodyR * 0.85f * sn, cy - bodyR * 0.85f * cs, 0.5f);
-                }
-            }
+            // (No additional ridges — the fluted polygon body provides
+            // all the perimeter texture. Adding more would clutter.)
 
             // ---- Body inner-edge shadow (deeper now — sells faceted edge) ----
             static thread_local melatonin::InnerShadow bodyInner {
