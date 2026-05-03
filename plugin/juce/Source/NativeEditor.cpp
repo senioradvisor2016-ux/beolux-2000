@@ -121,10 +121,16 @@ namespace bc2000dl
     //=========================================================================
     void AnalogVU::setLevel (float dbfs)
     {
-        // Smooth attack/release ballistics (~300ms VU response)
+        // Authentic VU ballistic: 2nd-order spring/damper.
+        // ~300ms reach to 99% with ~1% overshoot, like a real moving-coil
+        // mechanism. Slightly faster decay matches a real meter at 30Hz.
         const auto target = juce::jlimit (-30.0f, 6.0f, dbfs);
-        if (target > current) current += (target - current) * 0.35f;
-        else                  current += (target - current) * 0.10f;
+        const float spring  = 0.18f;
+        const float damping = 0.50f;
+        const float diff    = target - current;
+        velocity += diff * spring;
+        velocity *= (1.0f - damping);
+        current  += velocity;
 
         const bool nowPeaking = current > 0.0f;
         if (nowPeaking != peaking) { peaking = nowPeaking; }
@@ -161,6 +167,18 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     };
 
     // ---- Top deck zone: reels + 3 analog VU meters (IN L, IN R, OUT) ----
+    // Real Gaussian drop-shadows under the meters and reel deck — sells
+    // the "machined-into-a-recess" look at the bezels and reel rims.
+    vuShadow.setShadowProperties (
+        juce::DropShadow (juce::Colours::black.withAlpha (0.55f), 8, { 0, 3 }));
+    reelShadow.setShadowProperties (
+        juce::DropShadow (juce::Colours::black.withAlpha (0.45f), 12, { 0, 4 }));
+
+    vuInL.setComponentEffect (&vuShadow);
+    vuInR.setComponentEffect (&vuShadow);
+    vuOut.setComponentEffect (&vuShadow);
+    reelDeck.setComponentEffect (&reelShadow);
+
     addAndMakeVisible (reelDeck);
     addAndMakeVisible (vuInL);
     addAndMakeVisible (vuInR);
@@ -390,7 +408,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v37.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v38.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -654,14 +672,34 @@ void NativeEditor::timerCallback()
     vuOut.setLevel (juce::jmax (chain.meterLevelL_dBFS.load(),
                                  chain.meterLevelR_dBFS.load()));
 
-    // Reel spin when any input gain > threshold
+    // Reel spin when any input gain > threshold OR active output signal
     const float inputAny = processor.apvts.getRawParameterValue ("mic_gain")->load()
                          + processor.apvts.getRawParameterValue ("phono_gain")->load()
                          + processor.apvts.getRawParameterValue ("radio_gain")->load();
-    reelDeck.setActive (inputAny > 0.05f);
+    const float outLvl = juce::jmax (chain.meterLevelL_dBFS.load(),
+                                      chain.meterLevelR_dBFS.load());
+    const bool tapeRunning = (inputAny > 0.05f) || outLvl > -40.0f;
+    reelDeck.setActive (tapeRunning);
 
     const int speedIdx = (int) processor.apvts.getRawParameterValue ("speed")->load();
     reelDeck.setSpeed (speedIdx);
+
+    // Counter: ticks up while tape "runs" — speed-aware (faster speed = faster
+    // playback time consumed). Display: 0000 = quarters of a second since start
+    // (rolls at 9999 ≈ 41 minutes — same look as the real Beocord 4-digit drum).
+    if (tapeRunning)
+    {
+        const double rate = (speedIdx == 0 ? 1.0 : speedIdx == 1 ? 2.0 : 4.0);  // 4.75/9.5/19
+        counterSeconds += (1.0 / 30.0) * rate;
+        const int counts = ((int) (counterSeconds * 4.0)) % 10000;
+        juce::String c = juce::String (counts).paddedLeft ('0', 4);
+        if (c != counterText)
+        {
+            counterText = c;
+            // Repaint just the counter band (small region, near deck bottom)
+            repaint (juce::Rectangle<int> (kTeakW, kAluH - 28, kInnerW, 28));
+        }
+    }
 
     const double sr = processor.getSampleRate();
     if (sr > 0.0)
@@ -681,13 +719,23 @@ void NativeEditor::timerCallback()
 //=============================================================================
 void NativeEditor::applyPreset (int idx)
 {
+    // Tween parameter values to their new targets over ~250 ms instead of
+    // jumping. Uses a one-shot AnimationCallback running at 60Hz.
     auto& v = processor.apvts;
-    auto set = [&] (const juce::String& id, float val)
+    struct Tween { juce::String id; float fromN, toN; };
+    auto targets = std::make_shared<std::vector<Tween>>();
+
+    auto plan = [&] (const juce::String& id, float val)
     {
         if (auto* prm = v.getParameter (id))
-            prm->setValueNotifyingHost (prm->convertTo0to1 (val));
+        {
+            const float toN = prm->convertTo0to1 (val);
+            const float fromN = prm->getValue();
+            targets->push_back ({ id, fromN, toN });
+        }
     };
-    auto setBool = [&] (const juce::String& id, bool b) { set (id, b ? 1.0f : 0.0f); };
+    auto set = [&] (const juce::String& id, float val) { plan (id, val); };
+    auto setBool = [&] (const juce::String& id, bool b) { plan (id, b ? 1.0f : 0.0f); };
 
     // Baseline reset
     set ("speed", 2);
@@ -752,5 +800,27 @@ void NativeEditor::applyPreset (int idx)
         case 23: set ("wow_flutter", 1.8f); set ("multiplay_gen", 4);
                   set ("saturation_drive", 1.7f); break;
         default: break;
+    }
+
+    // ---- Schedule a smooth 250 ms tween (15 frames at 60Hz) ----
+    constexpr int totalFrames = 15;
+    auto& vRef = processor.apvts;
+    for (int f = 1; f <= totalFrames; ++f)
+    {
+        const float t = (float) f / (float) totalFrames;
+        const float e = t * t * (3.0f - 2.0f * t);   // smoothstep
+        const bool last = (f == totalFrames);
+        juce::Timer::callAfterDelay (16 * f,
+            [&vRef, targets, e, last]
+            {
+                for (const auto& tw : *targets)
+                    if (auto* prm = vRef.getParameter (tw.id))
+                    {
+                        const float val = last ? tw.toN
+                                                : juce::jlimit (0.0f, 1.0f,
+                                                    tw.fromN + (tw.toN - tw.fromN) * e);
+                        prm->setValueNotifyingHost (val);
+                    }
+            });
     }
 }

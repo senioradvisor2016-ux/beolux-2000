@@ -49,7 +49,8 @@ namespace bc2000dl
         bool recording { false };
     };
 
-    /** Analog VU meter with curved scale + needle on cream face.  */
+    /** Analog VU meter with curved scale + needle on cream face.
+        Authentic 2nd-order ballistics — 300ms attack/decay with overshoot. */
     class AnalogVU : public juce::Component
     {
     public:
@@ -57,8 +58,9 @@ namespace bc2000dl
         void setLevel (float dbfs);              // smoothed
         void paint (juce::Graphics&) override;
     private:
-        float current { -20.0f };
-        bool peaking { false };
+        float current  { -20.0f };
+        float velocity { 0.0f };
+        bool  peaking  { false };
         juce::String channel;
     };
 }
@@ -81,12 +83,16 @@ private:
     bc2000dl::ui::InstructionCardLnF lnf;
     juce::TooltipWindow tooltipWindow { this, 500 };
 
+    // Real Gaussian shadows (JUCE-native, applied via setComponentEffect)
+    juce::DropShadowEffect vuShadow, reelShadow;
+
     // ---- Top deck zone: reels + 3 analog VU meters (Left, Right, Output) ----
     bc2000dl::ReelDeck reelDeck;
     bc2000dl::AnalogVU vuInL { "VU" };
     bc2000dl::AnalogVU vuInR { "VU" };
     bc2000dl::AnalogVU vuOut { "VU" };
     juce::String       counterText { "0000" };
+    double             counterSeconds { 0.0 };  // animated tape counter
 
     // ---- 5 dual-faders (10 sliders) — instruction-card slide-faders ----
     struct DualFader
