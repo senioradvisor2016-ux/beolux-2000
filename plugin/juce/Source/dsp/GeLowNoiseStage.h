@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <random>
+#include <cstdint>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include "Constants.h"
 
