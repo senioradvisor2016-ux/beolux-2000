@@ -62,8 +62,9 @@ namespace bc2000dl::dsp
 
         // Crossover-distorsion-parametrar
         static constexpr float kCrossoverThreshold = 0.005f;
-        // AUTOMATSIKRING soft-clip-tröskel (~+14 dBu in pluginen)
-        static constexpr float kAutomatsikring = 0.89f;  // 10^(-1/20)
+        // AUTOMATSIKRING soft-clip-tröskel — knee 2.5 → transparent vid nominell,
+        // mjuk mättning bara vid riktig overdrive. (Var 0.89 = -1 dBFS, för lågt)
+        static constexpr float kAutomatsikring = 2.5f;
 
         float crossoverDistortion (float x) const;
     };

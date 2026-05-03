@@ -79,11 +79,9 @@ namespace bc2000dl::dsp
         if (! enabled) return x;
         // 1. Smooth crossover (germanium AC127/132 class-AB-mismatch)
         float y = crossoverDistortion (x);
-        // 2. AUTOMATSIKRING soft-clip — höjd tröskel rejält så power-amp bara
-        //    introducerar distorsion vid genuin overdrive. Vid -3 dBFS in i
-        //    nominell drift ska power-amp vara nästan transparent.
-        constexpr float kSoftClipKnee = 2.5f;
-        y = kSoftClipKnee * std::tanh (y / kSoftClipKnee);
+        // 2. AUTOMATSIKRING soft-clip — knee 2.5 → transparent vid nominell,
+        //    mjuk mättning bara vid riktig overdrive (>0 dBFS).
+        y = kAutomatsikring * std::tanh (y / kAutomatsikring);
         // 3. Cap-coupling HP @ 5 Hz
         y = hpFilter.processSample (y);
         return y;
