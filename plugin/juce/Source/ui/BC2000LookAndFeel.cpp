@@ -175,11 +175,11 @@ namespace bc2000dl::ui
     void InstructionCardLnF::drawSlideChannel (juce::Graphics& g, juce::Rectangle<float> ch)
     {
         // BEOCORD 2400 STYLE: deep recessed slot in black anodised panel,
-        // with WHITE silkscreen tick marks numbered 0–10 either side.
+        // with WHITE silkscreen tick marks AND numbers 0..10 alongside.
         g.setColour (juce::Colour (0xFF000000));
         g.fillRoundedRectangle (ch, 1.2f);
 
-        // Inner-edge highlight (left side catches light)
+        // Inner-edge highlight
         g.setColour (juce::Colour (0xFF383840).withAlpha (0.7f));
         g.drawLine (ch.getX() + 0.5f, ch.getY() + 2, ch.getX() + 0.5f, ch.getBottom() - 2, 0.7f);
 
@@ -187,14 +187,27 @@ namespace bc2000dl::ui
         g.setColour (juce::Colour (0xFF1E1E20));
         g.drawRoundedRectangle (ch, 1.2f, 0.6f);
 
-        // Tick marks — bright white silkscreen, longer at 0/5/10
-        g.setColour (juce::Colour (0xFFE8E8EA).withAlpha (0.85f));
+        // Tick marks + 0..10 number labels (vertically: 10 at TOP, 0 at BOTTOM
+        // matching the original Beocord 2400 — slider value increases upwards).
+        const auto silkCol = juce::Colour (0xFFE8E8EA).withAlpha (0.85f);
+        g.setFont (sectionFont (7.5f));
         for (int i = 0; i <= 10; ++i)
         {
+            // i==0 shown as "10" at top of slider, i==10 as "0" at bottom
+            const int label = 10 - i;
             const float ty = ch.getY() + (ch.getHeight() * (float) i / 10.0f);
-            const float tw = (i == 0 || i == 5 || i == 10) ? 8.0f : 5.0f;
+            const float tw = (i == 0 || i == 5 || i == 10) ? 7.0f : 4.5f;
+            g.setColour (silkCol);
             g.drawLine (ch.getX() - tw - 1.0f, ty, ch.getX() - 2.0f, ty, 0.85f);
             g.drawLine (ch.getRight() + 2.0f, ty, ch.getRight() + tw + 1.0f, ty, 0.85f);
+
+            // Numbers next to long ticks (0, 5, 10) — left side only to avoid clutter
+            if (i == 0 || i == 5 || i == 10)
+            {
+                g.drawText (juce::String (label),
+                    juce::Rectangle<float> (ch.getX() - 22.0f, ty - 5.0f, 12.0f, 10.0f).toNearestInt(),
+                    juce::Justification::centredRight, false);
+            }
         }
     }
 
@@ -658,39 +671,77 @@ namespace bc2000dl::ui
         }
     }
 
-    /** Warm teak/walnut end-caps with procedural grain. */
+    /** Rich teak/walnut end-caps with photoreal grain. */
     void InstructionCardLnF::drawWoodEndCap (juce::Graphics& g, juce::Rectangle<int> r, bool isLeft)
     {
         const auto bf = r.toFloat();
 
-        // Base gradient — cross-grain (horizontal)
+        // ---- Warm base gradient (rich Beocord teak) ----
+        const auto warm = juce::Colour (0xFFB87444);   // rich teak amber
+        const auto mid  = juce::Colour (0xFF7A4022);   // mid teak
+        const auto deep = juce::Colour (0xFF3A1808);   // dark walnut
         juce::ColourGradient grad (
-            isLeft ? teakLight() : teakDark(),
-            bf.getX(), bf.getCentreY(),
-            isLeft ? teakDark() : teakLight(),
-            bf.getRight(), bf.getCentreY(), false);
-        grad.addColour (0.4, teakMid());
+            isLeft ? warm : deep, bf.getX(), bf.getCentreY(),
+            isLeft ? deep : warm, bf.getRight(), bf.getCentreY(), false);
+        grad.addColour (0.45, mid);
         g.setGradientFill (grad);
         g.fillRect (bf);
 
-        // Grain lines — thin dark verticals, seeded for stability
+        // ---- Vertical grain streaks (long, irregular) ----
         juce::Random rng (isLeft ? 11111 : 22222);
-        for (int i = 0; i < 14; ++i)
+        for (int i = 0; i < 26; ++i)
         {
-            const float fx = bf.getX() + rng.nextFloat() * bf.getWidth();
-            const float alpha = rng.nextFloat() * 0.35f + 0.05f;
-            const float end   = fx + rng.nextFloat() * 1.5f - 0.75f;
-            g.setColour (teakDark().withAlpha (alpha));
-            g.drawLine (fx, bf.getY(), end, bf.getBottom(), 0.5f);
+            const float fx    = bf.getX() + rng.nextFloat() * bf.getWidth();
+            const float alpha = rng.nextFloat() * 0.32f + 0.04f;
+            const bool dark   = rng.nextBool();
+            const float end   = fx + (rng.nextFloat() * 3.0f - 1.5f);
+            g.setColour ((dark ? deep : warm).withAlpha (alpha));
+            const float thickness = rng.nextFloat() * 0.6f + 0.25f;
+            g.drawLine (fx, bf.getY(), end, bf.getBottom(), thickness);
         }
 
-        // Edge highlight (inner edge, lighter)
-        const float edgeX = isLeft ? bf.getRight() - 1.5f : bf.getX() + 1.5f;
+        // ---- Cathedral grain rings (the warm flame pattern of teak) ----
+        for (int i = 0; i < 4; ++i)
+        {
+            const float cx = bf.getX() + rng.nextFloat() * bf.getWidth();
+            const float cy = bf.getY() + rng.nextFloat() * bf.getHeight();
+            const float rad = rng.nextFloat() * 50.0f + 30.0f;
+            g.setColour (deep.withAlpha (0.10f));
+            g.drawEllipse (cx - rad, cy - rad * 0.4f, rad * 2, rad * 0.8f, 0.7f);
+        }
+
+        // ---- Sparse pore-flecks (small dark pin-points) ----
+        for (int i = 0; i < 30; ++i)
+        {
+            const float fx = bf.getX() + rng.nextFloat() * bf.getWidth();
+            const float fy = bf.getY() + rng.nextFloat() * bf.getHeight();
+            g.setColour (deep.withAlpha (rng.nextFloat() * 0.35f + 0.10f));
+            g.fillEllipse (fx, fy, 0.8f, 0.8f);
+        }
+
+        // ---- Lacquer top sheen (subtle horizontal highlight at top edge) ----
+        juce::ColourGradient lacquer (
+            juce::Colour (0xFFFFE0B8).withAlpha (0.20f), bf.getCentreX(), bf.getY(),
+            juce::Colours::transparentWhite, bf.getCentreX(), bf.getY() + 14, false);
+        g.setGradientFill (lacquer);
+        g.fillRect (bf.withHeight (16));
+
+        // ---- Edge highlight on the INNER side (where teak meets the deck) ----
+        const float edgeX = isLeft ? bf.getRight() - 2.0f : bf.getX() + 2.0f;
         juce::ColourGradient shine (
-            teakLight().withAlpha (0.5f), edgeX, bf.getY(),
-            juce::Colours::transparentBlack, edgeX, bf.getY() + 40, false);
+            juce::Colour (0xFFE8B080).withAlpha (0.55f), edgeX, bf.getY(),
+            juce::Colours::transparentBlack, edgeX, bf.getY() + 60, false);
         g.setGradientFill (shine);
-        g.fillRect (isLeft ? bf.withTrimmedLeft (bf.getWidth() - 4) : bf.withWidth (4));
+        g.fillRect (isLeft ? bf.withTrimmedLeft (bf.getWidth() - 5) : bf.withWidth (5));
+
+        // ---- Outer edge shadow (3D thickness) ----
+        const float outerX = isLeft ? bf.getX() : bf.getRight();
+        juce::ColourGradient outerShadow (
+            juce::Colours::black.withAlpha (0.50f), outerX, bf.getCentreY(),
+            juce::Colours::transparentBlack,
+            isLeft ? outerX + 5 : outerX - 5, bf.getCentreY(), false);
+        g.setGradientFill (outerShadow);
+        g.fillRect (isLeft ? bf.withWidth (5) : bf.withTrimmedLeft (bf.getWidth() - 5));
     }
 
     /** Black anodised aluminium control panel — Beocord 2400 / 2000 DL deck. */

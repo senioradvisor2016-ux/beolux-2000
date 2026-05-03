@@ -458,7 +458,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v40.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v41.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -468,6 +468,40 @@ void NativeEditor::paint (juce::Graphics& g)
                                   aluZone.getBottom() - cH - 4,
                                   cW, cH),
             counterText);
+    }
+
+    // ===== Recording LED (red dot to the LEFT of the counter, lights when running) =====
+    {
+        const float lr = 3.5f;
+        const float lx = (float) inner.getCentreX() - 76.0f;
+        const float ly = (float) (aluZone.getBottom() - 13);
+        if (recLedOn)
+        {
+            // Glow halo
+            g.setColour (juce::Colour (0xFFFF6050).withAlpha (0.55f));
+            g.fillEllipse (lx - lr * 2.4f, ly - lr * 2.4f, lr * 4.8f, lr * 4.8f);
+            // LED body
+            juce::ColourGradient lg (
+                juce::Colour (0xFFFFE070), lx - lr * 0.4f, ly - lr * 0.5f,
+                juce::Colour (0xFFA01810), lx + lr * 0.4f, ly + lr * 0.5f, false);
+            g.setGradientFill (lg);
+            g.fillEllipse (lx - lr, ly - lr, lr * 2, lr * 2);
+            g.setColour (juce::Colours::white.withAlpha (0.85f));
+            g.fillEllipse (lx - lr * 0.4f, ly - lr * 0.7f, lr * 0.7f, lr * 0.5f);
+        }
+        else
+        {
+            g.setColour (juce::Colour (0xFF1A1A1A));
+            g.fillEllipse (lx - lr, ly - lr, lr * 2, lr * 2);
+            g.setColour (juce::Colour (0xFF505056).withAlpha (0.65f));
+            g.drawEllipse (lx - lr, ly - lr, lr * 2, lr * 2, 0.6f);
+        }
+        // "REC" silkscreen label below
+        g.setColour (juce::Colour (0xFFB8B8BE).withAlpha (0.85f));
+        g.setFont (LnF::sectionFont (6.5f));
+        g.drawText ("REC",
+            juce::Rectangle<int> ((int) lx - 12, (int) ly + (int) lr + 2, 24, 8),
+            juce::Justification::centred, false);
     }
 
     // VU-meter engraved headers (silver on black metal, above each meter)
@@ -531,6 +565,44 @@ void NativeEditor::paint (juce::Graphics& g)
     drawSilk ("INPUT",       { kTeakW + 8, lblY, kLeftColW - 12, 12 });
     drawSilk ("FADERS",      { leftEnd + 8, lblY, 80, 12 });
     drawSilk ("TONE · TAPE", { centerEnd + 8, lblY, 130, 12 });
+
+    // ===== Chrome corner-screws (4 corners of the black panel — Beocord 2400 detail) =====
+    {
+        const int yTop = kAluH + kDivH + 6;
+        const int yBot = bounds.getBottom() - 10;
+        const int xLeft  = kTeakW + 8;
+        const int xRight = bounds.getRight() - kTeakW - 8;
+        const float sR = 4.5f;
+        for (auto p : { juce::Point<float> ((float) xLeft,  (float) yTop),
+                        juce::Point<float> ((float) xRight, (float) yTop),
+                        juce::Point<float> ((float) xLeft,  (float) yBot),
+                        juce::Point<float> ((float) xRight, (float) yBot) })
+        {
+            // Recess
+            g.setColour (juce::Colours::black.withAlpha (0.85f));
+            g.fillEllipse (p.x - sR - 0.5f, p.y - sR - 0.5f, (sR + 0.5f) * 2, (sR + 0.5f) * 2);
+            // Chrome dome
+            juce::ColourGradient sg (
+                juce::Colour (0xFFE8E8EA), p.x - sR * 0.45f, p.y - sR * 0.55f,
+                juce::Colour (0xFF40404A), p.x + sR * 0.45f, p.y + sR * 0.55f, false);
+            sg.addColour (0.55, juce::Colour (0xFFA8A8AE));
+            g.setGradientFill (sg);
+            g.fillEllipse (p.x - sR, p.y - sR, sR * 2, sR * 2);
+            g.setColour (juce::Colour (0xFF080808));
+            g.drawEllipse (p.x - sR, p.y - sR, sR * 2, sR * 2, 0.6f);
+            // Phillips slot (cross at slight angle for variety)
+            g.setColour (juce::Colours::black.withAlpha (0.75f));
+            const float a = juce::MathConstants<float>::pi * 0.15f;
+            const float c = std::cos (a), s = std::sin (a);
+            g.drawLine (p.x - sR * 0.6f * c, p.y - sR * 0.6f * s,
+                        p.x + sR * 0.6f * c, p.y + sR * 0.6f * s, 0.8f);
+            g.drawLine (p.x - sR * 0.6f * (-s), p.y - sR * 0.6f * c,
+                        p.x + sR * 0.6f * (-s), p.y + sR * 0.6f * c, 0.8f);
+            // Tiny highlight
+            g.setColour (juce::Colours::white.withAlpha (0.55f));
+            g.fillEllipse (p.x - sR * 0.4f, p.y - sR * 0.55f, sR * 0.4f, sR * 0.18f);
+        }
+    }
 
     // ===== Soundboys brand medallion (engraved on the black metal deck) =====
     // Small chrome-rimmed circular badge, just under the title text on the left.
@@ -788,6 +860,15 @@ void NativeEditor::timerCallback()
                                       chain.meterLevelR_dBFS.load());
     const bool tapeRunning = (inputAny > 0.05f) || outLvl > -40.0f;
     reelDeck.setActive (tapeRunning);
+
+    // Record LED — blinks at 2 Hz when tape is running
+    const bool ledTarget = tapeRunning &&
+        (((juce::Time::getMillisecondCounter() / 250) & 1) != 0);
+    if (ledTarget != recLedOn)
+    {
+        recLedOn = ledTarget;
+        repaint (juce::Rectangle<int> (kTeakW, kAluH - 22, kInnerW, 22));
+    }
 
     const int speedIdx = (int) processor.apvts.getRawParameterValue ("speed")->load();
     reelDeck.setSpeed (speedIdx);

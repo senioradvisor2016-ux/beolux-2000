@@ -103,6 +103,7 @@ private:
     bc2000dl::AnalogVU vuOut { "VU" };
     juce::String       counterText { "0000" };
     double             counterSeconds { 0.0 };  // animated tape counter
+    bool               recLedOn { false };       // record-LED state
 
     // ---- 5 dual-faders (10 sliders) — instruction-card slide-faders ----
     struct DualFader
