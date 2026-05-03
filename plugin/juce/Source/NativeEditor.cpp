@@ -34,9 +34,9 @@ namespace
     constexpr int kAluH       = 156;    // black-metal deck zone height
     constexpr int kDivH       = 3;      // metallic divider height
     constexpr int kPresetH    = 28;     // preset/nav bar height
-    constexpr int kLeftColW   = 286;    // left column (VU + selectors + toggles)
-    constexpr int kCenterColW = 490;    // center column (faders)
-    // right column width = kInnerW - kLeftColW - kCenterColW = 320
+    constexpr int kLeftColW   = 340;    // left column (selectors + toggles + transport)
+    constexpr int kCenterColW = 440;    // center column (5 dual-faders)
+    // right column width = kInnerW - kLeftColW - kCenterColW = 376
 
     juce::String tooltipFor (const juce::String& id)
     {
@@ -458,7 +458,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v41.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v41.1");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
