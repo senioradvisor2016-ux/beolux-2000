@@ -27,8 +27,8 @@ namespace
 {
     using LnF = bc2000dl::ui::InstructionCardLnF;
 
-    constexpr int kEditorW    = 1180;
-    constexpr int kEditorH    = 760;
+    constexpr int kEditorW    = 1220;
+    constexpr int kEditorH    = 820;
     constexpr int kTeakW      = 42;     // wood end-cap width (each side)
     constexpr int kInnerW     = kEditorW - 2 * kTeakW;   // 1096
     constexpr int kAluH       = 258;    // brushed-aluminium zone height
@@ -196,13 +196,15 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setSize (kEditorW, kEditorH);
     setResizable (false, false);
 
-    // Helper: cream label on dark panel
+    // Helper: cream label on dark panel — never intercepts mouse, so sliders
+    // beneath always receive drag events.
     auto creamLbl = [&] (juce::Label& l, const juce::String& text)
     {
         l.setText (text, juce::dontSendNotification);
         l.setFont (LnF::sectionFont (9.0f));
         l.setColour (juce::Label::textColourId, LnF::creamLabel());
         l.setJustificationType (juce::Justification::centred);
+        l.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (l);
     };
 
@@ -216,12 +218,16 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         l.setFont (LnF::monoFont (10.0f));
         l.setColour (juce::Label::textColourId, LnF::amber());
         l.setJustificationType (juce::Justification::centred);
+        l.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (l);
     };
     styleVuLbl (vuL_lbl, "L");
     styleVuLbl (vuR_lbl, "R");
 
     // ---- 5 dual-faders ----
+    // Bulletproof drag config: snap to mouse, no velocity-mode (predictable),
+    // tight sensitivity, popup readout on drag. Enabled mouse cursor confirms
+    // the cap is grabbable.
     auto setupDual = [&] (DualFader& f, const juce::String& cap,
                            const juce::String& idL, const juce::String& idR)
     {
@@ -230,6 +236,12 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
             sl->setSliderStyle (juce::Slider::LinearVertical);
             sl->setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
             sl->setDoubleClickReturnValue (true, 0.0);
+            sl->setSliderSnapsToMousePosition (true);
+            sl->setVelocityBasedMode (false);
+            sl->setMouseDragSensitivity (140);
+            sl->setScrollWheelEnabled (true);
+            sl->setPopupDisplayEnabled (true, true, this, 1500);
+            sl->setMouseCursor (juce::MouseCursor::PointingHandCursor);
             addAndMakeVisible (sl);
         }
         f.l.setTooltip (tooltipFor (idL));
@@ -241,6 +253,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         f.caption.setFont (LnF::sectionFont (9.5f));
         f.caption.setColour (juce::Label::textColourId, LnF::creamLabel());
         f.caption.setJustificationType (juce::Justification::centred);
+        f.caption.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (f.caption);
     };
     setupDual (radio, "RADIO", "radio_gain",       "radio_gain_r");
@@ -249,18 +262,24 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setupDual (drive, "DRIVE", "saturation_drive", "saturation_drive_r");
     setupDual (echo,  "ECHO",  "echo_amount",      "echo_amount_r");
 
-    // ---- 7 knobs ----
+    // ---- 7 knobs — vertical-drag rotary (move up/down = turn) ----
     auto setupKnob = [&] (juce::Slider& s, juce::Label& l, const juce::String& id,
                            const juce::String& cap)
     {
-        s.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
+        s.setSliderStyle (juce::Slider::RotaryVerticalDrag);
         s.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
         s.setRotaryParameters (juce::MathConstants<float>::pi * 1.2f,
                                 juce::MathConstants<float>::pi * 2.8f, true);
+        s.setVelocityBasedMode (false);
+        s.setMouseDragSensitivity (160);
+        s.setScrollWheelEnabled (true);
+        s.setPopupDisplayEnabled (true, true, this, 1500);
+        s.setMouseCursor (juce::MouseCursor::UpDownResizeCursor);
         s.setTooltip (tooltipFor (id));
         addAndMakeVisible (s);
         sAtts.push_back (std::make_unique<SAtt> (processor.apvts, id, s));
         creamLbl (l, cap);
+        l.setInterceptsMouseClicks (false, false);
     };
     setupKnob (knob_treble,  lbl_treble,  "treble_db",      "TREBLE");
     setupKnob (knob_bass,    lbl_bass,    "bass_db",        "BASS");
@@ -285,6 +304,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         l.setFont (LnF::sectionFont (8.5f));
         l.setColour (juce::Label::textColourId, LnF::creamDim());
         l.setJustificationType (juce::Justification::centredLeft);
+        l.setInterceptsMouseClicks (false, false);
         addAndMakeVisible (l);
     };
     setupCombo (cb_speed,   lbl_speed,   "speed",        "TAPE SPEED",  { "4.75", "9.5", "19 cm/s" });
@@ -385,12 +405,13 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("BC2000DL · v29.9 HARDWARE")
+                .withTitle ("BC2000DL · v30.0 HARDWARE")
                 .withMessage ("Bang & Olufsen Beocord 2000 De Luxe (1968-69)\n\n"
                               "DSP: Jiles-Atherton hysteresis · 8× oversampling\n"
                               "21/21 PASS vs Studio-Sound + Service Manual\n\n"
                               "UI: native JUCE · hardware-accurate aesthetic\n"
-                              "Teak frame · brushed aluminium deck · bullseye reels")
+                              "Teak frame · brushed aluminium deck · bullseye reels\n"
+                              "Chunky chrome slide-fader caps · amber arc knobs")
                 .withButton ("OK"), nullptr);
     };
     addAndMakeVisible (btn_about);
@@ -424,7 +445,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (20, 10).removeFromTop (28),
-                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v29.9");
+                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v30.0");
 
     // Counter (bottom-centre of alu zone, between the reels)
     {
