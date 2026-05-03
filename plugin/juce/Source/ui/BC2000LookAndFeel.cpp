@@ -452,30 +452,11 @@ namespace bc2000dl::ui
             g.setColour (juce::Colours::black.withAlpha (0.85f));
             g.drawEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2, 1.0f);
 
-            // ---- FLUTED PHENOLIC BODY — Fairchild 670 star-profile ----
-            // Real Fairchild knobs have visible vertical flutes around the
-            // perimeter. From above this looks like a 12-pointed star: small
-            // peaks alternate with valleys, ~5% radial difference.
-            // Each flute catches light brightly on its lit side and shadows on
-            // its dark side, giving the iconic "fluted column" appearance.
-            const int numFlutes = 12;
-            const int numVerts = numFlutes * 2;
-            const float twoPi = juce::MathConstants<float>::twoPi;
-            const float peakR   = bodyR;
-            const float valleyR = bodyR * 0.93f;
-
+            // ---- ROUND GLOSSY PHENOLIC BODY (Fairchild 670 reference) ----
+            // Pure circle — no flutes. The Fairchild aesthetic is in the
+            // glossy black finish, sharp specular, and T-shaped grip pointer.
             juce::Path bodyShape;
-            for (int i = 0; i < numVerts; ++i)
-            {
-                const bool isPeak = (i % 2 == 0);
-                const float r = isPeak ? peakR : valleyR;
-                const float a = angle + (float) i * twoPi / (float) numVerts;
-                const float vx = cx + r * std::sin (a);
-                const float vy = cy - r * std::cos (a);
-                if (i == 0) bodyShape.startNewSubPath (vx, vy);
-                else        bodyShape.lineTo (vx, vy);
-            }
-            bodyShape.closeSubPath();
+            bodyShape.addEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
 
             juce::ColourGradient bodyGrad (
                 juce::Colour (0xFF3A3A3E), cx, cy - bodyR,
@@ -485,43 +466,6 @@ namespace bc2000dl::ui
             bodyGrad.addColour (0.85, juce::Colour (0xFF050508));
             g.setGradientFill (bodyGrad);
             g.fillPath (bodyShape);
-
-            // ---- PER-FLUTE DIFFERENTIAL LIGHTING ----
-            // Each flute has a "lit side" (peak edge facing the light) and a
-            // "dark side" (peak edge facing away). Draw bright/dark strokes
-            // along each peak-to-valley edge to sell the 3D fluted geometry.
-            for (int i = 0; i < numVerts; ++i)
-            {
-                const int next = (i + 1) % numVerts;
-                const bool currentIsPeak = (i % 2 == 0);
-
-                const float a0 = angle + (float) i * twoPi / (float) numVerts;
-                const float a1 = angle + (float) next * twoPi / (float) numVerts;
-                const float midA = (a0 + a1) * 0.5f;
-                // Light direction: upper-left
-                const float lightDot = (-std::sin (midA)) * 0.6f + std::cos (midA) * 0.8f;
-                // Side normal: peak→valley going clockwise faces "this side"
-                // direction. If lightDot > 0 → this edge is lit; else shadowed.
-                const float r0 = currentIsPeak ? peakR : valleyR;
-                const float r1 = currentIsPeak ? valleyR : peakR;
-                const float v0x = cx + r0 * std::sin (a0);
-                const float v0y = cy - r0 * std::cos (a0);
-                const float v1x = cx + r1 * std::sin (a1);
-                const float v1y = cy - r1 * std::cos (a1);
-
-                if (lightDot > 0.0f)
-                {
-                    // Lit side — bright crisp white edge
-                    g.setColour (juce::Colours::white.withAlpha (juce::jmin (0.55f, lightDot * 0.65f)));
-                    g.drawLine (v0x, v0y, v1x, v1y, 1.0f);
-                }
-                else
-                {
-                    // Shadow side — deep black edge
-                    g.setColour (juce::Colours::black.withAlpha (juce::jmin (0.65f, -lightDot * 0.75f)));
-                    g.drawLine (v0x, v0y, v1x, v1y, 1.0f);
-                }
-            }
 
             // ---- BEVEL HIGHLIGHT just inside chrome rim ----
             g.setColour (juce::Colour (0xFF8A8A92).withAlpha (0.85f));
@@ -603,42 +547,67 @@ namespace bc2000dl::ui
         }
 
         // -------------------------------------------------------------------
-        // 5. LONG WHITE POINTER STRIPE — Fairchild signature
-        //    Painted stripe from near centre extending past the body rim,
-        //    just like the UAD Fairchild Tube Limiter Collection.
+        // 5. T-SHAPED GRIP-POINTER — Fairchild 670 signature handle
+        //    A long white stem extending past the rim, with a horizontal
+        //    cross-bar at the tip forming a T. This is the iconic grip you
+        //    pinch when turning the knob.
         // -------------------------------------------------------------------
         {
-            const float stripeBaseR = bodyR * 0.20f;       // start near centre
-            const float stripeTipR  = bodyR * 1.04f;       // extend past rim
-            const float bx = cx + stripeBaseR * std::sin (angle);
-            const float by = cy - stripeBaseR * std::cos (angle);
-            const float tx = cx + stripeTipR  * std::sin (angle);
-            const float ty = cy - stripeTipR  * std::cos (angle);
+            const float stemBaseR = bodyR * 0.18f;
+            const float stemTipR  = bodyR * 1.02f;
+            const float crossLen  = bodyR * 0.42f;        // horizontal cross length
+            const float stemThick = juce::jmax (2.6f, bodyR * 0.075f);
+            const float crossThick= juce::jmax (2.2f, bodyR * 0.060f);
 
-            // Recessed groove shadow first (sells "engraved into knob")
-            g.setColour (juce::Colours::black.withAlpha (0.95f));
-            g.drawLine (bx + 0.6f, by + 0.6f, tx + 0.6f, ty + 0.6f, 4.5f);
+            // Stem direction (radial)
+            const float sn = std::sin (angle);
+            const float cs = std::cos (angle);
+            const float bx = cx + stemBaseR * sn;
+            const float by = cy - stemBaseR * cs;
+            const float tx = cx + stemTipR * sn;
+            const float ty = cy - stemTipR * cs;
 
-            // Bright white painted stripe — stays bold and clear
-            g.setColour (juce::Colour (0xFFFAFAF4));
-            g.drawLine (bx, by, tx, ty, 3.0f);
+            // Cross direction (perpendicular to stem)
+            const float crossDx =  cs * crossLen * 0.5f;
+            const float crossDy =  sn * crossLen * 0.5f;
 
-            // Subtle warm-tone variation along the stripe (bakelite undertone)
-            g.setColour (juce::Colour (0xFFFFF8E0).withAlpha (0.50f));
-            g.drawLine (bx, by, tx, ty, 1.6f);
-
-            // Red tip cap at the very end
-            const auto tipCol = s.isEnabled() ? redAccent() : creamDim();
-            juce::Path tipPath;
-            tipPath.addEllipse (tx - 2.6f, ty - 2.6f, 5.2f, 5.2f);
-            static thread_local melatonin::DropShadow tipGlow {
-                { juce::Colour (0xFFFF5040).withAlpha (0.85f), 6, { 0, 0 }, 0 }
+            // ---- Drop shadow under the whole T (melatonin) ----
+            juce::Path tShape;
+            tShape.addLineSegment (juce::Line<float> (bx, by, tx, ty), stemThick);
+            tShape.addLineSegment (juce::Line<float> (tx - crossDx, ty - crossDy,
+                                                      tx + crossDx, ty + crossDy), crossThick);
+            static thread_local melatonin::DropShadow tShadow {
+                { juce::Colours::black.withAlpha (0.85f), 4, { 0, 1 }, 0 }
             };
-            tipGlow.render (g, tipPath);
+            tShadow.render (g, tShape);
+
+            // ---- Stem (white painted) ----
+            g.setColour (juce::Colour (0xFFFAFAF4));
+            g.drawLine (bx, by, tx, ty, stemThick);
+
+            // ---- Cross-bar at tip ----
+            g.drawLine (tx - crossDx, ty - crossDy,
+                        tx + crossDx, ty + crossDy, crossThick);
+
+            // Highlight on top edge of stem (sells curved 3D)
+            g.setColour (juce::Colour (0xFFFFFFFF).withAlpha (0.55f));
+            g.drawLine (bx, by, tx, ty, stemThick * 0.45f);
+
+            // Highlight on top edge of cross-bar
+            g.drawLine (tx - crossDx, ty - crossDy,
+                        tx + crossDx, ty + crossDy, crossThick * 0.45f);
+
+            // Red dot at the very centre of the cross-bar (the visual lock-on)
+            const auto tipCol = s.isEnabled() ? redAccent() : creamDim();
+            const float dotR = juce::jmax (1.6f, bodyR * 0.045f);
+            juce::Path dotPath;
+            dotPath.addEllipse (tx - dotR, ty - dotR, dotR * 2, dotR * 2);
+            static thread_local melatonin::DropShadow tipGlow {
+                { juce::Colour (0xFFFF5040).withAlpha (0.85f), 4, { 0, 0 }, 0 }
+            };
+            tipGlow.render (g, dotPath);
             g.setColour (tipCol);
-            g.fillEllipse (tx - 2.2f, ty - 2.2f, 4.4f, 4.4f);
-            g.setColour (juce::Colour (0xFFFFD0C0).withAlpha (0.85f));
-            g.fillEllipse (tx - 0.8f, ty - 1.2f, 1.4f, 0.9f);
+            g.fillEllipse (tx - dotR, ty - dotR, dotR * 2, dotR * 2);
         }
 
         // -------------------------------------------------------------------
@@ -1460,31 +1429,45 @@ namespace bc2000dl::ui
             g.drawLine (p.x - screwR * 0.6f, p.y, p.x + screwR * 0.6f, p.y, 0.7f);
         }
 
-        // ---- Backlit cream-amber meter face (Fairchild glow effect) ----
+        // ---- BACKLIT AMBER METER FACE (Fairchild 670 reference) ----
         const float screwBuffer = screwR * 2.0f + 6.0f;
         const auto face = bf.reduced (screwBuffer, screwR + 5.0f);
 
-        // Recessed shadow ring (the rebate the face sits in)
+        // Recessed shadow ring
         g.setColour (juce::Colours::black.withAlpha (0.7f));
         g.fillRoundedRectangle (face.expanded (1.4f), 3.5f);
 
-        // Fairchild face — warmer, brighter, with subtle backlit glow
+        // Deep amber/gold base (the iconic Fairchild backlit warmth)
         juce::ColourGradient faceGrad (
-            juce::Colour (0xFFFFF1D4), face.getCentreX(), face.getY(),
-            juce::Colour (0xFFE6D0A0), face.getCentreX(), face.getBottom(), false);
-        faceGrad.addColour (0.45, juce::Colour (0xFFFFE6B8));      // mid warm
+            juce::Colour (0xFFE8C078), face.getCentreX(), face.getY(),
+            juce::Colour (0xFFB87830), face.getCentreX(), face.getBottom(), false);
+        faceGrad.addColour (0.45, juce::Colour (0xFFD8A858));
         g.setGradientFill (faceGrad);
         g.fillRoundedRectangle (face, 3.0f);
 
-        // Subtle radial glow centre (suggests internal lamp behind dial)
+        // Strong radial backlit glow from below — sells the lamp-behind-dial
         {
             juce::ColourGradient lamp (
-                juce::Colour (0xFFFFF8E0).withAlpha (0.55f),
-                face.getCentreX(), face.getCentreY() + face.getHeight() * 0.5f,
+                juce::Colour (0xFFFFE0A0).withAlpha (0.85f),
+                face.getCentreX(), face.getCentreY() + face.getHeight() * 0.6f,
                 juce::Colours::transparentWhite,
                 face.getCentreX(), face.getY(), true);
             g.setGradientFill (lamp);
             g.fillRoundedRectangle (face, 3.0f);
+        }
+        // Real Gaussian glow inside (melatonin) — gives true backlit hot-spot
+        {
+            juce::Path facePath;
+            facePath.addRoundedRectangle (face, 3.0f);
+            static thread_local melatonin::DropShadow faceBacklight {
+                { juce::Colour (0xFFFFB060).withAlpha (0.30f), 12, { 0, 4 }, 0 }
+            };
+            // (Drop-shadow on the face from inside? Use as halo by drawing path
+            // smaller and using shadow as the amber bloom.)
+            const auto inner = face.reduced (2.0f);
+            juce::Path innerPath;
+            innerPath.addRoundedRectangle (inner, 2.5f);
+            faceBacklight.render (g, innerPath);
         }
 
         // Face inner shadow at top (real Gaussian, gives true recess feel)
