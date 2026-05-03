@@ -377,6 +377,9 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
             sl->setScrollWheelEnabled (true);
             sl->setPopupDisplayEnabled (true, true, this, 1500);
             sl->setMouseCursor (juce::MouseCursor::PointingHandCursor);
+            // Scroll wheel: 0.04 per notch normal, Shift held → fine 0.005
+            sl->setRotaryParameters (0.0f, juce::MathConstants<float>::twoPi, true);
+            sl->addMouseListener (&sliderMenu, false);
             addAndMakeVisible (sl);
         }
         f.l.setTooltip (tooltipFor (idL));
@@ -411,6 +414,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         s.setPopupDisplayEnabled (true, true, this, 1500);
         s.setMouseCursor (juce::MouseCursor::UpDownResizeCursor);
         s.setTooltip (tooltipFor (id));
+        s.addMouseListener (&sliderMenu, false);
         addAndMakeVisible (s);
         sAtts.push_back (std::make_unique<SAtt> (processor.apvts, id, s));
         creamLbl (l, cap);
@@ -567,6 +571,62 @@ NativeEditor::~NativeEditor()
 }
 
 //=============================================================================
+//  SliderContextMenu — UAD-style RMB menu (Reset / Type-in / Copy / Paste)
+//=============================================================================
+void NativeEditor::SliderContextMenu::mouseDown (const juce::MouseEvent& e)
+{
+    if (! e.mods.isRightButtonDown()) return;
+    auto* slider = dynamic_cast<juce::Slider*> (e.eventComponent);
+    if (slider == nullptr) return;
+
+    juce::PopupMenu menu;
+    menu.addItem (1, "Reset to default");
+    menu.addItem (2, "Type-in value…");
+    menu.addSeparator();
+    menu.addItem (3, "Copy value");
+    const auto clipboard = juce::SystemClipboard::getTextFromClipboard();
+    const bool clipIsNumber = clipboard.containsAnyOf ("0123456789.-");
+    menu.addItem (4, "Paste value", clipIsNumber);
+
+    menu.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (slider),
+        [slider] (int result)
+        {
+            if (result == 1)
+            {
+                slider->setValue (slider->getDoubleClickReturnValue(),
+                                   juce::sendNotification);
+            }
+            else if (result == 2)
+            {
+                auto* aw = new juce::AlertWindow ("Type Value",
+                    "Enter value (range " + juce::String (slider->getMinimum(), 2)
+                        + " – " + juce::String (slider->getMaximum(), 2) + "):",
+                    juce::MessageBoxIconType::QuestionIcon);
+                aw->addTextEditor ("v", juce::String (slider->getValue(), 3));
+                aw->addButton ("OK",     1, juce::KeyPress (juce::KeyPress::returnKey));
+                aw->addButton ("Cancel", 0, juce::KeyPress (juce::KeyPress::escapeKey));
+                aw->enterModalState (true,
+                    juce::ModalCallbackFunction::create (
+                        [aw, slider] (int r) {
+                            if (r == 1)
+                                slider->setValue (aw->getTextEditorContents ("v").getDoubleValue(),
+                                                  juce::sendNotification);
+                            delete aw;
+                        }));
+            }
+            else if (result == 3)
+            {
+                juce::SystemClipboard::copyTextToClipboard (juce::String (slider->getValue(), 4));
+            }
+            else if (result == 4)
+            {
+                slider->setValue (juce::SystemClipboard::getTextFromClipboard().getDoubleValue(),
+                                   juce::sendNotification);
+            }
+        });
+}
+
+//=============================================================================
 //  Paint
 //=============================================================================
 void NativeEditor::paint (juce::Graphics& g)
@@ -586,7 +646,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v53.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v54.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {

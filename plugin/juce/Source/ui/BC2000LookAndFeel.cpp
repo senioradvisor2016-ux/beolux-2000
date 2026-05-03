@@ -935,12 +935,12 @@ namespace bc2000dl::ui
         g.fillRect (isLeft ? bf.withWidth (5) : bf.withTrimmedLeft (bf.getWidth() - 5));
     }
 
-    /** Black anodised aluminium control panel — Beocord 2400 / 2000 DL deck. */
+    /** Black anodised aluminium control panel — with subtle vintage patina. */
     void InstructionCardLnF::drawBlackPanel (juce::Graphics& g, juce::Rectangle<int> r)
     {
         const auto bf = r.toFloat();
 
-        // Deep matte black anodised gradient (slightly lifted at top)
+        // Deep matte black anodised gradient
         juce::ColourGradient grad (
             juce::Colour (0xFF1E1E20), bf.getCentreX(), bf.getY(),
             juce::Colour (0xFF050507), bf.getCentreX(), bf.getBottom(), false);
@@ -949,7 +949,7 @@ namespace bc2000dl::ui
         g.setGradientFill (grad);
         g.fillRect (bf);
 
-        // Horizontal brushed-anodise grain (seeded random → stable repaint)
+        // Horizontal brushed-anodise grain
         juce::Random rng (24681357);
         for (int i = 0; i < 160; ++i)
         {
@@ -961,14 +961,55 @@ namespace bc2000dl::ui
             g.drawLine (bf.getX(), fy, bf.getRight(), fy, thickness);
         }
 
-        // Subtle radial vignette (centre slightly lifted by overhead light)
+        // ---- VINTAGE PATINA — dust specks, micro-scratches, edge wear ----
+        // Subtle but adds that "well-used 1960s gear" authenticity that
+        // UAD/Soundtoys plugins are famous for.
+        juce::Random patRng (1969);
+        // 1) Bright dust specks (random pixel-sized dots in cream/silver)
+        for (int i = 0; i < 90; ++i)
+        {
+            const float fx = bf.getX() + patRng.nextFloat() * bf.getWidth();
+            const float fy = bf.getY() + patRng.nextFloat() * bf.getHeight();
+            const float a  = patRng.nextFloat() * 0.05f + 0.015f;
+            g.setColour ((patRng.nextBool() ? juce::Colour (0xFFC0B898)
+                                              : juce::Colour (0xFF807870)).withAlpha (a));
+            g.fillEllipse (fx, fy, 0.8f, 0.8f);
+        }
+        // 2) Diagonal micro-scratches (faint lines)
+        for (int i = 0; i < 18; ++i)
+        {
+            const float fx0 = bf.getX() + patRng.nextFloat() * bf.getWidth();
+            const float fy0 = bf.getY() + patRng.nextFloat() * bf.getHeight();
+            const float len = patRng.nextFloat() * 22.0f + 8.0f;
+            const float ang = patRng.nextFloat() * juce::MathConstants<float>::twoPi;
+            const float fx1 = fx0 + std::cos (ang) * len;
+            const float fy1 = fy0 + std::sin (ang) * len;
+            g.setColour (juce::Colour (0xFF787068).withAlpha (patRng.nextFloat() * 0.06f + 0.015f));
+            g.drawLine (fx0, fy0, fx1, fy1, 0.4f);
+        }
+        // 3) Edge corner darkening (years of finger oils + dust accumulation)
+        for (auto corner : { juce::Point<float> (bf.getX(),     bf.getY()),
+                             juce::Point<float> (bf.getRight(), bf.getY()),
+                             juce::Point<float> (bf.getX(),     bf.getBottom()),
+                             juce::Point<float> (bf.getRight(), bf.getBottom()) })
+        {
+            juce::ColourGradient cgrad (
+                juce::Colours::black.withAlpha (0.35f), corner.x, corner.y,
+                juce::Colours::transparentBlack,
+                corner.x + (corner.x < bf.getCentreX() ? 80.0f : -80.0f),
+                corner.y + (corner.y < bf.getCentreY() ? 80.0f : -80.0f), true);
+            g.setGradientFill (cgrad);
+            g.fillRect (bf);
+        }
+
+        // Radial vignette (centre slightly lifted)
         juce::ColourGradient vig (
             juce::Colours::transparentBlack, bf.getCentreX(), bf.getCentreY(),
             juce::Colours::black.withAlpha (0.35f), bf.getX(), bf.getBottom(), true);
         g.setGradientFill (vig);
         g.fillRect (bf);
 
-        // Top chrome separator (catches light at the deck/panel boundary)
+        // Top chrome separator
         g.setColour (juce::Colour (0xFF8A8A92).withAlpha (0.85f));
         g.drawLine (bf.getX(), bf.getY() + 0.5f, bf.getRight(), bf.getY() + 0.5f, 0.7f);
         g.setColour (juce::Colour (0xFF50505A).withAlpha (0.7f));

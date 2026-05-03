@@ -135,6 +135,14 @@ private:
     // Real Gaussian shadows (JUCE-native, applied via setComponentEffect)
     juce::DropShadowEffect vuShadow, reelShadow;
 
+    /** Right-click context menu for sliders — Reset / Type-in / Copy.
+        Attached to every slider so any control supports the UAD-style RMB menu. */
+    struct SliderContextMenu : public juce::MouseListener
+    {
+        void mouseDown (const juce::MouseEvent& e) override;
+    };
+    SliderContextMenu sliderMenu;
+
     // melatonin_inspector — Cmd+Shift+I toggles the live component inspector
     melatonin::Inspector inspector { *this };
 
