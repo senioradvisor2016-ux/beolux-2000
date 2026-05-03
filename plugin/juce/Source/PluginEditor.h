@@ -30,7 +30,7 @@ private:
     void applyPreset (int presetIndex);
     void showAboutDialog();
 
-    BC2000DLProcessor& processor;
+    BC2000DLProcessor& audioProc;
     bc2000dl::ui::BCLookAndFeel lookAndFeel;
     juce::TooltipWindow tooltipWindow { this, 600 };
     bc2000dl::ui::HybridHeroPanel heroPanel;

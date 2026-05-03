@@ -128,7 +128,7 @@ namespace
 
 BC2000DLEditor::BC2000DLEditor (BC2000DLProcessor& p)
     : juce::AudioProcessorEditor (&p),
-      processor (p),
+      audioProc (p),
       meterL ("LEFT"),
       meterR ("RIGHT")
 {
@@ -175,9 +175,9 @@ BC2000DLEditor::BC2000DLEditor (BC2000DLProcessor& p)
     {
         addAndMakeVisible (f);
         sliderAttachments.push_back (std::make_unique<SliderAttach> (
-            processor.apvts, idL, f.getLeftSlider()));
+            audioProc.apvts, idL, f.getLeftSlider()));
         sliderAttachments.push_back (std::make_unique<SliderAttach> (
-            processor.apvts, idR, f.getRightSlider()));
+            audioProc.apvts, idR, f.getRightSlider()));
         attachTip (f.getLeftSlider(), idL);
         attachTip (f.getRightSlider(), idL);
     };
@@ -197,7 +197,7 @@ BC2000DLEditor::BC2000DLEditor (BC2000DLProcessor& p)
         // UAD-pattern: trigga repaint vid mouse-enter/exit/click så hover-glow funkar
         s.setRepaintsOnMouseActivity (true);
         addAndMakeVisible (s);
-        sliderAttachments.push_back (std::make_unique<SliderAttach> (processor.apvts, paramId, s));
+        sliderAttachments.push_back (std::make_unique<SliderAttach> (audioProc.apvts, paramId, s));
         attachTip (s, paramId);
         styleEtchedLbl (lbl, labelText);
     };
@@ -223,7 +223,7 @@ BC2000DLEditor::BC2000DLEditor (BC2000DLProcessor& p)
         for (auto& o : options) cb.addItem (o, id++);
         addAndMakeVisible (cb);
         attachTip (cb, paramId);
-        attachOut = std::make_unique<ChoiceAttach> (processor.apvts, paramId, cb);
+        attachOut = std::make_unique<ChoiceAttach> (audioProc.apvts, paramId, cb);
 
         lbl.setText (labelText, juce::dontSendNotification);
         lbl.setJustificationType (juce::Justification::centredLeft);
@@ -244,16 +244,16 @@ BC2000DLEditor::BC2000DLEditor (BC2000DLProcessor& p)
 
     // === UAD-Studer-A800-style knapp-rader (ersätter dropdowns ovan) ===
     speedSelector = std::make_unique<bc2000dl::ui::UADStyleSelector> (
-        processor.apvts, "speed",
+        audioProc.apvts, "speed",
         juce::StringArray { "4.75", "9.5", "19" }, "TAPE SPEED  cm/s");
     formulaSelector = std::make_unique<bc2000dl::ui::UADStyleSelector> (
-        processor.apvts, "tape_formula",
+        audioProc.apvts, "tape_formula",
         juce::StringArray { "AGFA", "BASF", "SCOTCH" }, "TAPE FORMULA");
     phonoSelector = std::make_unique<bc2000dl::ui::UADStyleSelector> (
-        processor.apvts, "phono_mode",
+        audioProc.apvts, "phono_mode",
         juce::StringArray { "L", "H" }, "PHONO");
     monitorSelector = std::make_unique<bc2000dl::ui::UADStyleSelector> (
-        processor.apvts, "monitor_mode",
+        audioProc.apvts, "monitor_mode",
         juce::StringArray { "SOURCE", "TAPE" }, "MONITOR");
 
     addAndMakeVisible (speedSelector.get());
@@ -275,7 +275,7 @@ BC2000DLEditor::BC2000DLEditor (BC2000DLProcessor& p)
     {
         b.setButtonText (label);
         addAndMakeVisible (b);
-        buttonAttachments.push_back (std::make_unique<ButtonAttach> (processor.apvts, paramId, b));
+        buttonAttachments.push_back (std::make_unique<ButtonAttach> (audioProc.apvts, paramId, b));
         attachTip (b, paramId);
     };
     setupBtn (echoBtn,    "ECHO",    "echo_enabled");
@@ -333,18 +333,18 @@ BC2000DLEditor::BC2000DLEditor (BC2000DLProcessor& p)
         b.onClick = [this, isA]
         {
             auto& store = slotIsA ? stateA : stateB;
-            store = processor.apvts.copyState();
+            store = audioProc.apvts.copyState();
             slotIsA = isA;
             auto& load = slotIsA ? stateA : stateB;
             if (load.isValid())
-                processor.apvts.replaceState (load);
+                audioProc.apvts.replaceState (load);
         };
     };
     setupAB (aBtn, true);
     setupAB (bBtn, false);
     aBtn.setToggleState (true, juce::dontSendNotification);
 
-    stateA = processor.apvts.copyState();
+    stateA = audioProc.apvts.copyState();
     startTimerHz (30);
 }
 
@@ -355,7 +355,7 @@ BC2000DLEditor::~BC2000DLEditor()
 
 void BC2000DLEditor::applyPreset (int idx)
 {
-    auto& v = processor.apvts;
+    auto& v = audioProc.apvts;
     auto set = [&] (const juce::String& id, float val)
     {
         if (auto* prm = v.getParameter (id))
@@ -788,27 +788,27 @@ void BC2000DLEditor::resized()
 
 void BC2000DLEditor::timerCallback()
 {
-    auto& chain = processor.getChain();
+    auto& chain = audioProc.getChain();
     meterL.pushLevel (chain.meterLevelL_dBFS.load());
     meterR.pushLevel (chain.meterLevelR_dBFS.load());
     meterL.setRecording (chain.isRecordingL.load());
     meterR.setRecording (chain.isRecordingR.load());
 
     // L/R-record-bar-indicators speglar rec_arm-toggles
-    const bool armL = processor.apvts.getRawParameterValue ("rec_arm_1")->load() > 0.5f;
-    const bool armR = processor.apvts.getRawParameterValue ("rec_arm_2")->load() > 0.5f;
+    const bool armL = audioProc.apvts.getRawParameterValue ("rec_arm_1")->load() > 0.5f;
+    const bool armR = audioProc.apvts.getRawParameterValue ("rec_arm_2")->load() > 0.5f;
     recIndL.setLit (armL);
     recIndR.setLit (armR);
 
-    const float inputAny = processor.apvts.getRawParameterValue ("mic_gain")->load()
-                         + processor.apvts.getRawParameterValue ("phono_gain")->load()
-                         + processor.apvts.getRawParameterValue ("radio_gain")->load();
+    const float inputAny = audioProc.apvts.getRawParameterValue ("mic_gain")->load()
+                         + audioProc.apvts.getRawParameterValue ("phono_gain")->load()
+                         + audioProc.apvts.getRawParameterValue ("radio_gain")->load();
     heroPanel.setReelsRotating (inputAny > 0.05f);
 
-    const auto sr = processor.getSampleRate();
+    const auto sr = audioProc.getSampleRate();
     if (sr > 0.0)
     {
-        const int speedIdx = (int) processor.apvts.getRawParameterValue ("speed")->load();
+        const int speedIdx = (int) audioProc.apvts.getRawParameterValue ("speed")->load();
         const char* speedStr = (speedIdx == 0 ? "4.75" : speedIdx == 1 ? "9.5" : "19");
         juce::String newStatus = juce::String (speedStr) + " cm/s  ·  "
                                 + juce::String (sr / 1000.0, 1) + " kHz";

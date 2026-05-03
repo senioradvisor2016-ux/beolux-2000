@@ -130,7 +130,7 @@ private:
     void timerCallback() override;
     void applyPreset (int presetIndex);
 
-    BC2000DLProcessor& processor;
+    BC2000DLProcessor& audioProc;
     bc2000dl::ui::InstructionCardLnF lnf;
     juce::TooltipWindow tooltipWindow { this, 500 };
 

@@ -342,7 +342,7 @@ namespace bc2000dl
 //  NativeEditor
 //=============================================================================
 NativeEditor::NativeEditor (BC2000DLProcessor& p)
-    : juce::AudioProcessorEditor (p), processor (p)
+    : juce::AudioProcessorEditor (p), audioProc (p)
 {
     setLookAndFeel (&lnf);
     setSize (kEditorW, kEditorH);
@@ -378,8 +378,8 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     addAndMakeVisible (vuOut);
 
     // ---- Spectrum analyser (live FFT strip on deck) ----
-    spectrum.setSource (processor.getChain().spectrumBuffer,
-                         &processor.getChain().spectrumWriteIdx,
+    spectrum.setSource (audioProc.getChain().spectrumBuffer,
+                         &audioProc.getChain().spectrumWriteIdx,
                          bc2000dl::dsp::SignalChain::kSpecBufSize);
     spectrum.setInterceptsMouseClicks (false, false);
     addAndMakeVisible (spectrum);
@@ -409,8 +409,8 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         }
         f.l.setTooltip (tooltipFor (idL));
         f.r.setTooltip (tooltipFor (idR));
-        sAtts.push_back (std::make_unique<SAtt> (processor.apvts, idL, f.l));
-        sAtts.push_back (std::make_unique<SAtt> (processor.apvts, idR, f.r));
+        sAtts.push_back (std::make_unique<SAtt> (audioProc.apvts, idL, f.l));
+        sAtts.push_back (std::make_unique<SAtt> (audioProc.apvts, idR, f.r));
 
         f.caption.setText (cap, juce::dontSendNotification);
         f.caption.setFont (LnF::sectionFont (10.5f));
@@ -441,7 +441,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         s.setTooltip (tooltipFor (id));
         s.addMouseListener (&sliderMenu, false);
         addAndMakeVisible (s);
-        sAtts.push_back (std::make_unique<SAtt> (processor.apvts, id, s));
+        sAtts.push_back (std::make_unique<SAtt> (audioProc.apvts, id, s));
         creamLbl (l, cap);
         l.setInterceptsMouseClicks (false, false);
     };
@@ -498,7 +498,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         for (auto* it : items) c.addItem (it, idx++);
         c.setTooltip (tooltipFor (id));
         addAndMakeVisible (c);
-        cAtts.push_back (std::make_unique<CAtt> (processor.apvts, id, c));
+        cAtts.push_back (std::make_unique<CAtt> (audioProc.apvts, id, c));
 
         l.setText (cap, juce::dontSendNotification);
         l.setFont (LnF::sectionFont (8.5f));
@@ -519,7 +519,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         b.setButtonText (cap);
         b.setTooltip (tooltipFor (id));
         addAndMakeVisible (b);
-        bAtts.push_back (std::make_unique<BAtt> (processor.apvts, id, b));
+        bAtts.push_back (std::make_unique<BAtt> (audioProc.apvts, id, b));
     };
     setupToggle (t_echo,    "ECHO",    "echo_enabled");
     setupToggle (t_bypass,  "BYPASS",  "bypass_tape");
@@ -538,7 +538,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         b.setTooltip (tooltipFor (id));
         if (cap.startsWith ("REC")) b.setName ("REC");
         addAndMakeVisible (b);
-        bAtts.push_back (std::make_unique<BAtt> (processor.apvts, id, b));
+        bAtts.push_back (std::make_unique<BAtt> (audioProc.apvts, id, b));
     };
     setupKey (k_rec1, "REC 1", "rec_arm_1");
     setupKey (k_rec2, "REC 2", "rec_arm_2");
@@ -589,10 +589,10 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         b.onClick = [this, isA]
         {
             auto& store = slotIsA ? stateA : stateB;
-            store   = processor.apvts.copyState();
+            store   = audioProc.apvts.copyState();
             slotIsA = isA;
             auto& load = slotIsA ? stateA : stateB;
-            if (load.isValid()) processor.apvts.replaceState (load);
+            if (load.isValid()) audioProc.apvts.replaceState (load);
         };
     };
     setupAB (btn_a, true);
@@ -619,7 +619,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     };
     addAndMakeVisible (btn_about);
 
-    stateA = processor.apvts.copyState();
+    stateA = audioProc.apvts.copyState();
     startTimerHz (30);
 
     // melatonin_inspector — enable keyboard focus so Cmd+Shift+I toggles it
@@ -781,7 +781,7 @@ void NativeEditor::paint (juce::Graphics& g)
     // ===== Tape-speed indicator LEDs (3 amber dots next to TAPE SPEED label) =====
     // Positions derived from the layout constants; stable across repaints.
     {
-        const int speedIdx = (int) processor.apvts.getRawParameterValue ("speed")->load();
+        const int speedIdx = (int) audioProc.apvts.getRawParameterValue ("speed")->load();
 
         // lbl_speed sits at y = kAluH+kDivH+kPresetH+11+3, h=10  →  centre ≈ y+5
         constexpr int lcdY   = kAluH + kDivH + kPresetH + 11 + 3 + 5;
@@ -1158,7 +1158,7 @@ void NativeEditor::resized()
 //=============================================================================
 void NativeEditor::timerCallback()
 {
-    auto& chain = processor.getChain();
+    auto& chain = audioProc.getChain();
     vuInL.setLevel (chain.inputLevelL_dBFS.load());
     vuInR.setLevel (chain.inputLevelR_dBFS.load());
     // OUT meter: max of L/R post-processing (most useful for clip-detection)
@@ -1166,9 +1166,9 @@ void NativeEditor::timerCallback()
                                  chain.meterLevelR_dBFS.load()));
 
     // Reel spin when any input gain > threshold OR active output signal
-    const float inputAny = processor.apvts.getRawParameterValue ("mic_gain")->load()
-                         + processor.apvts.getRawParameterValue ("phono_gain")->load()
-                         + processor.apvts.getRawParameterValue ("radio_gain")->load();
+    const float inputAny = audioProc.apvts.getRawParameterValue ("mic_gain")->load()
+                         + audioProc.apvts.getRawParameterValue ("phono_gain")->load()
+                         + audioProc.apvts.getRawParameterValue ("radio_gain")->load();
     const float outLvl = juce::jmax (chain.meterLevelL_dBFS.load(),
                                       chain.meterLevelR_dBFS.load());
     const bool tapeRunning = (inputAny > 0.05f) || outLvl > -40.0f;
@@ -1187,7 +1187,7 @@ void NativeEditor::timerCallback()
         repaint (juce::Rectangle<int> (kTeakW, kAluH - 22, kInnerW, 22));
     }
 
-    const int speedIdx = (int) processor.apvts.getRawParameterValue ("speed")->load();
+    const int speedIdx = (int) audioProc.apvts.getRawParameterValue ("speed")->load();
     reelDeck.setSpeed (speedIdx);
 
     // Repaint the speed-indicator LED strip whenever the selected speed changes.
@@ -1215,7 +1215,7 @@ void NativeEditor::timerCallback()
         }
     }
 
-    const double sr = processor.getSampleRate();
+    const double sr = audioProc.getSampleRate();
     if (sr > 0.0)
     {
         const char* sp = (speedIdx == 0 ? "4.75" : speedIdx == 1 ? "9.5" : "19");
@@ -1235,7 +1235,7 @@ void NativeEditor::applyPreset (int idx)
 {
     // Tween parameter values to their new targets over ~250 ms instead of
     // jumping. Uses a one-shot AnimationCallback running at 60Hz.
-    auto& v = processor.apvts;
+    auto& v = audioProc.apvts;
     struct Tween { juce::String id; float fromN, toN; };
     auto targets = std::make_shared<std::vector<Tween>>();
 
@@ -1318,7 +1318,7 @@ void NativeEditor::applyPreset (int idx)
 
     // ---- Schedule a smooth 250 ms tween (15 frames at 60Hz) ----
     constexpr int totalFrames = 15;
-    auto& vRef = processor.apvts;
+    auto& vRef = audioProc.apvts;
     for (int f = 1; f <= totalFrames; ++f)
     {
         const float t = (float) f / (float) totalFrames;

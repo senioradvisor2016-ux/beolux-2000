@@ -33,7 +33,7 @@ private:
     void pushPresetListToJS();
     void pushOneParamToJS (const juce::String& id, float value01);
 
-    BC2000DLProcessor& processor;
+    BC2000DLProcessor& audioProc;
     juce::WebBrowserComponent webView;
 
     // Peak-hold state för VU

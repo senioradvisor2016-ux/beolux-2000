@@ -61,7 +61,7 @@ namespace
 
 BC2000DLWebEditor::BC2000DLWebEditor (BC2000DLProcessor& p)
     : juce::AudioProcessorEditor (&p),
-      processor (p),
+      audioProc (p),
       webView (juce::WebBrowserComponent::Options{}
         .withNativeIntegrationEnabled (true)
         .withResourceProvider ([] (const auto& path) { return fetchEmbeddedResource (path); })
@@ -105,7 +105,7 @@ BC2000DLWebEditor::BC2000DLWebEditor (BC2000DLProcessor& p)
         "mic_loz", "phono_mode", "radio_mode"
     };
     for (const auto& id : kListenedParams)
-        processor.apvts.addParameterListener (id, this);
+        audioProc.apvts.addParameterListener (id, this);
 
     startTimerHz (30);
 }
@@ -130,12 +130,12 @@ BC2000DLWebEditor::~BC2000DLWebEditor()
         "mic_loz", "phono_mode", "radio_mode"
     };
     for (const auto& id : kListenedParams)
-        processor.apvts.removeParameterListener (id, this);
+        audioProc.apvts.removeParameterListener (id, this);
 }
 
 void BC2000DLWebEditor::parameterChanged (const juce::String& parameterID, float /*newValue*/)
 {
-    if (auto* prm = processor.apvts.getParameter (parameterID))
+    if (auto* prm = audioProc.apvts.getParameter (parameterID))
     {
         const float v01 = prm->getValue();
         // Echo suppression: if this matches the last value JS sent for this
@@ -175,20 +175,20 @@ void BC2000DLWebEditor::onParamChangeFromJS (const juce::var& payload)
                                        static_cast<float> ((double) valueVar));
     // Track this so the listener echo-back is suppressed for OUR own UI-originated changes
     lastJSValue[paramId] = value01;
-    if (auto* prm = processor.apvts.getParameter (paramId))
+    if (auto* prm = audioProc.apvts.getParameter (paramId))
         prm->setValueNotifyingHost (value01);
 }
 
 void BC2000DLWebEditor::pushPresetListToJS()
 {
     juce::Array<juce::var> names;
-    const int n = processor.getNumPrograms();
+    const int n = audioProc.getNumPrograms();
     for (int i = 0; i < n; ++i)
-        names.add (processor.getProgramName (i));
+        names.add (audioProc.getProgramName (i));
 
     juce::DynamicObject::Ptr o = new juce::DynamicObject();
     o->setProperty ("names", juce::var (names));
-    o->setProperty ("index", processor.getCurrentProgram());
+    o->setProperty ("index", audioProc.getCurrentProgram());
     webView.emitEventIfBrowserIsVisible ("presetSync", juce::var (o.get()));
 }
 
@@ -196,7 +196,7 @@ void BC2000DLWebEditor::onPresetChangeFromJS (const juce::var& payload)
 {
     if (! payload.isObject()) return;
     const int idx = (int) payload.getProperty ("index", juce::var (0));
-    processor.setCurrentProgram (idx);
+    audioProc.setCurrentProgram (idx);
     // Push synced parameter values back so HTML reflects new preset
     pushFullStateToJS();
 }
@@ -205,7 +205,7 @@ void BC2000DLWebEditor::pushFullStateToJS()
 {
     // Skicka initial 0..1 för varje parameter så UI:t synkar med APVTS-state
     // (t.ex. vid preset-load eller när host återställer state).
-    auto& apvts = processor.apvts;
+    auto& apvts = audioProc.apvts;
     static constexpr const char* ids[] = {
         "speed", "tape_formula",
         "mic_gain", "mic_gain_r",
@@ -237,7 +237,7 @@ void BC2000DLWebEditor::pushFullStateToJS()
 
 void BC2000DLWebEditor::timerCallback()
 {
-    auto& chain = processor.getChain();
+    auto& chain = audioProc.getChain();
     const float lvlL = chain.meterLevelL_dBFS.load();
     const float lvlR = chain.meterLevelR_dBFS.load();
 

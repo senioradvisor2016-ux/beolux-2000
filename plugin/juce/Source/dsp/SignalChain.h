@@ -83,6 +83,10 @@ namespace bc2000dl::dsp
             // Tape-formel (plan §7): 0=Agfa, 1=BASF, 2=Scotch
             int   tapeFormula       { 0 };
 
+            // Print-through (specs §10): geisterande pre-echo / post-echo från angränsande varv.
+            // 0 = off, 0.01 = subtil, 0.05 = maximum (−26 dB ghost)
+            float printThrough      { 0.0f };
+
             // Radio AUX input sensitivity (hardware sensitivity switch)
             // 0 = L (3 mV ceramic/low-level) → high preamp gain → more character
             // 1 = H (100 mV line/tuner)      → lower preamp gain → cleaner

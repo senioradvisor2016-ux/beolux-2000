@@ -50,6 +50,7 @@ namespace
     constexpr auto kP_PhonoMode     = "phono_mode";
     constexpr auto kP_RadioMode     = "radio_mode";
     constexpr auto kP_TapeFormula   = "tape_formula";  // 0=Agfa 1=BASF 2=Scotch
+    constexpr auto kP_PrintThrough  = "print_through"; // 0..0.05 (specs §10)
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout
@@ -180,6 +181,11 @@ BC2000DLProcessor::createParameterLayout()
         juce::ParameterID { kP_TapeFormula, 1 }, "Tape Formula",
         juce::StringArray { "Agfa", "BASF", "Scotch" }, 0));
 
+    // Print-through (specs §10 — geisterande pre/post-echo från angränsande varv)
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_PrintThrough, 1 }, "Print Through",
+        juce::NormalisableRange<float> { 0.0f, 0.05f, 0.001f }, 0.0f));
+
     return layout;
 }
 
@@ -256,6 +262,7 @@ void BC2000DLProcessor::updateChainParameters()
     p.phonoMode        = static_cast<int> (getF (kP_PhonoMode));
     p.tapeFormula      = static_cast<int> (getF (kP_TapeFormula));
     p.radioMode        = static_cast<int> (getF (kP_RadioMode));
+    p.printThrough     = getF (kP_PrintThrough);
 
     // P.A. mode — duckar phono+radio när mic aktiv (-12 dB)
     if (p.publicAddress && (p.micGain > 0.05f || p.micGainR > 0.05f))

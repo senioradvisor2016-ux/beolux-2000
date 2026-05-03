@@ -148,6 +148,9 @@ namespace bc2000dl::dsp
                         p.tapeFormula == 2 ? TapeFormula::Scotch : TapeFormula::Agfa);
         L.tape.setFormula (tf); R.tape.setFormula (tf);
 
+        // Print-through (specs §10)
+        L.tape.setPrintThrough (p.printThrough); R.tape.setPrintThrough (p.printThrough);
+
         // Notera: mixer.setGains används bara för totalgain (för bypass-mode).
         // Per-kanal-gain hanteras i processChannelChain.
         mixer.setGains (p.micGain, p.phonoGain, p.radioGain);
