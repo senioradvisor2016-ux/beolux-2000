@@ -322,170 +322,237 @@ namespace bc2000dl::ui
                                                 float angleStart, float angleEnd,
                                                 juce::Slider& s)
     {
-        // PREMIUM KNOB: chrome bezel ring → satin black body → glass top sheen
-        // → recessed white indicator → red tip → centre rivet. Same fidelity
-        // as the VU bezels.
+        // ===================================================================
+        //  UAD-GRADE KNOB
+        //   1. Recessed skirt (knob sits IN the panel)
+        //   2. Always-visible wide amber value-arc with track
+        //   3. 12 perimeter tick-marks
+        //   4. Multi-light PBR-style body shading
+        //   5. Recessed triangular indicator nub at outer rim
+        //   6. Centre chrome rivet
+        // ===================================================================
         const auto area = juce::Rectangle<float> ((float) x, (float) y, (float) w, (float) h)
-                              .reduced (4.0f);
+                              .reduced (5.0f);
         const float radius = juce::jmin (area.getWidth(), area.getHeight()) * 0.5f;
         const float cx = area.getCentreX();
         const float cy = area.getCentreY();
         const float angle = angleStart + sliderPos * (angleEnd - angleStart);
         const bool hot = s.isMouseOverOrDragging();
 
-        const auto inkCol = juce::Colour (0xFF181408);
+        const float bezR    = radius * 0.78f;             // bezel outer
+        const float trackR  = radius * 0.94f;             // value-arc radius
+        const float bodyR   = radius * 0.68f;             // body outer
+        const auto  amberC  = juce::Colour (0xFFE8B040);
+        const auto  amberHi = juce::Colour (0xFFFFD080);
 
-        // ---- Real Gaussian drop-shadow (melatonin) ----
+        // -------------------------------------------------------------------
+        // 1. RECESSED SKIRT (knob sits in a milled depression in the panel)
+        // -------------------------------------------------------------------
         {
+            juce::Path skirt;
+            skirt.addEllipse (cx - radius, cy - radius, radius * 2, radius * 2);
+            // outer drop shadow on the skirt rim
+            static thread_local melatonin::DropShadow skirtShadow {
+                { juce::Colours::black.withAlpha (0.55f), 6, { 0, 1 }, 0 }
+            };
+            skirtShadow.render (g, skirt);
+
+            juce::ColourGradient skirtGrad (
+                juce::Colour (0xFF050507), cx, cy - radius,
+                juce::Colour (0xFF1A1A1E), cx, cy + radius, false);
+            g.setGradientFill (skirtGrad);
+            g.fillEllipse (cx - radius, cy - radius, radius * 2, radius * 2);
+
+            // Inner shadow on the skirt — sells the recess
+            static thread_local melatonin::InnerShadow skirtInner {
+                { juce::Colours::black.withAlpha (0.85f), 4, { 0, 2 }, 0 }
+            };
+            skirtInner.render (g, skirt);
+        }
+
+        // -------------------------------------------------------------------
+        // 2. VALUE-ARC TRACK (the always-visible UAD signature)
+        // -------------------------------------------------------------------
+        {
+            // Background track (dark, slightly recessed)
+            juce::Path bgArc;
+            bgArc.addCentredArc (cx, cy, trackR, trackR, 0, angleStart, angleEnd, true);
+            g.setColour (juce::Colour (0xFF202024));
+            g.strokePath (bgArc, juce::PathStrokeType (4.0f, juce::PathStrokeType::curved,
+                                                        juce::PathStrokeType::rounded));
+
+            // Filled value-arc — amber, with melatonin glow when hot
+            juce::Path valArc;
+            valArc.addCentredArc (cx, cy, trackR, trackR, 0, angleStart, angle, true);
+
+            if (hot)
+            {
+                static thread_local melatonin::DropShadow arcGlow {
+                    { amberHi.withAlpha (0.85f), 8, { 0, 0 }, 1 }
+                };
+                arcGlow.render (g, valArc, juce::PathStrokeType (3.0f, juce::PathStrokeType::curved,
+                                                                 juce::PathStrokeType::rounded));
+            }
+
+            g.setColour (hot ? amberHi : amberC);
+            g.strokePath (valArc, juce::PathStrokeType (3.2f, juce::PathStrokeType::curved,
+                                                        juce::PathStrokeType::rounded));
+        }
+
+        // -------------------------------------------------------------------
+        // 3. 12 PERIMETER TICK-MARKS (silkscreen on the panel around knob)
+        // -------------------------------------------------------------------
+        {
+            const float tickR1 = radius + 1.5f;
+            const float tickR2 = radius + 6.0f;
+            const float majorR2 = radius + 8.0f;
+            for (int i = 0; i < 12; ++i)
+            {
+                const float t = (float) i / 11.0f;
+                const float a = angleStart + t * (angleEnd - angleStart);
+                const bool major = (i == 0 || i == 6 || i == 11);
+                const float r2 = major ? majorR2 : tickR2;
+                g.setColour (juce::Colour (0xFFE0E0E4).withAlpha (major ? 0.85f : 0.55f));
+                g.drawLine (cx + tickR1 * std::sin (a), cy - tickR1 * std::cos (a),
+                            cx + r2 * std::sin (a),     cy - r2 * std::cos (a),
+                            major ? 1.2f : 0.7f);
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // 4. KNOB BODY with MULTI-LIGHT PBR-STYLE SHADING
+        // -------------------------------------------------------------------
+        {
+            // Outer thin chrome bezel ring (frames the body)
+            g.setColour (juce::Colour (0xFF606068));
+            g.fillEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2);
+            g.setColour (juce::Colours::black.withAlpha (0.85f));
+            g.drawEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2, 1.0f);
+
+            // Body base — deep satin matte
+            juce::ColourGradient bodyGrad (
+                juce::Colour (0xFF38383E), cx, cy - bodyR,
+                juce::Colour (0xFF050508), cx, cy + bodyR, false);
+            bodyGrad.addColour (0.30, juce::Colour (0xFF1E1E22));
+            bodyGrad.addColour (0.65, juce::Colour (0xFF0E0E12));
+            g.setGradientFill (bodyGrad);
+            g.fillEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
+
+            // ---- LIGHT 1: Main top-left specular (primary studio light) ----
+            {
+                juce::Path glint;
+                const float gR = bodyR * 0.95f;
+                glint.addPieSegment (cx - gR, cy - gR, gR * 2, gR * 2,
+                                      -juce::MathConstants<float>::pi * 0.65f,
+                                      -juce::MathConstants<float>::pi * 0.15f,
+                                      0.45f);
+                juce::ColourGradient gg (
+                    juce::Colour (0xFFFFFFFF).withAlpha (0.35f),
+                    cx - bodyR * 0.4f, cy - bodyR,
+                    juce::Colours::transparentWhite,
+                    cx, cy + bodyR * 0.1f, false);
+                g.setGradientFill (gg);
+                g.fillPath (glint);
+            }
+
+            // ---- LIGHT 2: Cool blue rim-light (top-right, suggests fill) ----
+            {
+                const float pR = bodyR * 0.30f;
+                const float px = cx + bodyR * 0.55f;
+                const float py = cy - bodyR * 0.30f;
+                juce::ColourGradient bg (
+                    juce::Colour (0xFFA8C8E0).withAlpha (0.22f), px, py,
+                    juce::Colours::transparentWhite,             px + pR, py + pR, true);
+                g.setGradientFill (bg);
+                g.fillEllipse (px - pR, py - pR, pR * 2, pR * 2);
+            }
+
+            // ---- LIGHT 3: Warm bottom rim-light (sells curvature underside) ----
+            {
+                juce::Path rimLight;
+                const float gR = bodyR * 0.92f;
+                rimLight.addPieSegment (cx - gR, cy - gR, gR * 2, gR * 2,
+                                         juce::MathConstants<float>::pi * 0.30f,
+                                         juce::MathConstants<float>::pi * 0.70f,
+                                         0.92f);
+                g.setColour (juce::Colour (0xFFFFD0A0).withAlpha (0.18f));
+                g.fillPath (rimLight);
+            }
+
+            // ---- POINT-LIGHT BRIGHT SPOT (the iconic UAD "wet glint") ----
+            {
+                const float pgR = bodyR * 0.16f;
+                const float pgX = cx - bodyR * 0.40f;
+                const float pgY = cy - bodyR * 0.55f;
+                juce::ColourGradient pg (
+                    juce::Colours::white.withAlpha (0.65f), pgX, pgY,
+                    juce::Colours::transparentWhite,         pgX + pgR, pgY + pgR, true);
+                g.setGradientFill (pg);
+                g.fillEllipse (pgX - pgR, pgY - pgR, pgR * 2, pgR * 2);
+            }
+
+            // ---- Body inner-edge shadow (depth) ----
             juce::Path bodyPath;
-            const float bodyR = radius * 0.82f;
             bodyPath.addEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
-            static thread_local melatonin::DropShadow knobShadow {
-                { juce::Colours::black.withAlpha (0.65f), 10, { 0, 4 }, 0 }
+            static thread_local melatonin::InnerShadow bodyInner {
+                { juce::Colours::black.withAlpha (0.45f), 4, { 0, 1 }, 0 }
             };
-            knobShadow.render (g, bodyPath);
+            bodyInner.render (g, bodyPath);
         }
 
-        // ---- Hover halo (warm glow expanded) ----
-        if (hot)
+        // -------------------------------------------------------------------
+        // 5. RECESSED INDICATOR NUB at the outer rim (the iconic UAD pointer)
+        // -------------------------------------------------------------------
         {
-            juce::Path haloPath;
-            haloPath.addEllipse (cx - radius - 1, cy - radius - 1,
-                                  (radius + 1) * 2, (radius + 1) * 2);
-            static thread_local melatonin::DropShadow knobHotHalo {
-                { juce::Colour (0xFFC2A050).withAlpha (0.45f), 18, { 0, 0 }, 4 }
+            const float nubBaseR = bodyR * 0.92f;
+            const float nubTipR  = bodyR * 1.02f;
+            // Position: at body rim
+            const float bx = cx + nubBaseR * std::sin (angle);
+            const float by = cy - nubBaseR * std::cos (angle);
+            const float tx = cx + nubTipR * std::sin (angle);
+            const float ty = cy - nubTipR * std::cos (angle);
+
+            // Recessed groove shadow first
+            g.setColour (juce::Colours::black.withAlpha (0.95f));
+            g.drawLine (bx + 0.5f, by + 0.5f, tx + 0.5f, ty + 0.5f, 4.5f);
+
+            // Bright white pointer (recessed indicator paint)
+            g.setColour (juce::Colour (0xFFF6F6F0));
+            g.drawLine (bx, by, tx, ty, 3.2f);
+
+            // Red tip with glow halo
+            const auto tipCol = s.isEnabled() ? redAccent() : creamDim();
+            juce::Path tipPath;
+            tipPath.addEllipse (tx - 3.2f, ty - 3.2f, 6.4f, 6.4f);
+            static thread_local melatonin::DropShadow tipGlow {
+                { juce::Colour (0xFFFF6050).withAlpha (0.85f), 6, { 0, 0 }, 0 }
             };
-            knobHotHalo.render (g, haloPath);
+            tipGlow.render (g, tipPath);
+            g.setColour (tipCol);
+            g.fillEllipse (tx - 2.6f, ty - 2.6f, 5.2f, 5.2f);
+            g.setColour (juce::Colour (0xFFFFD0C0).withAlpha (0.85f));
+            g.fillEllipse (tx - 1.0f, ty - 1.4f, 1.6f, 1.0f);
         }
 
-        // ---- Tick marks at min/max (printed on cream paper) ----
-        const float bezR = radius * 0.95f;
-        g.setColour (inkCol.withAlpha (0.85f));
-        for (float a : { angleStart, angleEnd })
+        // -------------------------------------------------------------------
+        // 6. CENTRE CHROME RIVET
+        // -------------------------------------------------------------------
         {
-            const float r1 = bezR + 2.0f;
-            const float r2 = bezR + 6.0f;
-            g.drawLine (cx + r1 * std::sin (a), cy - r1 * std::cos (a),
-                        cx + r2 * std::sin (a), cy - r2 * std::cos (a), 1.0f);
-        }
-
-        // ---- 1. CHROME BEZEL RING (outer ~5% of radius) ----
-        juce::ColourGradient bezelGrad (
-            juce::Colour (0xFFE0E0E4), cx - bezR * 0.5f, cy - bezR * 0.6f,
-            juce::Colour (0xFF50505A), cx + bezR * 0.5f, cy + bezR * 0.6f, false);
-        bezelGrad.addColour (0.40, juce::Colour (0xFFB8B8BC));
-        bezelGrad.addColour (0.65, juce::Colour (0xFF7A7A82));
-        g.setGradientFill (bezelGrad);
-        g.fillEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2);
-
-        // Bezel inner shadow (separates bezel from body)
-        g.setColour (juce::Colours::black.withAlpha (0.75f));
-        const float bodyR = radius * 0.82f;
-        g.drawEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2, 1.5f);
-
-        // ---- 2. BODY: deep satin black (multi-stop gradient) ----
-        juce::ColourGradient bodyGrad (
-            juce::Colour (0xFF44444A), cx, cy - bodyR,
-            juce::Colour (0xFF050507), cx, cy + bodyR, false);
-        bodyGrad.addColour (0.30, juce::Colour (0xFF2C2C32));
-        bodyGrad.addColour (0.65, juce::Colour (0xFF14141A));
-        g.setGradientFill (bodyGrad);
-        g.fillEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
-
-        // ---- 3. RECESSED INDICATOR GROOVE ----
-        // Dark line cut into the body, white indicator paint sits in it
-        const float indR0 = bodyR * 0.20f;
-        const float indR1 = bodyR * 0.95f;
-        const float sx = cx + indR0 * std::sin (angle);
-        const float sy = cy - indR0 * std::cos (angle);
-        const float ex = cx + indR1 * std::sin (angle);
-        const float ey = cy - indR1 * std::cos (angle);
-        // Recess shadow (slightly offset)
-        g.setColour (juce::Colours::black.withAlpha (0.85f));
-        g.drawLine (sx + 0.7f, sy + 0.7f, ex + 0.7f, ey + 0.7f, 3.2f);
-        // White indicator paint
-        g.setColour (juce::Colour (0xFFF8F8F0));
-        g.drawLine (sx, sy, ex, ey, 2.4f);
-        // Red tip glow + dot
-        const auto tipCol = s.isEnabled() ? redAccent() : creamDim();
-        g.setColour (tipCol.withAlpha (0.50f));
-        g.fillEllipse (ex - 4.0f, ey - 4.0f, 8.0f, 8.0f);
-        g.setColour (tipCol);
-        g.fillEllipse (ex - 2.6f, ey - 2.6f, 5.2f, 5.2f);
-        g.setColour (juce::Colour (0xFFFFC0B0).withAlpha (0.7f));
-        g.fillEllipse (ex - 1.2f, ey - 1.6f, 2.0f, 1.4f);
-
-        // ---- 4. GLASS TOP SHEEN (premium 3D glint) ----
-        // Specular crescent on upper half (60° arc)
-        {
-            juce::Path glint;
-            const float gR = bodyR * 0.92f;
-            glint.addPieSegment (cx - gR, cy - gR, gR * 2, gR * 2,
-                                  -juce::MathConstants<float>::pi * 0.55f,
-                                  -juce::MathConstants<float>::pi * 0.10f,
-                                  0.55f);
-            juce::ColourGradient gg (
-                juce::Colours::white.withAlpha (0.30f), cx, cy - bodyR,
-                juce::Colours::transparentWhite,         cx, cy + bodyR * 0.2f, false);
-            g.setGradientFill (gg);
-            g.fillPath (glint);
-        }
-
-        // Soft point-light glint (small bright dot upper-left)
-        {
-            const float pgR = bodyR * 0.20f;
-            const float pgX = cx - bodyR * 0.40f;
-            const float pgY = cy - bodyR * 0.55f;
-            juce::ColourGradient pg (
-                juce::Colours::white.withAlpha (0.45f), pgX, pgY,
-                juce::Colours::transparentWhite,         pgX + pgR, pgY + pgR, true);
-            g.setGradientFill (pg);
-            g.fillEllipse (pgX - pgR, pgY - pgR, pgR * 2, pgR * 2);
-        }
-
-        // ---- 5. CENTRE CHROME RIVET ----
-        const float rivR = bodyR * 0.16f;
-        // Recess
-        g.setColour (juce::Colours::black);
-        g.fillEllipse (cx - rivR - 0.6f, cy - rivR - 0.6f, (rivR + 0.6f) * 2, (rivR + 0.6f) * 2);
-        // Chrome dome
-        juce::ColourGradient rivGrad (
-            juce::Colour (0xFFEFEFE8), cx - rivR * 0.4f, cy - rivR * 0.5f,
-            juce::Colour (0xFF40404A), cx + rivR * 0.4f, cy + rivR * 0.5f, false);
-        rivGrad.addColour (0.5, juce::Colour (0xFFA8A8AC));
-        g.setGradientFill (rivGrad);
-        g.fillEllipse (cx - rivR, cy - rivR, rivR * 2, rivR * 2);
-        // Tiny highlight on rivet
-        g.setColour (juce::Colours::white.withAlpha (0.7f));
-        g.fillEllipse (cx - rivR * 0.4f, cy - rivR * 0.6f, rivR * 0.5f, rivR * 0.4f);
-
-        // ---- 6. CURVED DIRECTION-ARROW above the knob (cream-paper schematic) ----
-        const float arrR = bezR + 9.0f;
-        const float a0 = -juce::MathConstants<float>::pi * 0.55f;
-        const float a1 = -juce::MathConstants<float>::pi * 0.20f;
-        juce::Path arrow;
-        arrow.addCentredArc (cx, cy, arrR, arrR, 0, a0, a1, true);
-        g.setColour (inkCol.withAlpha (0.65f));
-        g.strokePath (arrow, juce::PathStrokeType (1.0f));
-        const float ahx = cx + arrR * std::sin (a1);
-        const float ahy = cy - arrR * std::cos (a1);
-        juce::Path head;
-        head.startNewSubPath (ahx, ahy);
-        head.lineTo (ahx - 4.0f, ahy - 1.5f);
-        head.lineTo (ahx - 2.5f, ahy + 3.5f);
-        head.closeSubPath();
-        g.fillPath (head);
-
-        // ---- 7. Hot amber value-arc ----
-        if (hot)
-        {
-            const float trackR = bezR + 4.0f;
-            juce::Path arcFill;
-            arcFill.addCentredArc (cx, cy, trackR, trackR, 0, angleStart, angle, true);
-            g.setColour (juce::Colour (0xFFC2A050));
-            g.strokePath (arcFill, juce::PathStrokeType (1.8f));
-            g.setColour (juce::Colour (0xFFE0C070).withAlpha (0.45f));
-            g.strokePath (arcFill, juce::PathStrokeType (3.5f));
+            const float rivR = bodyR * 0.14f;
+            // recess
+            g.setColour (juce::Colours::black);
+            g.fillEllipse (cx - rivR - 0.7f, cy - rivR - 0.7f,
+                           (rivR + 0.7f) * 2, (rivR + 0.7f) * 2);
+            // chrome dome
+            juce::ColourGradient rivGrad (
+                juce::Colour (0xFFEFEFE8), cx - rivR * 0.4f, cy - rivR * 0.5f,
+                juce::Colour (0xFF353540), cx + rivR * 0.4f, cy + rivR * 0.5f, false);
+            rivGrad.addColour (0.5, juce::Colour (0xFFA8A8AC));
+            g.setGradientFill (rivGrad);
+            g.fillEllipse (cx - rivR, cy - rivR, rivR * 2, rivR * 2);
+            // bright spec
+            g.setColour (juce::Colours::white.withAlpha (0.75f));
+            g.fillEllipse (cx - rivR * 0.45f, cy - rivR * 0.6f, rivR * 0.55f, rivR * 0.4f);
         }
     }
 
