@@ -148,5 +148,12 @@ namespace bc2000dl::ui
         /** Mechanical counter readout (4-digit, amber digits on dark window). */
         static void drawCounter (juce::Graphics&, juce::Rectangle<int>,
                                  const juce::String& text);
+
+        /** Analog VU meter — cream face with curved scale, black needle, glass.
+            @param dbValue   current value in dB (typical -20…+3 range)
+            @param channel   "L" or "R" (or any short label drawn under VU mark)  */
+        static void drawAnalogVU (juce::Graphics&, juce::Rectangle<int>,
+                                   float dbValue, bool isPeaking,
+                                   const juce::String& channel);
     };
 }

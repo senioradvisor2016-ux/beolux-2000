@@ -98,92 +98,45 @@ namespace bc2000dl
     {
         auto bounds = getLocalBounds();
 
-        // Reels are ~40% of total width each, with gap in the middle for heads + counter
-        const int reelDiam = juce::jmin (bounds.getHeight() - 10, (int) (bounds.getWidth() * 0.40f));
-        const int gapW     = bounds.getWidth() - reelDiam * 2;
+        // Reels are ~40% of total width each. Centre gap is reserved for the
+        // analog VU meters (placed by the editor as separate components).
+        const int reelDiam = juce::jmin (bounds.getHeight() - 6, (int) (bounds.getWidth() * 0.36f));
         const int reelY    = bounds.getCentreY() - reelDiam / 2;
 
-        const juce::Rectangle<int> leftReel  (bounds.getX(),                      reelY, reelDiam, reelDiam);
-        const juce::Rectangle<int> rightReel (bounds.getRight() - reelDiam,       reelY, reelDiam, reelDiam);
-        const juce::Rectangle<int> gapRect   (bounds.getX() + reelDiam, reelY, gapW, reelDiam);
+        const juce::Rectangle<int> leftReel  (bounds.getX(),                  reelY, reelDiam, reelDiam);
+        const juce::Rectangle<int> rightReel (bounds.getRight() - reelDiam,   reelY, reelDiam, reelDiam);
 
-        // Left reel (feeds tape)
-        ui::InstructionCardLnF::drawReel (g, leftReel, angleL, isActive);
-
-        // Right reel (takes up tape; rotates opposite direction on takeup)
+        ui::InstructionCardLnF::drawReel (g, leftReel,  angleL, isActive);
         ui::InstructionCardLnF::drawReel (g, rightReel, -angleR * 0.7f, isActive);
 
-        // Head assembly centred in the gap
-        auto headsRect = gapRect.reduced (gapW / 6, reelDiam / 4);
-        ui::InstructionCardLnF::drawHeadAssembly (g, headsRect);
-
-        // Tape path lines
+        // Tape path: thin metallic line spanning the gap (passing behind the VU pair)
         const float tapeY = (float) bounds.getCentreY();
-        g.setColour (juce::Colour (0xFF202020).withAlpha (0.55f));
-        g.drawLine ((float) leftReel.getRight() - reelDiam * 0.04f, tapeY,
-                    (float) headsRect.getX() - 2,                   tapeY, 1.0f);
-        g.drawLine ((float) headsRect.getRight() + 2, tapeY,
-                    (float) rightReel.getX() + reelDiam * 0.04f, tapeY, 1.0f);
+        g.setColour (juce::Colour (0xFFA0A0A8).withAlpha (0.45f));
+        g.drawLine ((float) leftReel.getRight() - reelDiam * 0.05f, tapeY,
+                    (float) rightReel.getX()    + reelDiam * 0.05f, tapeY, 0.8f);
     }
 
     //=========================================================================
-    //  VU bar — green→yellow→red gradient on dark background
+    //  Analog VU meter
     //=========================================================================
-    void VUBar::setLevel (float dbfs)
+    void AnalogVU::setLevel (float dbfs)
     {
-        const auto target = juce::jlimit (-60.0f, 6.0f, dbfs);
-        if (target > current) current = target;
-        else                  current = juce::jmax (target, current - 0.5f); // ~18 dB/s release
+        // Smooth attack/release ballistics (~300ms VU response)
+        const auto target = juce::jlimit (-30.0f, 6.0f, dbfs);
+        if (target > current) current += (target - current) * 0.35f;
+        else                  current += (target - current) * 0.10f;
+
+        const bool nowPeaking = current > 0.0f;
+        if (nowPeaking != peaking) { peaking = nowPeaking; }
         repaint();
     }
 
-    void VUBar::paint (juce::Graphics& g)
+    void AnalogVU::paint (juce::Graphics& g)
     {
-        const auto r = getLocalBounds().toFloat();
-
-        // Recessed dark window
-        g.setColour (juce::Colour (0xFF0A0A0C));
-        g.fillRoundedRectangle (r, 2.5f);
-        g.setColour (juce::Colour (0xFF383840).withAlpha (0.6f));
-        g.drawRoundedRectangle (r, 2.5f, 0.7f);
-
-        // Bar fill
-        const float pos = juce::jlimit (0.0f, 1.0f, (current + 60.0f) / 66.0f);
-        if (pos > 0.005f)
-        {
-            auto bar = r.reduced (2.0f);
-            bar.setWidth (bar.getWidth() * pos);
-
-            juce::ColourGradient grad (
-                juce::Colour (0xff28C45A), bar.getX(),   bar.getCentreY(),
-                juce::Colour (0xffD03030), r.getRight(), bar.getCentreY(), false);
-            grad.addColour (0.60, juce::Colour (0xffC8B830));
-            grad.addColour (0.82, juce::Colour (0xffD07020));
-            g.setGradientFill (grad);
-            g.fillRoundedRectangle (bar, 1.2f);
-        }
-
-        // Tick marks at -40, -20, -10, -3, 0
-        g.setColour (ui::InstructionCardLnF::amber().withAlpha (0.40f));
-        for (int db : { -40, -20, -10, -3, 0 })
-        {
-            const float fx = r.getX() + r.getWidth() * (db + 60.0f) / 66.0f;
-            g.drawLine (fx, r.getY() + 1, fx, r.getBottom() - 1, 0.5f);
-        }
-
-        // dB readout
-        g.setColour (ui::InstructionCardLnF::amberHot());
-        g.setFont (ui::InstructionCardLnF::monoFont (8.5f));
-        g.drawText (juce::String (current, 1) + " dB",
-                    r.reduced (5, 0).toNearestInt(), juce::Justification::centredRight, false);
-
-        // REC blink dot
-        if (recording)
-        {
-            g.setColour (ui::InstructionCardLnF::redAccent());
-            g.fillEllipse (r.getX() + 4, r.getCentreY() - 2.5f, 5, 5);
-        }
+        ui::InstructionCardLnF::drawAnalogVU (g, getLocalBounds(), current, peaking, channel);
     }
+
+    // (Old VUBar removed — replaced by AnalogVU above.)
 }
 
 //=============================================================================
@@ -207,21 +160,10 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         addAndMakeVisible (l);
     };
 
-    // ---- Top deck zone ----
+    // ---- Top deck zone: reels + analog VU pair ----
     addAndMakeVisible (reelDeck);
     addAndMakeVisible (vuL);
     addAndMakeVisible (vuR);
-    auto styleVuLbl = [&] (juce::Label& l, const juce::String& t)
-    {
-        l.setText (t, juce::dontSendNotification);
-        l.setFont (LnF::monoFont (10.0f));
-        l.setColour (juce::Label::textColourId, LnF::amber());
-        l.setJustificationType (juce::Justification::centred);
-        l.setInterceptsMouseClicks (false, false);
-        addAndMakeVisible (l);
-    };
-    styleVuLbl (vuL_lbl, "L");
-    styleVuLbl (vuR_lbl, "R");
 
     // ---- 5 dual-faders ----
     // Bulletproof drag config: snap to mouse, no velocity-mode (predictable),
@@ -404,7 +346,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("BC2000DL · v31.0 INSTRUCTION-CARD")
+                .withTitle ("BC2000DL · v32.0 BLACK METAL DECK")
                 .withMessage ("Bang & Olufsen Beocord 2000 De Luxe (1968-69)\n\n"
                               "DSP: Jiles-Atherton hysteresis · 8× oversampling\n"
                               "21/21 PASS vs Studio-Sound + Service Manual\n\n"
@@ -444,14 +386,14 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (16, 6).removeFromTop (24),
-                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v31.1");
+                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v32.0");
 
-    // Counter (bottom-centre of alu zone, between the reels)
+    // Counter (bottom-centre of deck, just below the VU pair)
     {
-        constexpr int cW = 80, cH = 22;
+        constexpr int cW = 76, cH = 18;
         LnF::drawCounter (g,
             juce::Rectangle<int> (inner.getCentreX() - cW / 2,
-                                  aluZone.getBottom() - cH - 8,
+                                  aluZone.getBottom() - cH - 4,
                                   cW, cH),
             counterText);
     }
@@ -504,9 +446,23 @@ void NativeEditor::resized()
     const auto bounds = getLocalBounds();
     auto inner = bounds.withTrimmedLeft (kTeakW).withTrimmedRight (kTeakW);
 
-    // ===== Aluminium zone: reel deck (below title strip) =====
-    auto aluZone = inner.withHeight (kAluH).withTrimmedTop (26).reduced (6, 3);
-    reelDeck.setBounds (aluZone);
+    // ===== Top deck zone: reel deck + analog VU pair =====
+    auto deckZone = inner.withHeight (kAluH).withTrimmedTop (26).reduced (6, 3);
+    reelDeck.setBounds (deckZone);
+
+    // Two analog VU meters in the centre gap, between the reels.
+    {
+        const int reelDiam = juce::jmin (deckZone.getHeight() - 6,
+                                          (int) (deckZone.getWidth() * 0.36f));
+        const int gapL = deckZone.getX() + reelDiam + 8;
+        const int gapR = deckZone.getRight() - reelDiam - 8;
+        const int gapW = juce::jmax (160, gapR - gapL);
+        const int vuW  = (gapW - 14) / 2;
+        const int vuH  = juce::jmin (deckZone.getHeight() - 30, 110);
+        const int vuY  = deckZone.getY() + (deckZone.getHeight() - vuH) / 2;
+        vuL.setBounds (gapL, vuY, vuW, vuH);
+        vuR.setBounds (gapL + vuW + 14, vuY, vuW, vuH);
+    }
 
     // ===== Black panel zone =====
     auto blackZone = inner.withY (kAluH + kDivH)
@@ -538,21 +494,10 @@ void NativeEditor::resized()
     auto rightCol  = blackZone.reduced (8, 6);
 
     // =====================================================================
-    // LEFT COLUMN: VU meters → combos → toggles → transport keys
-    //   (compressed for tight horizontal-strip proportions)
+    // LEFT COLUMN: combos → toggles → transport keys
+    //   (VU meters now live on the top black-metal deck — see deckZone above)
     // =====================================================================
     {
-        // VU meters (slimmer)
-        auto vuRow = leftCol.removeFromTop (44);
-        auto vuLRow = vuRow.removeFromTop (20).reduced (0, 1);
-        vuL_lbl.setBounds (vuLRow.removeFromLeft (14));
-        vuL.setBounds (vuLRow);
-        auto vuRRow = vuRow.removeFromTop (20).reduced (0, 1);
-        vuR_lbl.setBounds (vuRRow.removeFromLeft (14));
-        vuR.setBounds (vuRRow);
-
-        leftCol.removeFromTop (4);
-
         // 5 combo boxes (compact)
         auto layoutCombo = [&] (juce::ComboBox& c, juce::Label& l)
         {
@@ -664,8 +609,6 @@ void NativeEditor::timerCallback()
     auto& chain = processor.getChain();
     vuL.setLevel (chain.meterLevelL_dBFS.load());
     vuR.setLevel (chain.meterLevelR_dBFS.load());
-    vuL.setRecording (chain.isRecordingL.load());
-    vuR.setRecording (chain.isRecordingR.load());
 
     // Reel spin when any input gain > threshold
     const float inputAny = processor.apvts.getRawParameterValue ("mic_gain")->load()

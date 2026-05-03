@@ -48,6 +48,19 @@ namespace bc2000dl
         float current { -60.0f };
         bool recording { false };
     };
+
+    /** Analog VU meter with curved scale + needle on cream face.  */
+    class AnalogVU : public juce::Component
+    {
+    public:
+        explicit AnalogVU (const juce::String& chLabel = "L") : channel (chLabel) {}
+        void setLevel (float dbfs);              // smoothed
+        void paint (juce::Graphics&) override;
+    private:
+        float current { -20.0f };
+        bool peaking { false };
+        juce::String channel;
+    };
 }
 
 class NativeEditor : public juce::AudioProcessorEditor,
@@ -68,10 +81,10 @@ private:
     bc2000dl::ui::InstructionCardLnF lnf;
     juce::TooltipWindow tooltipWindow { this, 500 };
 
-    // ---- Top deck zone: reels + counter + VU ----
+    // ---- Top deck zone: reels + analog VU meters + counter ----
     bc2000dl::ReelDeck reelDeck;
-    bc2000dl::VUBar    vuL, vuR;
-    juce::Label        vuL_lbl, vuR_lbl;
+    bc2000dl::AnalogVU vuL { "L" };
+    bc2000dl::AnalogVU vuR { "R" };
     juce::String       counterText { "0000" };
 
     // ---- 5 dual-faders (10 sliders) — instruction-card slide-faders ----
