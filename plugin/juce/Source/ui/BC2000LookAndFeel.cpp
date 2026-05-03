@@ -204,51 +204,68 @@ namespace bc2000dl::ui
     void InstructionCardLnF::drawSlideFaderCap (juce::Graphics& g, juce::Rectangle<float> r,
                                                   bool bright)
     {
-        // ---- Drop shadow (sells depth, reads as a chunky thumb) ----
-        g.setColour (juce::Colours::black.withAlpha (0.55f));
-        g.fillRoundedRectangle (r.translated (0, 1.5f).expanded (0.5f, 0.5f), 3.0f);
+        // AUTENTIC MATTE ALUMINIUM fader cap — anodised silver-grey, satin
+        // (no chrome highlights). Subtle top edge, red position-marker line.
+        // The real Beocord cap is a small extruded aluminium block with a
+        // recessed red stripe across the centre.
 
-        // ---- Body: brushed dark chrome with bright top/bottom edges ----
+        // ---- Soft drop shadow ----
+        g.setColour (juce::Colours::black.withAlpha (0.40f));
+        g.fillRoundedRectangle (r.translated (0, 1.0f).expanded (0.3f, 0.3f), 2.5f);
+
+        // ---- Matte aluminium body (very subtle vertical gradient) ----
         juce::ColourGradient grad (
-            juce::Colour (0xFF7A7A82),  r.getCentreX(), r.getY(),
-            juce::Colour (0xFF26262A),  r.getCentreX(), r.getBottom(), false);
-        grad.addColour (0.12, juce::Colour (0xFFA8A8B0));   // top highlight
-        grad.addColour (0.50, juce::Colour (0xFF5A5A60));   // mid
-        grad.addColour (0.88, juce::Colour (0xFF1A1A1E));   // bottom shadow
+            juce::Colour (0xFFB8B8B2), r.getCentreX(), r.getY(),
+            juce::Colour (0xFF8E8E88), r.getCentreX(), r.getBottom(), false);
+        grad.addColour (0.50, juce::Colour (0xFFA0A09A));
         g.setGradientFill (grad);
-        g.fillRoundedRectangle (r, 3.0f);
+        g.fillRoundedRectangle (r, 2.5f);
 
-        // ---- Side knurling (vertical micro-grooves either side of the red bar) ----
+        // ---- Faint horizontal brushed-anodise grain (stable seeded noise) ----
+        juce::Random rng (int (r.getY() * 17.0f) ^ int (r.getX() * 31.0f));
+        for (int i = 0; i < 18; ++i)
+        {
+            const float fy = r.getY() + 1.5f + rng.nextFloat() * (r.getHeight() - 3.0f);
+            const bool dark = rng.nextBool();
+            g.setColour ((dark ? juce::Colour (0xFF6E6E68) : juce::Colour (0xFFD2D2CC))
+                            .withAlpha (rng.nextFloat() * 0.10f + 0.02f));
+            g.drawLine (r.getX() + 2.0f, fy, r.getRight() - 2.0f, fy, 0.4f);
+        }
+
+        // ---- Top hairline highlight ----
+        g.setColour (juce::Colour (0xFFE0E0DA).withAlpha (0.55f));
+        g.drawLine (r.getX() + 2.0f, r.getY() + 0.6f,
+                    r.getRight() - 2.0f, r.getY() + 0.6f, 0.6f);
+
+        // ---- Bottom edge shadow ----
+        g.setColour (juce::Colour (0xFF202020).withAlpha (0.35f));
+        g.drawLine (r.getX() + 2.0f, r.getBottom() - 0.6f,
+                    r.getRight() - 2.0f, r.getBottom() - 0.6f, 0.6f);
+
+        // ---- Crisp dark outline ----
+        g.setColour (juce::Colour (0xFF252522).withAlpha (0.85f));
+        g.drawRoundedRectangle (r, 2.5f, 0.8f);
+
+        // ---- Recessed red position-marker line ----
         const float cy = r.getCentreY();
-        g.setColour (juce::Colour (0xFF101012).withAlpha (0.55f));
-        for (float dy : { -8.0f, -5.5f, -3.0f, 3.0f, 5.5f, 8.0f })
-            g.drawLine (r.getX() + 2.5f, cy + dy, r.getRight() - 2.5f, cy + dy, 0.5f);
-        g.setColour (juce::Colour (0xFFC8C8D0).withAlpha (0.20f));
-        for (float dy : { -7.2f, -4.7f, -2.2f, 3.7f, 6.2f, 8.7f })
-            g.drawLine (r.getX() + 2.5f, cy + dy, r.getRight() - 2.5f, cy + dy, 0.4f);
-
-        // ---- Bright outline ----
-        g.setColour (juce::Colour (0xFFB0B0B8).withAlpha (bright ? 0.85f : 0.55f));
-        g.drawRoundedRectangle (r, 3.0f, 0.9f);
-
-        // ---- THE iconic red position-marker bar across the centre ----
-        const float barH = 2.5f;
-        const auto bar = juce::Rectangle<float> (r.getX() + 1.5f, cy - barH * 0.5f,
-                                                  r.getWidth() - 3.0f, barH);
+        const float barH = 2.0f;
+        const auto bar = juce::Rectangle<float> (r.getX() + 2.5f, cy - barH * 0.5f,
+                                                  r.getWidth() - 5.0f, barH);
+        // Recess shadow above the bar
+        g.setColour (juce::Colours::black.withAlpha (0.30f));
+        g.drawLine (bar.getX(), bar.getY() - 0.5f, bar.getRight(), bar.getY() - 0.5f, 0.5f);
+        // Red paint inside the recess
         juce::ColourGradient barGrad (
-            juce::Colour (0xFFE85040), bar.getCentreX(), bar.getY(),
-            juce::Colour (0xFFA02818), bar.getCentreX(), bar.getBottom(), false);
+            juce::Colour (0xFFD23828), bar.getCentreX(), bar.getY(),
+            juce::Colour (0xFF8C1810), bar.getCentreX(), bar.getBottom(), false);
         g.setGradientFill (barGrad);
-        g.fillRoundedRectangle (bar, 0.8f);
-        // Bar highlight
-        g.setColour (juce::Colour (0xFFFF9080).withAlpha (0.6f));
-        g.drawLine (bar.getX() + 1, bar.getY() + 0.5f, bar.getRight() - 1, bar.getY() + 0.5f, 0.6f);
+        g.fillRect (bar);
 
-        // ---- Hot ring when mouse over / dragging ----
+        // ---- Hot amber ring on hover/drag ----
         if (bright)
         {
-            g.setColour (amber().withAlpha (0.30f));
-            g.drawRoundedRectangle (r.expanded (0.8f), 3.5f, 1.2f);
+            g.setColour (juce::Colour (0xFFC2A050).withAlpha (0.35f));
+            g.drawRoundedRectangle (r.expanded (0.8f), 3.0f, 1.0f);
         }
     }
 
