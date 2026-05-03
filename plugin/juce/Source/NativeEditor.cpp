@@ -28,12 +28,12 @@ namespace
     using LnF = bc2000dl::ui::InstructionCardLnF;
 
     constexpr int kEditorW    = 1220;
-    constexpr int kEditorH    = 580;    // tight horizontal-strip proportions
-    constexpr int kTeakW      = 36;     // wood end-cap width (each side)
+    constexpr int kEditorH    = 530;    // tighter horizontal-strip proportions
+    constexpr int kTeakW      = 34;     // wood end-cap width (each side)
     constexpr int kInnerW     = kEditorW - 2 * kTeakW;
-    constexpr int kAluH       = 198;    // brushed-aluminium zone height
-    constexpr int kDivH       = 5;      // metallic divider height
-    constexpr int kPresetH    = 34;     // preset/nav bar height
+    constexpr int kAluH       = 174;    // black-metal deck zone height
+    constexpr int kDivH       = 4;      // metallic divider height
+    constexpr int kPresetH    = 30;     // preset/nav bar height
     constexpr int kLeftColW   = 286;    // left column (VU + selectors + toggles)
     constexpr int kCenterColW = 490;    // center column (faders)
     // right column width = kInnerW - kLeftColW - kCenterColW = 320
@@ -389,8 +389,8 @@ void NativeEditor::paint (juce::Graphics& g)
     LnF::drawPaperPanel (g, aluZone);
 
     // Title (top-left of alu deck)
-    LnF::drawTitle (g, aluZone.reduced (16, 6).removeFromTop (24),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v36.0");
+    LnF::drawTitle (g, aluZone.reduced (16, 4).removeFromTop (22),
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v36.1");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -450,7 +450,7 @@ void NativeEditor::paint (juce::Graphics& g)
     g.drawVerticalLine (centerEnd, (float) divTop, (float) divBot);
 
     // Engraved section labels (ivory-emboss on cream paper)
-    const int lblY = kAluH + kDivH + kPresetH + 4;
+    const int lblY = kAluH + kDivH + kPresetH + 2;
     auto drawEngraved = [&] (const char* text, juce::Rectangle<int> rect)
     {
         g.setFont (LnF::sectionFont (9.0f));
@@ -483,7 +483,7 @@ void NativeEditor::resized()
     auto inner = bounds.withTrimmedLeft (kTeakW).withTrimmedRight (kTeakW);
 
     // ===== Top deck zone: reel deck + analog VU pair =====
-    auto deckZone = inner.withHeight (kAluH).withTrimmedTop (26).reduced (6, 3);
+    auto deckZone = inner.withHeight (kAluH).withTrimmedTop (22).reduced (6, 2);
     reelDeck.setBounds (deckZone);
 
     // 3 analog VU meters in a single horizontal row, with engraved headers
@@ -496,9 +496,9 @@ void NativeEditor::resized()
         const int gapW = juce::jmax (300, gapR - gapL);
 
         const int meterW = (gapW - 24) / 3;
-        // Reserve 18 px above for engraved header and 22 px below for counter.
-        const int meterH = juce::jmin (deckZone.getHeight() - 44, 122);
-        const int meterY = deckZone.getY() + 20;
+        // Reserve 14 px above for engraved header and 18 px below for counter.
+        const int meterH = juce::jmin (deckZone.getHeight() - 36, 110);
+        const int meterY = deckZone.getY() + 16;
 
         vuInL.setBounds (gapL,                       meterY, meterW, meterH);
         vuInR.setBounds (gapL +  meterW + 12,        meterY, meterW, meterH);
@@ -526,8 +526,8 @@ void NativeEditor::resized()
 
     cb_preset.setBounds (presetBar.reduced (0, 2));
 
-    // Skip section-label row
-    blackZone.removeFromTop (20);
+    // Skip section-label row (tighter: 14 px instead of 20)
+    blackZone.removeFromTop (14);
 
     // --- Three columns ---
     auto leftCol   = blackZone.removeFromLeft (kLeftColW).reduced (8, 6);
