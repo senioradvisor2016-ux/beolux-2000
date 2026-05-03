@@ -15,6 +15,8 @@
 #include "PluginProcessor.h"
 #include "ui/BC2000LookAndFeel.h"
 
+#include <melatonin_inspector/melatonin_inspector.h>
+
 namespace bc2000dl
 {
     /** Reel-pair component — the two big circles at top of the card.
@@ -95,6 +97,9 @@ private:
 
     // Real Gaussian shadows (JUCE-native, applied via setComponentEffect)
     juce::DropShadowEffect vuShadow, reelShadow;
+
+    // melatonin_inspector — Cmd+Shift+I toggles the live component inspector
+    melatonin::Inspector inspector { *this };
 
     // ---- Top deck zone: reels + 3 analog VU meters (Left, Right, Output) ----
     bc2000dl::ReelDeck reelDeck;
