@@ -452,8 +452,25 @@ namespace bc2000dl::ui
             g.setColour (juce::Colours::black.withAlpha (0.85f));
             g.drawEllipse (cx - bezR, cy - bezR, bezR * 2, bezR * 2, 1.0f);
 
-            // ---- GLOSSY BLACK PHENOLIC BODY (Fairchild 670 / UAD Tube Limiter) ----
-            // Deep black with warm undertones — the iconic vintage knob look
+            // ---- FACETED PHENOLIC BODY — 16-sided subtle polygon ----
+            // Real Fairchild 670 knobs have visible facets — subtle flat sides
+            // moulded into the phenolic. Catches light differentially at every
+            // angle, gives the knob its iconic "industrial" feel rather than
+            // soft-round.
+            const int numFacets = 16;
+            const float twoPi = juce::MathConstants<float>::twoPi;
+
+            juce::Path bodyShape;
+            for (int i = 0; i < numFacets; ++i)
+            {
+                const float a = angle + (float) i * twoPi / (float) numFacets;
+                const float vx = cx + bodyR * std::sin (a);
+                const float vy = cy - bodyR * std::cos (a);
+                if (i == 0) bodyShape.startNewSubPath (vx, vy);
+                else        bodyShape.lineTo (vx, vy);
+            }
+            bodyShape.closeSubPath();
+
             juce::ColourGradient bodyGrad (
                 juce::Colour (0xFF3A3A3E), cx, cy - bodyR,
                 juce::Colour (0xFF030305), cx, cy + bodyR, false);
@@ -461,21 +478,59 @@ namespace bc2000dl::ui
             bodyGrad.addColour (0.50, juce::Colour (0xFF101014));
             bodyGrad.addColour (0.85, juce::Colour (0xFF050508));
             g.setGradientFill (bodyGrad);
-            g.fillEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
+            g.fillPath (bodyShape);
 
-            // ---- LIGHT 1: Main bright crescent specular (glossy lacquer) ----
+            // ---- PER-FACET DIFFERENTIAL LIGHTING ----
+            // Each facet's normal points outward at its centre angle. Compute
+            // dot-product against light direction (upper-left) and add a thin
+            // bright/dark stroke at each facet edge.
+            for (int i = 0; i < numFacets; ++i)
+            {
+                const float a0 = angle + (float) i * twoPi / (float) numFacets;
+                const float a1 = angle + (float) (i + 1) * twoPi / (float) numFacets;
+                const float midA = (a0 + a1) * 0.5f;
+                const float lightDot = (-std::sin (midA)) * 0.6f + std::cos (midA) * 0.8f;
+
+                const float v0x = cx + bodyR * std::sin (a0);
+                const float v0y = cy - bodyR * std::cos (a0);
+                const float v1x = cx + bodyR * std::sin (a1);
+                const float v1y = cy - bodyR * std::cos (a1);
+
+                if (lightDot > 0.0f)
+                {
+                    g.setColour (juce::Colours::white.withAlpha (lightDot * 0.18f));
+                    g.drawLine (v0x, v0y, v1x, v1y, 0.7f);
+                }
+                else
+                {
+                    g.setColour (juce::Colours::black.withAlpha (-lightDot * 0.30f));
+                    g.drawLine (v0x, v0y, v1x, v1y, 0.7f);
+                }
+            }
+
+            // ---- BEVEL HIGHLIGHT — bright thin ring just inside chrome rim ----
+            // Sells the sharp transition from chrome bezel into the phenolic body
+            g.setColour (juce::Colour (0xFF8A8A92).withAlpha (0.85f));
+            g.drawEllipse (cx - bodyR + 0.5f, cy - bodyR + 0.5f,
+                           (bodyR - 0.5f) * 2, (bodyR - 0.5f) * 2, 0.8f);
+            g.setColour (juce::Colours::black.withAlpha (0.85f));
+            g.drawEllipse (cx - bodyR + 1.5f, cy - bodyR + 1.5f,
+                           (bodyR - 1.5f) * 2, (bodyR - 1.5f) * 2, 0.6f);
+
+            // ---- LIGHT 1: Sharp bright crescent (high-gloss lacquer) ----
+            // Fairchild lacquer is intensely reflective — sharper highlight.
             {
                 juce::Path glint;
-                const float gR = bodyR * 0.96f;
+                const float gR = bodyR * 0.97f;
                 glint.addPieSegment (cx - gR, cy - gR, gR * 2, gR * 2,
-                                      -juce::MathConstants<float>::pi * 0.65f,
-                                      -juce::MathConstants<float>::pi * 0.10f,
-                                      0.40f);
+                                      -juce::MathConstants<float>::pi * 0.62f,
+                                      -juce::MathConstants<float>::pi * 0.14f,
+                                      0.50f);
                 juce::ColourGradient gg (
-                    juce::Colours::white.withAlpha (0.42f),
+                    juce::Colours::white.withAlpha (0.65f),
                     cx - bodyR * 0.4f, cy - bodyR,
                     juce::Colours::transparentWhite,
-                    cx, cy + bodyR * 0.1f, false);
+                    cx, cy + bodyR * 0.05f, false);
                 g.setGradientFill (gg);
                 g.fillPath (glint);
             }
@@ -504,16 +559,23 @@ namespace bc2000dl::ui
                 g.fillPath (rimLight);
             }
 
-            // ---- POINT-LIGHT WET-GLINT — bright spot catching the studio light ----
+            // ---- POINT-LIGHT WET-GLINT — sharper, brighter Fairchild reflection ----
             {
-                const float pgR = bodyR * 0.14f;
-                const float pgX = cx - bodyR * 0.38f;
-                const float pgY = cy - bodyR * 0.58f;
+                const float pgR = bodyR * 0.12f;
+                const float pgX = cx - bodyR * 0.35f;
+                const float pgY = cy - bodyR * 0.55f;
                 juce::ColourGradient pg (
-                    juce::Colours::white.withAlpha (0.85f), pgX, pgY,
+                    juce::Colours::white,                   pgX, pgY,
                     juce::Colours::transparentWhite,         pgX + pgR, pgY + pgR, true);
                 g.setGradientFill (pg);
                 g.fillEllipse (pgX - pgR, pgY - pgR, pgR * 2, pgR * 2);
+            }
+            // Tighter inner core (super-sharp catchlight)
+            {
+                const float pgR = bodyR * 0.045f;
+                g.setColour (juce::Colours::white);
+                g.fillEllipse (cx - bodyR * 0.36f - pgR, cy - bodyR * 0.56f - pgR,
+                               pgR * 2, pgR * 2);
             }
 
             // ---- SUBTLE FAIRCHILD RIDGES — softer, fewer ridges (~24) ----
@@ -568,13 +630,11 @@ namespace bc2000dl::ui
                 }
             }
 
-            // ---- Body inner-edge shadow (depth) ----
-            juce::Path bodyPath;
-            bodyPath.addEllipse (cx - bodyR, cy - bodyR, bodyR * 2, bodyR * 2);
+            // ---- Body inner-edge shadow (deeper now — sells faceted edge) ----
             static thread_local melatonin::InnerShadow bodyInner {
-                { juce::Colours::black.withAlpha (0.45f), 4, { 0, 1 }, 0 }
+                { juce::Colours::black.withAlpha (0.65f), 5, { 0, 1 }, 0 }
             };
-            bodyInner.render (g, bodyPath);
+            bodyInner.render (g, bodyShape);
         }
 
         // -------------------------------------------------------------------
