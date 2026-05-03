@@ -1198,14 +1198,15 @@ void NativeEditor::timerCallback()
         repaint (juce::Rectangle<int> (kTeakW, kAluH + kDivH, kLeftColW, kPresetH + 60));
     }
 
-    // Counter: ticks up while tape "runs" — speed-aware (faster speed = faster
-    // playback time consumed). Display: 0000 = quarters of a second since start
-    // (rolls at 9999 ≈ 41 minutes — same look as the real Beocord 4-digit drum).
+    // Counter: ticks up while tape "runs" — speed-aware (more tape passes per second
+    // at higher speed, exactly like the mechanical Beocord drum counter).
+    // rate: 4.75 cm/s = ×1, 9.5 = ×2, 19 = ×4 — matches the capstan linear velocity ratio.
+    // Rolls at 9999 ≈ 41 min at 4.75 cm/s / ≈ 10 min at 19 cm/s — same as real machine.
     if (tapeRunning)
     {
-        // Counter driven directly by DSP tape-transport time — perfectly synced
         const double tapePos = chain.tapePositionSeconds.load (std::memory_order_relaxed);
-        const int counts = static_cast<int> (tapePos * 4.0) % 10000;
+        const double rate = (speedIdx == 0 ? 1.0 : speedIdx == 1 ? 2.0 : 4.0);
+        const int counts = static_cast<int> (tapePos * 4.0 * rate) % 10000;
         juce::String c = juce::String (counts).paddedLeft ('0', 4);
         if (c != counterText)
         {

@@ -31,7 +31,7 @@ public:
     bool acceptsMidi() const override                { return false; }
     bool producesMidi() const override               { return false; }
     bool isMidiEffect() const override               { return false; }
-    double getTailLengthSeconds() const override     { return 0.4; }  // echo-tail vid 4.75 cm/s
+    double getTailLengthSeconds() const override     { return 1.5; }  // 300 ms echo + self-osc decay margin
 
     int getNumPrograms() override;
     int getCurrentProgram() override;
