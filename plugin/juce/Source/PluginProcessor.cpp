@@ -290,8 +290,9 @@ void BC2000DLProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
 juce::AudioProcessorEditor* BC2000DLProcessor::createEditor()
 {
-    // v29 BEOFLUX 2000DL — TEAC-platform WebView UI
-    return new BC2000DLWebEditor (*this);
+    // v29.8 — native JUCE UI (ersätter sega WebView).
+    // WebView-version finns kvar i WebEditor.cpp för fallback om native havererar.
+    return new BC2000DLEditor (*this);
 }
 
 // ============================================================================

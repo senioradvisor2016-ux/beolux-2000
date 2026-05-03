@@ -205,7 +205,9 @@ BC2000DLEditor::BC2000DLEditor (BC2000DLProcessor& p)
     setupKnob (recEqKnob,   "treble_db",        recEq_lbl,   "TREBLE");
     setupKnob (wowKnob,     "wow_flutter",      wow_lbl,     "WOW & FLT");
     setupKnob (satKnob,     "saturation_drive", sat_lbl,     "SATURATE");
-    setupKnob (echoKnob,    "echo_amount_r",    echoR_lbl,   "ECHO R");
+    // Master volume — tidigare saknades helt, nu på advanced grid (var "ECHO R"
+    // duplicate av echoFader-höger). echoFader styr fortfarande både L+R echo.
+    setupKnob (echoKnob,    "master_volume",    echoR_lbl,   "MASTER");
     setupKnob (multKnob,    "multiplay_gen",    mult_lbl,    "MULT");
     setupKnob (bassKnob,    "bass_db",          bass_lbl,    "BASS");
     setupKnob (balanceKnob, "balance",          balance_lbl, "BALANCE");
