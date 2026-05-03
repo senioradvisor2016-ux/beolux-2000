@@ -962,31 +962,75 @@ namespace bc2000dl::ui
         const auto bf = r.toFloat().reduced (1.0f);
         const auto inkCol = juce::Colour (0xFF181408);
 
-        // ---- Outer black-metal bezel ----
+        // ===================================================================
+        //  PREMIUM BEZEL — heavy black anodised housing with chrome trim
+        // ===================================================================
+
+        // Outer drop shadow
+        for (int i = 0; i < 3; ++i)
+        {
+            g.setColour (juce::Colours::black.withAlpha (0.18f - (float) i * 0.04f));
+            g.fillRoundedRectangle (bf.expanded ((float) i + 0.5f).translated (0, 1.0f), 5.0f);
+        }
+
+        // Heavy black bezel — multi-stop gradient for depth
         juce::ColourGradient bezelGrad (
-            juce::Colour (0xFF2C2C30), bf.getCentreX(), bf.getY(),
-            juce::Colour (0xFF050507), bf.getCentreX(), bf.getBottom(), false);
+            juce::Colour (0xFF3A3A3E), bf.getCentreX(), bf.getY(),
+            juce::Colour (0xFF030305), bf.getCentreX(), bf.getBottom(), false);
+        bezelGrad.addColour (0.20, juce::Colour (0xFF2A2A2E));
+        bezelGrad.addColour (0.55, juce::Colour (0xFF15151A));
         g.setGradientFill (bezelGrad);
-        g.fillRoundedRectangle (bf, 4.0f);
+        g.fillRoundedRectangle (bf, 5.0f);
 
-        // Bezel rim highlight
-        g.setColour (juce::Colour (0xFF6A6A72).withAlpha (0.7f));
-        g.drawRoundedRectangle (bf, 4.0f, 1.0f);
+        // Bright top hairline (catches light at the bezel edge)
+        g.setColour (juce::Colour (0xFF8A8A92).withAlpha (0.9f));
+        g.drawLine (bf.getX() + 4, bf.getY() + 0.8f,
+                    bf.getRight() - 4, bf.getY() + 0.8f, 0.8f);
 
-        // ---- Cream-coloured meter face (recessed) ----
-        const auto face = bf.reduced (5.0f, 5.0f);
+        // Outer chrome trim line
+        g.setColour (juce::Colour (0xFFB0B0B6).withAlpha (0.55f));
+        g.drawRoundedRectangle (bf.reduced (0.4f), 5.0f, 0.7f);
+
+        // Four chrome corner screws (premium meter detail)
+        const float screwR = juce::jmax (1.8f, juce::jmin (bf.getWidth(), bf.getHeight()) * 0.018f);
+        const float screwInset = screwR + 4.0f;
+        for (auto p : { juce::Point<float> (bf.getX() + screwInset, bf.getY() + screwInset),
+                        juce::Point<float> (bf.getRight() - screwInset, bf.getY() + screwInset),
+                        juce::Point<float> (bf.getX() + screwInset, bf.getBottom() - screwInset),
+                        juce::Point<float> (bf.getRight() - screwInset, bf.getBottom() - screwInset) })
+        {
+            juce::ColourGradient sg (
+                juce::Colour (0xFFD8D8DA), p.x - screwR * 0.5f, p.y - screwR * 0.5f,
+                juce::Colour (0xFF40404A), p.x + screwR * 0.5f, p.y + screwR * 0.5f, false);
+            g.setGradientFill (sg);
+            g.fillEllipse (p.x - screwR, p.y - screwR, screwR * 2, screwR * 2);
+            g.setColour (juce::Colour (0xFF050507));
+            g.drawEllipse (p.x - screwR, p.y - screwR, screwR * 2, screwR * 2, 0.5f);
+            // Slot
+            g.drawLine (p.x - screwR * 0.6f, p.y, p.x + screwR * 0.6f, p.y, 0.7f);
+        }
+
+        // ---- Cream-coloured meter face (deeply recessed) ----
+        const float screwBuffer = screwR * 2.0f + 6.0f;
+        const auto face = bf.reduced (screwBuffer, screwR + 5.0f);
+
+        // Recessed shadow ring (the rebate the face sits in)
+        g.setColour (juce::Colours::black.withAlpha (0.7f));
+        g.fillRoundedRectangle (face.expanded (1.4f), 3.5f);
+
         juce::ColourGradient faceGrad (
-            juce::Colour (0xFFF5EBD0), face.getCentreX(), face.getY(),
-            juce::Colour (0xFFD8CDB0), face.getCentreX(), face.getBottom(), false);
+            juce::Colour (0xFFF8EFD4), face.getCentreX(), face.getY(),
+            juce::Colour (0xFFD2C7AA), face.getCentreX(), face.getBottom(), false);
+        faceGrad.addColour (0.5, juce::Colour (0xFFE6DDC0));
         g.setGradientFill (faceGrad);
-        g.fillRoundedRectangle (face, 2.5f);
+        g.fillRoundedRectangle (face, 3.0f);
 
         // Face inner shadow at top (recessed look)
         juce::ColourGradient shadow (
-            juce::Colours::black.withAlpha (0.30f), face.getCentreX(), face.getY(),
-            juce::Colours::transparentBlack,         face.getCentreX(), face.getY() + 6.0f, false);
+            juce::Colours::black.withAlpha (0.45f), face.getCentreX(), face.getY(),
+            juce::Colours::transparentBlack,         face.getCentreX(), face.getY() + 8.0f, false);
         g.setGradientFill (shadow);
-        g.fillRoundedRectangle (face, 2.5f);
+        g.fillRoundedRectangle (face, 3.0f);
 
         // ---- Needle pivot (bottom-centre, well below the visible face) ----
         const float pivotX = face.getCentreX();
@@ -1054,15 +1098,18 @@ namespace bc2000dl::ui
                         pivotX + r2 * std::sin (a), pivotY - r2 * std::cos (a), 0.6f);
         }
 
-        // VU + channel label
+        // VU mark (the canonical printed "VU" wordmark on the dial)
         g.setColour (inkCol);
-        g.setFont (logoFont (10.0f));
-        g.drawText ("VU", face.toNearestInt().withTrimmedTop ((int) (face.getHeight() * 0.55f)),
+        g.setFont (logoFont (11.0f));
+        g.drawText ("VU", face.toNearestInt().withTrimmedTop ((int) (face.getHeight() * 0.62f)),
                      juce::Justification::centred, false);
-        g.setFont (sectionFont (7.5f));
-        g.setColour (inkCol.withAlpha (0.7f));
-        g.drawText (channel, face.toNearestInt().withTrimmedTop ((int) (face.getHeight() * 0.72f)),
+        // Manufacturer line under VU
+        g.setFont (sectionFont (6.5f));
+        g.setColour (inkCol.withAlpha (0.55f));
+        g.drawText ("SOUNDBOYS", face.toNearestInt()
+                       .withTrimmedTop ((int) (face.getHeight() * 0.80f)),
                      juce::Justification::centred, false);
+        juce::ignoreUnused (channel);
 
         // ---- Needle ----
         const float vuNorm = juce::jlimit (0.0f, 1.0f, (dbValue + 20.0f) / 23.0f);
@@ -1085,67 +1132,114 @@ namespace bc2000dl::ui
         g.drawEllipse (pivotX - 3.0f, face.getBottom() - 4.0f, 6.0f, 6.0f, 0.6f);
 
         // ===================================================================
-        //  GLASS COVER — convex front, two-layer reflection, edge highlight
+        //  PREMIUM GLASS COVER — thick convex glass, multi-layer reflections,
+        //  chromatic edge, dust speck, subtle tint. Studio-quality finish.
         // ===================================================================
 
-        // 1. Subtle blue-tint cast (suggests tinted protective glass)
-        g.setColour (juce::Colour (0xFFA8C8E0).withAlpha (0.06f));
-        g.fillRoundedRectangle (face, 2.5f);
+        // 1. Cool tint cast (premium tinted protective glass)
+        g.setColour (juce::Colour (0xFFA8C8E0).withAlpha (0.08f));
+        g.fillRoundedRectangle (face, 3.0f);
 
-        // 2. Bottom darkening (light falls off at the lower curve of convex glass)
+        // 2. Convex bottom darkening (light falls off at lower curve)
         juce::ColourGradient glassDarken (
-            juce::Colours::transparentBlack, face.getCentreX(), face.getCentreY(),
-            juce::Colours::black.withAlpha (0.18f), face.getCentreX(), face.getBottom(), false);
+            juce::Colours::transparentBlack, face.getCentreX(), face.getCentreY() - face.getHeight() * 0.10f,
+            juce::Colours::black.withAlpha (0.28f), face.getCentreX(), face.getBottom(), false);
         g.setGradientFill (glassDarken);
-        g.fillRoundedRectangle (face, 2.5f);
+        g.fillRoundedRectangle (face, 3.0f);
 
-        // 3. Big specular sweep across the upper-left (overhead studio light)
+        // 3. PRIMARY specular sweep — big diagonal across upper half
         {
             juce::Path sweep;
-            sweep.startNewSubPath (face.getX(), face.getY());
-            sweep.lineTo          (face.getX() + face.getWidth() * 0.85f, face.getY());
-            sweep.lineTo          (face.getX() + face.getWidth() * 0.30f,
-                                    face.getY() + face.getHeight() * 0.55f);
-            sweep.lineTo          (face.getX(),
-                                    face.getY() + face.getHeight() * 0.40f);
+            sweep.startNewSubPath (face.getX() - 2, face.getY() - 1);
+            sweep.lineTo          (face.getX() + face.getWidth() * 0.92f, face.getY() - 1);
+            sweep.lineTo          (face.getX() + face.getWidth() * 0.42f,
+                                    face.getY() + face.getHeight() * 0.62f);
+            sweep.lineTo          (face.getX() - 2,
+                                    face.getY() + face.getHeight() * 0.45f);
             sweep.closeSubPath();
 
             juce::Graphics::ScopedSaveState s (g);
             g.reduceClipRegion (sweep);
             juce::ColourGradient sg (
-                juce::Colours::white.withAlpha (0.45f), face.getX(), face.getY(),
+                juce::Colours::white.withAlpha (0.62f), face.getX(), face.getY(),
                 juce::Colours::transparentWhite,         face.getX(),
-                face.getY() + face.getHeight() * 0.55f, false);
+                face.getY() + face.getHeight() * 0.62f, false);
             g.setGradientFill (sg);
-            g.fillRoundedRectangle (face, 2.5f);
+            g.fillRoundedRectangle (face, 3.0f);
         }
 
-        // 4. Smaller secondary highlight at upper-right (second light source)
+        // 4. SECONDARY bright crescent highlight (the "wet" sheen at top)
         {
-            juce::Path highlight2;
-            const float hx = face.getRight() - face.getWidth() * 0.30f;
-            const float hy = face.getY() + face.getHeight() * 0.10f;
-            const float hw = face.getWidth() * 0.22f;
-            const float hh = face.getHeight() * 0.32f;
+            juce::Path crescent;
+            const float cy0 = face.getY() - face.getHeight() * 0.65f;
+            const float cw  = face.getWidth() * 1.5f;
+            const float ch  = face.getHeight() * 1.6f;
+            const float cx0 = face.getCentreX() - cw * 0.5f;
+            crescent.addEllipse (cx0, cy0, cw, ch);
 
-            highlight2.addEllipse (hx, hy, hw, hh);
+            juce::Path mask;
+            mask.addRoundedRectangle (face, 3.0f);
+            crescent.setUsingNonZeroWinding (true);
+
             juce::Graphics::ScopedSaveState s (g);
-            g.reduceClipRegion (highlight2);
-            juce::ColourGradient sg (
-                juce::Colours::white.withAlpha (0.30f), hx + hw * 0.5f, hy,
-                juce::Colours::transparentWhite,         hx + hw * 0.5f, hy + hh, false);
-            g.setGradientFill (sg);
-            g.fillRect (face);
+            g.reduceClipRegion (mask);
+            g.reduceClipRegion (crescent);
+            juce::ColourGradient cg (
+                juce::Colours::white.withAlpha (0.55f), face.getCentreX(), face.getY() - 4,
+                juce::Colours::transparentWhite,         face.getCentreX(),
+                face.getY() + face.getHeight() * 0.4f, false);
+            g.setGradientFill (cg);
+            g.fillRect (face.expanded (4.0f));
         }
 
-        // 5. Bright top-edge hairline (catches the rim of the glass)
-        g.setColour (juce::Colours::white.withAlpha (0.6f));
-        g.drawLine (face.getX() + 3, face.getY() + 0.5f,
-                    face.getRight() - 3, face.getY() + 0.5f, 0.7f);
+        // 5. Side reflection — vertical strip on right side (inner edge of glass)
+        {
+            const float sw = face.getWidth() * 0.05f;
+            const auto strip = juce::Rectangle<float> (face.getRight() - sw - 2,
+                                                        face.getY() + 2,
+                                                        sw, face.getHeight() - 4);
+            juce::ColourGradient sg (
+                juce::Colours::transparentWhite, strip.getX(), strip.getCentreY(),
+                juce::Colours::white.withAlpha (0.22f), strip.getRight(), strip.getCentreY(), false);
+            g.setGradientFill (sg);
+            g.fillRect (strip);
+        }
 
-        // 6. Thin inset shadow at bezel edge (sells "glass sits in metal frame")
-        g.setColour (juce::Colours::black.withAlpha (0.30f));
-        g.drawRoundedRectangle (face.reduced (0.3f), 2.5f, 0.6f);
+        // 6. Lower-right small highlight blob (point-light reflection)
+        {
+            const float bw = face.getWidth() * 0.18f;
+            const float bh = face.getHeight() * 0.12f;
+            const float bx = face.getRight() - bw - face.getWidth() * 0.10f;
+            const float by = face.getBottom() - bh - face.getHeight() * 0.18f;
+            juce::ColourGradient bg (
+                juce::Colours::white.withAlpha (0.28f), bx + bw * 0.5f, by + bh * 0.5f,
+                juce::Colours::transparentWhite,         bx + bw, by + bh, true);
+            g.setGradientFill (bg);
+            g.fillEllipse (bx, by, bw, bh);
+        }
+
+        // 7. Chromatic rim — a faint coloured fringe at the bezel edge
+        //    (the way real glass refracts light at its perimeter)
+        g.setColour (juce::Colour (0xFFB8E0FF).withAlpha (0.30f));
+        g.drawRoundedRectangle (face.reduced (0.4f), 3.0f, 0.6f);
+        g.setColour (juce::Colour (0xFFFFD0A0).withAlpha (0.20f));
+        g.drawRoundedRectangle (face.reduced (1.0f), 2.6f, 0.5f);
+
+        // 8. Bright top edge — sharp white catch at the very top of the glass
+        g.setColour (juce::Colours::white.withAlpha (0.85f));
+        g.drawLine (face.getX() + 4, face.getY() + 0.7f,
+                    face.getRight() - 4, face.getY() + 0.7f, 0.9f);
+
+        // 9. Inner deep shadow at bezel (sells thickness — glass sits IN metal)
+        juce::ColourGradient innerShadow (
+            juce::Colours::black.withAlpha (0.55f), face.getCentreX(), face.getY() - 1,
+            juce::Colours::transparentBlack,         face.getCentreX(), face.getY() + 3, false);
+        g.setGradientFill (innerShadow);
+        g.drawRoundedRectangle (face, 3.0f, 1.5f);
+
+        // 10. Final outline — crisp dark line where glass ends
+        g.setColour (juce::Colours::black.withAlpha (0.55f));
+        g.drawRoundedRectangle (face, 3.0f, 0.7f);
 
         // ---- PEAK dot (red LED, top-right of face, lights when isPeaking) ----
         if (isPeaking)

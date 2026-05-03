@@ -390,9 +390,9 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (16, 6).removeFromTop (24),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v34.1");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v35.0");
 
-    // Counter (bottom-centre of deck, just below the VU pair)
+    // Counter (bottom-centre of deck, just below the VU row)
     {
         constexpr int cW = 76, cH = 18;
         LnF::drawCounter (g,
@@ -400,6 +400,32 @@ void NativeEditor::paint (juce::Graphics& g)
                                   aluZone.getBottom() - cH - 4,
                                   cW, cH),
             counterText);
+    }
+
+    // VU-meter engraved headers (silver on black metal, above each meter)
+    {
+        struct Hdr { juce::Rectangle<int> r; const char* text; };
+        const auto& vuLb = vuInL.getBounds();
+        const auto& vuRb = vuInR.getBounds();
+        const auto& vuOb = vuOut.getBounds();
+        const int hY = juce::jmax (aluZone.getY(), vuLb.getY() - 18);
+        const int hH = 14;
+
+        Hdr hs[] = {
+            { { vuLb.getX(), hY, vuLb.getWidth(), hH }, "LEFT"   },
+            { { vuRb.getX(), hY, vuRb.getWidth(), hH }, "RIGHT"  },
+            { { vuOb.getX(), hY, vuOb.getWidth(), hH }, "OUTPUT" }
+        };
+        for (auto& h : hs)
+        {
+            const auto rr = h.r.toFloat();
+            g.setFont (LnF::sectionFont (10.5f));
+            // engraved-into-metal effect: dark shadow below, bright silver on top
+            g.setColour (juce::Colours::black.withAlpha (0.85f));
+            g.drawText (h.text, h.r.translated (0, 1), juce::Justification::centred, false);
+            g.setColour (juce::Colour (0xFFE0E0E4));
+            g.drawText (h.text, h.r, juce::Justification::centred, false);
+        }
     }
 
     // ===== Divider strip =====
@@ -454,8 +480,8 @@ void NativeEditor::resized()
     auto deckZone = inner.withHeight (kAluH).withTrimmedTop (26).reduced (6, 3);
     reelDeck.setBounds (deckZone);
 
-    // 3 analog VU meters in a single horizontal row: IN L | IN R | OUT.
-    // Counter sits centred just below.
+    // 3 analog VU meters in a single horizontal row, with engraved headers
+    // above (LEFT / RIGHT / OUTPUT) and counter below.
     {
         const int reelDiam = juce::jmin (deckZone.getHeight() - 6,
                                           (int) (deckZone.getWidth() * 0.36f));
@@ -464,8 +490,9 @@ void NativeEditor::resized()
         const int gapW = juce::jmax (300, gapR - gapL);
 
         const int meterW = (gapW - 24) / 3;
-        const int meterH = juce::jmin (deckZone.getHeight() - 36, 130);
-        const int meterY = deckZone.getY() + (deckZone.getHeight() - meterH - 18) / 2;
+        // Reserve 18 px above for engraved header and 22 px below for counter.
+        const int meterH = juce::jmin (deckZone.getHeight() - 44, 122);
+        const int meterY = deckZone.getY() + 20;
 
         vuInL.setBounds (gapL,                       meterY, meterW, meterH);
         vuInR.setBounds (gapL +  meterW + 12,        meterY, meterW, meterH);
