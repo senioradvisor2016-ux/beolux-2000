@@ -1084,12 +1084,68 @@ namespace bc2000dl::ui
         g.setColour (juce::Colour (0xFF6A6A72));
         g.drawEllipse (pivotX - 3.0f, face.getBottom() - 4.0f, 6.0f, 6.0f, 0.6f);
 
-        // ---- Glass sheen (subtle reflection) ----
-        juce::ColourGradient glass (
-            juce::Colours::white.withAlpha (0.18f), face.getX(), face.getY(),
-            juce::Colours::transparentWhite,         face.getX(), face.getCentreY(), false);
-        g.setGradientFill (glass);
+        // ===================================================================
+        //  GLASS COVER — convex front, two-layer reflection, edge highlight
+        // ===================================================================
+
+        // 1. Subtle blue-tint cast (suggests tinted protective glass)
+        g.setColour (juce::Colour (0xFFA8C8E0).withAlpha (0.06f));
         g.fillRoundedRectangle (face, 2.5f);
+
+        // 2. Bottom darkening (light falls off at the lower curve of convex glass)
+        juce::ColourGradient glassDarken (
+            juce::Colours::transparentBlack, face.getCentreX(), face.getCentreY(),
+            juce::Colours::black.withAlpha (0.18f), face.getCentreX(), face.getBottom(), false);
+        g.setGradientFill (glassDarken);
+        g.fillRoundedRectangle (face, 2.5f);
+
+        // 3. Big specular sweep across the upper-left (overhead studio light)
+        {
+            juce::Path sweep;
+            sweep.startNewSubPath (face.getX(), face.getY());
+            sweep.lineTo          (face.getX() + face.getWidth() * 0.85f, face.getY());
+            sweep.lineTo          (face.getX() + face.getWidth() * 0.30f,
+                                    face.getY() + face.getHeight() * 0.55f);
+            sweep.lineTo          (face.getX(),
+                                    face.getY() + face.getHeight() * 0.40f);
+            sweep.closeSubPath();
+
+            juce::Graphics::ScopedSaveState s (g);
+            g.reduceClipRegion (sweep);
+            juce::ColourGradient sg (
+                juce::Colours::white.withAlpha (0.45f), face.getX(), face.getY(),
+                juce::Colours::transparentWhite,         face.getX(),
+                face.getY() + face.getHeight() * 0.55f, false);
+            g.setGradientFill (sg);
+            g.fillRoundedRectangle (face, 2.5f);
+        }
+
+        // 4. Smaller secondary highlight at upper-right (second light source)
+        {
+            juce::Path highlight2;
+            const float hx = face.getRight() - face.getWidth() * 0.30f;
+            const float hy = face.getY() + face.getHeight() * 0.10f;
+            const float hw = face.getWidth() * 0.22f;
+            const float hh = face.getHeight() * 0.32f;
+
+            highlight2.addEllipse (hx, hy, hw, hh);
+            juce::Graphics::ScopedSaveState s (g);
+            g.reduceClipRegion (highlight2);
+            juce::ColourGradient sg (
+                juce::Colours::white.withAlpha (0.30f), hx + hw * 0.5f, hy,
+                juce::Colours::transparentWhite,         hx + hw * 0.5f, hy + hh, false);
+            g.setGradientFill (sg);
+            g.fillRect (face);
+        }
+
+        // 5. Bright top-edge hairline (catches the rim of the glass)
+        g.setColour (juce::Colours::white.withAlpha (0.6f));
+        g.drawLine (face.getX() + 3, face.getY() + 0.5f,
+                    face.getRight() - 3, face.getY() + 0.5f, 0.7f);
+
+        // 6. Thin inset shadow at bezel edge (sells "glass sits in metal frame")
+        g.setColour (juce::Colours::black.withAlpha (0.30f));
+        g.drawRoundedRectangle (face.reduced (0.3f), 2.5f, 0.6f);
 
         // ---- PEAK dot (red LED, top-right of face, lights when isPeaking) ----
         if (isPeaking)
