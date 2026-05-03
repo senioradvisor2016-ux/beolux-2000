@@ -34,9 +34,9 @@ namespace
     constexpr int kAluH       = 156;    // black-metal deck zone height
     constexpr int kDivH       = 3;      // metallic divider height
     constexpr int kPresetH    = 28;     // preset/nav bar height
-    constexpr int kLeftColW   = 340;    // left column (selectors + toggles + transport)
-    constexpr int kCenterColW = 440;    // center column (5 dual-faders)
-    // right column width = kInnerW - kLeftColW - kCenterColW = 376
+    constexpr int kLeftColW   = 400;    // left column (selectors + toggles + transport)
+    constexpr int kCenterColW = 400;    // center column (5 dual-faders)
+    // right column width = kInnerW - kLeftColW - kCenterColW = 356
 
     juce::String tooltipFor (const juce::String& id)
     {
@@ -458,7 +458,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v43.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v43.1");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -733,16 +733,31 @@ void NativeEditor::resized()
     auto rightCol  = blackZone.reduced (8, 3);
 
     // =====================================================================
-    // LEFT COLUMN: combos → toggles → transport keys
-    //   (VU meters now live on the top black-metal deck — see deckZone above)
+    // LEFT COLUMN: combos at top → toggles + transport pinned at BOTTOM
+    //   (so all three columns end at the same baseline)
     // =====================================================================
     {
-        // 5 combo boxes (very compact)
+        // ---- Pin transport keys at BOTTOM ----
+        const int kRowH = 30;  // bigger transport keys (was 20)
+        const int kGap  = 3;
+        auto transportRow2 = leftCol.removeFromBottom (kRowH);
+        leftCol.removeFromBottom (kGap);
+        auto transportRow1 = leftCol.removeFromBottom (kRowH);
+        leftCol.removeFromBottom (5);
+
+        // ---- Toggles (2 rows of 4) just above transport ----
+        const int tRowH = 24;  // bigger toggles (was 17)
+        auto togRow2 = leftCol.removeFromBottom (tRowH);
+        leftCol.removeFromBottom (kGap);
+        auto togRow1 = leftCol.removeFromBottom (tRowH);
+        leftCol.removeFromBottom (6);
+
+        // ---- 5 combo boxes at top, expanded to fill remaining space ----
         auto layoutCombo = [&] (juce::ComboBox& c, juce::Label& l)
         {
-            l.setBounds (leftCol.removeFromTop (9));
-            c.setBounds (leftCol.removeFromTop (16).reduced (0, 1));
-            leftCol.removeFromTop (1);
+            l.setBounds (leftCol.removeFromTop (10));
+            c.setBounds (leftCol.removeFromTop (20).reduced (0, 1));
+            leftCol.removeFromTop (2);
         };
         layoutCombo (cb_speed,   lbl_speed);
         layoutCombo (cb_monitor, lbl_monitor);
@@ -750,37 +765,26 @@ void NativeEditor::resized()
         layoutCombo (cb_radio,   lbl_radio);
         layoutCombo (cb_formula, lbl_formula);
 
-        leftCol.removeFromTop (3);
-
-        // 8 toggles in 2 rows of 4 (slim)
-        const int tW = leftCol.getWidth() / 4;
-        auto togRow1 = leftCol.removeFromTop (17);
-        auto togRow2 = leftCol.removeFromTop (17);
-        leftCol.removeFromTop (3);
+        // ---- Lay out toggle rows ----
+        const int tW = togRow1.getWidth() / 4;
         juce::ToggleButton* r1[] = { &t_echo, &t_bypass, &t_speaker, &t_sync };
         juce::ToggleButton* r2[] = { &t_loz,  &t_pa,     &t_sos,     &t_pause };
         for (auto* tb : r1) { tb->setBounds (togRow1.removeFromLeft (tW).reduced (1, 1)); }
         for (auto* tb : r2) { tb->setBounds (togRow2.removeFromLeft (tW).reduced (1, 1)); }
 
-        leftCol.removeFromTop (3);
-
-        // Transport: 4 keys row 1
+        // ---- Lay out transport keys ----
         {
-            auto kRow = leftCol.removeFromTop (20);
-            const int kW = kRow.getWidth() / 4;
-            k_rec1.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
-            k_rec2.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
-            k_trk1.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
-            k_trk2.setBounds (kRow.reduced (2, 1));
+            const int kW = transportRow1.getWidth() / 4;
+            k_rec1.setBounds (transportRow1.removeFromLeft (kW).reduced (2, 1));
+            k_rec2.setBounds (transportRow1.removeFromLeft (kW).reduced (2, 1));
+            k_trk1.setBounds (transportRow1.removeFromLeft (kW).reduced (2, 1));
+            k_trk2.setBounds (transportRow1.reduced (2, 1));
         }
-        leftCol.removeFromTop (2);
-        // Transport: 3 keys row 2
         {
-            auto kRow = leftCol.removeFromTop (20);
-            const int kW = kRow.getWidth() / 3;
-            k_spkA.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
-            k_spkB.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
-            k_mute.setBounds (kRow.reduced (2, 1));
+            const int kW = transportRow2.getWidth() / 3;
+            k_spkA.setBounds (transportRow2.removeFromLeft (kW).reduced (2, 1));
+            k_spkB.setBounds (transportRow2.removeFromLeft (kW).reduced (2, 1));
+            k_mute.setBounds (transportRow2.reduced (2, 1));
         }
     }
 
@@ -805,7 +809,8 @@ void NativeEditor::resized()
     }
 
     // =====================================================================
-    // RIGHT COLUMN: 7 knobs in 2 rows (compressed)
+    // RIGHT COLUMN: 7 knobs in 2 rows that fill the column to the bottom,
+    //   so the right column ends at the same baseline as left + center.
     // =====================================================================
     {
         const int rowW  = rightCol.getWidth();
@@ -820,19 +825,20 @@ void NativeEditor::resized()
             s.setBounds (cell.reduced (3, 2));
         };
 
-        // Row 1: TREBLE / BASS / BAL (slightly bigger, the "tone" trio)
+        // Split the column into 2 equal rows that fill the entire vertical
         const int totalH = rightCol.getHeight();
-        const int row1H = juce::jlimit (70, 100, (int) (totalH * 0.50f));
+        const int gap = 4;
+        const int row1H = (totalH - gap) / 2;
         auto row1 = rightCol.removeFromTop (row1H);
+        rightCol.removeFromTop (gap);
+        auto row2 = rightCol;        // remainder fills to bottom
+
+        // Row 1: TREBLE / BASS / BAL
         layoutKnob (knob_treble,  lbl_treble,  row1, cell3);
         layoutKnob (knob_bass,    lbl_bass,    row1, cell3);
         layoutKnob (knob_balance, lbl_balance, row1, cell3);
 
-        rightCol.removeFromTop (4);
-
-        // Row 2: BIAS / WOW / MULT / VOL
-        const int row2H = juce::jmin (rightCol.getHeight(), juce::jlimit (60, 88, (int) (totalH * 0.42f)));
-        auto row2 = rightCol.removeFromTop (row2H);
+        // Row 2: BIAS / WOW / MULT / VOL — pinned to bottom
         layoutKnob (knob_bias,   lbl_bias,   row2, cell4);
         layoutKnob (knob_wow,    lbl_wow,    row2, cell4);
         layoutKnob (knob_mult,   lbl_mult,   row2, cell4);
