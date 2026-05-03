@@ -90,8 +90,10 @@ namespace bc2000dl::dsp
         void setParameters (const Parameters& p);
 
         // VU-meter atomic feed (UI-thread läser)
-        std::atomic<float> meterLevelL_dBFS { -60.0f };
-        std::atomic<float> meterLevelR_dBFS { -60.0f };
+        std::atomic<float> inputLevelL_dBFS  { -60.0f };
+        std::atomic<float> inputLevelR_dBFS  { -60.0f };
+        std::atomic<float> meterLevelL_dBFS  { -60.0f };
+        std::atomic<float> meterLevelR_dBFS  { -60.0f };
         std::atomic<bool>  isRecordingL { false };
         std::atomic<bool>  isRecordingR { false };
 

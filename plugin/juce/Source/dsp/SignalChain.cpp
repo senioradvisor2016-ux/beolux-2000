@@ -278,6 +278,14 @@ namespace bc2000dl::dsp
     {
         const int numCh = buffer.getNumChannels();
 
+        // Snapshot raw INPUT levels before any DSP touches the buffer.
+        if (numCh >= 1)
+            inputLevelL_dBFS.store (
+                computeBlockRMSdBFS (buffer.getReadPointer (0), buffer.getNumSamples()));
+        if (numCh >= 2)
+            inputLevelR_dBFS.store (
+                computeBlockRMSdBFS (buffer.getReadPointer (1), buffer.getNumSamples()));
+
         if (numCh >= 1)
             processChannelChain (L, echoL, buffer, 0);
         if (numCh >= 2)
