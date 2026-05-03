@@ -28,12 +28,12 @@ namespace
     using LnF = bc2000dl::ui::InstructionCardLnF;
 
     constexpr int kEditorW    = 1220;
-    constexpr int kEditorH    = 820;
-    constexpr int kTeakW      = 42;     // wood end-cap width (each side)
-    constexpr int kInnerW     = kEditorW - 2 * kTeakW;   // 1096
-    constexpr int kAluH       = 258;    // brushed-aluminium zone height
-    constexpr int kDivH       = 6;      // metallic divider height
-    constexpr int kPresetH    = 42;     // preset/nav bar height inside black panel
+    constexpr int kEditorH    = 580;    // tight horizontal-strip proportions
+    constexpr int kTeakW      = 36;     // wood end-cap width (each side)
+    constexpr int kInnerW     = kEditorW - 2 * kTeakW;
+    constexpr int kAluH       = 198;    // brushed-aluminium zone height
+    constexpr int kDivH       = 5;      // metallic divider height
+    constexpr int kPresetH    = 34;     // preset/nav bar height
     constexpr int kLeftColW   = 286;    // left column (VU + selectors + toggles)
     constexpr int kCenterColW = 490;    // center column (faders)
     // right column width = kInnerW - kLeftColW - kCenterColW = 320
@@ -443,15 +443,15 @@ void NativeEditor::paint (juce::Graphics& g)
     LnF::drawPaperPanel (g, aluZone);
 
     // Title (top-left of alu deck)
-    LnF::drawTitle (g, aluZone.reduced (20, 10).removeFromTop (28),
-                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v31.0");
+    LnF::drawTitle (g, aluZone.reduced (16, 6).removeFromTop (24),
+                     "BC2000DL", "BEOCORD 2000 DE LUXE · DANISH TAPE 2000 · v31.1");
 
     // Counter (bottom-centre of alu zone, between the reels)
     {
-        constexpr int cW = 88, cH = 26;
+        constexpr int cW = 80, cH = 22;
         LnF::drawCounter (g,
             juce::Rectangle<int> (inner.getCentreX() - cW / 2,
-                                  aluZone.getBottom() - cH - 12,
+                                  aluZone.getBottom() - cH - 8,
                                   cW, cH),
             counterText);
     }
@@ -505,7 +505,7 @@ void NativeEditor::resized()
     auto inner = bounds.withTrimmedLeft (kTeakW).withTrimmedRight (kTeakW);
 
     // ===== Aluminium zone: reel deck (below title strip) =====
-    auto aluZone = inner.withHeight (kAluH).withTrimmedTop (30).reduced (8, 4);
+    auto aluZone = inner.withHeight (kAluH).withTrimmedTop (26).reduced (6, 3);
     reelDeck.setBounds (aluZone);
 
     // ===== Black panel zone =====
@@ -539,25 +539,26 @@ void NativeEditor::resized()
 
     // =====================================================================
     // LEFT COLUMN: VU meters → combos → toggles → transport keys
+    //   (compressed for tight horizontal-strip proportions)
     // =====================================================================
     {
-        // VU meters
-        auto vuRow = leftCol.removeFromTop (60);
-        auto vuLRow = vuRow.removeFromTop (28).reduced (0, 1);
-        vuL_lbl.setBounds (vuLRow.removeFromLeft (16));
+        // VU meters (slimmer)
+        auto vuRow = leftCol.removeFromTop (44);
+        auto vuLRow = vuRow.removeFromTop (20).reduced (0, 1);
+        vuL_lbl.setBounds (vuLRow.removeFromLeft (14));
         vuL.setBounds (vuLRow);
-        auto vuRRow = vuRow.removeFromTop (28).reduced (0, 1);
-        vuR_lbl.setBounds (vuRRow.removeFromLeft (16));
+        auto vuRRow = vuRow.removeFromTop (20).reduced (0, 1);
+        vuR_lbl.setBounds (vuRRow.removeFromLeft (14));
         vuR.setBounds (vuRRow);
 
-        leftCol.removeFromTop (8);
+        leftCol.removeFromTop (4);
 
-        // 5 combo boxes
+        // 5 combo boxes (compact)
         auto layoutCombo = [&] (juce::ComboBox& c, juce::Label& l)
         {
-            l.setBounds (leftCol.removeFromTop (12));
-            c.setBounds (leftCol.removeFromTop (22).reduced (0, 1));
-            leftCol.removeFromTop (4);
+            l.setBounds (leftCol.removeFromTop (10));
+            c.setBounds (leftCol.removeFromTop (18).reduced (0, 1));
+            leftCol.removeFromTop (2);
         };
         layoutCombo (cb_speed,   lbl_speed);
         layoutCombo (cb_monitor, lbl_monitor);
@@ -565,33 +566,33 @@ void NativeEditor::resized()
         layoutCombo (cb_radio,   lbl_radio);
         layoutCombo (cb_formula, lbl_formula);
 
-        leftCol.removeFromTop (6);
-
-        // 8 toggles in 2 rows of 4
-        const int tW = leftCol.getWidth() / 4;
-        auto togRow1 = leftCol.removeFromTop (22);
-        auto togRow2 = leftCol.removeFromTop (22);
         leftCol.removeFromTop (4);
+
+        // 8 toggles in 2 rows of 4 (slim)
+        const int tW = leftCol.getWidth() / 4;
+        auto togRow1 = leftCol.removeFromTop (18);
+        auto togRow2 = leftCol.removeFromTop (18);
+        leftCol.removeFromTop (3);
         juce::ToggleButton* r1[] = { &t_echo, &t_bypass, &t_speaker, &t_sync };
         juce::ToggleButton* r2[] = { &t_loz,  &t_pa,     &t_sos,     &t_pause };
         for (auto* tb : r1) { tb->setBounds (togRow1.removeFromLeft (tW).reduced (1, 1)); }
         for (auto* tb : r2) { tb->setBounds (togRow2.removeFromLeft (tW).reduced (1, 1)); }
 
-        leftCol.removeFromTop (4);
+        leftCol.removeFromTop (3);
 
         // Transport: 4 keys row 1
         {
-            auto kRow = leftCol.removeFromTop (28);
+            auto kRow = leftCol.removeFromTop (22);
             const int kW = kRow.getWidth() / 4;
             k_rec1.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
             k_rec2.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
             k_trk1.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
             k_trk2.setBounds (kRow.reduced (2, 1));
         }
-        leftCol.removeFromTop (4);
+        leftCol.removeFromTop (3);
         // Transport: 3 keys row 2
         {
-            auto kRow = leftCol.removeFromTop (28);
+            auto kRow = leftCol.removeFromTop (22);
             const int kW = kRow.getWidth() / 3;
             k_spkA.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
             k_spkB.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
@@ -620,46 +621,38 @@ void NativeEditor::resized()
     }
 
     // =====================================================================
-    // RIGHT COLUMN: 7 knobs in 2 rows + right-side counter
-    //   Row 1 (3 tone knobs: TREBLE, BASS, BAL)  — wider cells
-    //   Row 2 (4 tape knobs: BIAS, WOW, MULT, VOL)
+    // RIGHT COLUMN: 7 knobs in 2 rows (compressed)
     // =====================================================================
     {
         const int rowW  = rightCol.getWidth();
-        const int cell3 = rowW / 3;    // 3-knob row
-        const int cell4 = rowW / 4;    // 4-knob row
+        const int cell3 = rowW / 3;
+        const int cell4 = rowW / 4;
 
         auto layoutKnob = [&] (juce::Slider& s, juce::Label& l,
                                 juce::Rectangle<int>& row, int cellW)
         {
             auto cell = row.removeFromLeft (cellW);
-            l.setBounds (cell.removeFromTop (14));
-            s.setBounds (cell.reduced (4, 4));
+            l.setBounds (cell.removeFromTop (12));
+            s.setBounds (cell.reduced (3, 2));
         };
 
-        // Row 1: TREBLE / BASS / BAL  (tone controls — bigger knobs)
-        const int row1H = juce::jmin (120, (int) (rightCol.getHeight() * 0.45f));
+        // Row 1: TREBLE / BASS / BAL (slightly bigger, the "tone" trio)
+        const int totalH = rightCol.getHeight();
+        const int row1H = juce::jlimit (70, 100, (int) (totalH * 0.50f));
         auto row1 = rightCol.removeFromTop (row1H);
         layoutKnob (knob_treble,  lbl_treble,  row1, cell3);
         layoutKnob (knob_bass,    lbl_bass,    row1, cell3);
         layoutKnob (knob_balance, lbl_balance, row1, cell3);
 
-        rightCol.removeFromTop (8);
+        rightCol.removeFromTop (4);
 
         // Row 2: BIAS / WOW / MULT / VOL
-        const int row2H = juce::jmin (110, (int) (rightCol.getHeight() * 0.42f));
+        const int row2H = juce::jmin (rightCol.getHeight(), juce::jlimit (60, 88, (int) (totalH * 0.42f)));
         auto row2 = rightCol.removeFromTop (row2H);
         layoutKnob (knob_bias,   lbl_bias,   row2, cell4);
         layoutKnob (knob_wow,    lbl_wow,    row2, cell4);
         layoutKnob (knob_mult,   lbl_mult,   row2, cell4);
         layoutKnob (knob_master, lbl_master, row2, cell4);
-
-        // Counter display in remaining space
-        rightCol.removeFromTop (10);
-        if (rightCol.getHeight() >= 28)
-        {
-            // drawn in paint() — nothing to lay out here
-        }
     }
 }
 
