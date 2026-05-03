@@ -28,12 +28,12 @@ namespace
     using LnF = bc2000dl::ui::InstructionCardLnF;
 
     constexpr int kEditorW    = 1220;
-    constexpr int kEditorH    = 530;    // tighter horizontal-strip proportions
-    constexpr int kTeakW      = 34;     // wood end-cap width (each side)
+    constexpr int kEditorH    = 482;    // even tighter — full horizontal strip
+    constexpr int kTeakW      = 32;     // wood end-cap width (each side)
     constexpr int kInnerW     = kEditorW - 2 * kTeakW;
-    constexpr int kAluH       = 174;    // black-metal deck zone height
-    constexpr int kDivH       = 4;      // metallic divider height
-    constexpr int kPresetH    = 30;     // preset/nav bar height
+    constexpr int kAluH       = 156;    // black-metal deck zone height
+    constexpr int kDivH       = 3;      // metallic divider height
+    constexpr int kPresetH    = 28;     // preset/nav bar height
     constexpr int kLeftColW   = 286;    // left column (VU + selectors + toggles)
     constexpr int kCenterColW = 490;    // center column (faders)
     // right column width = kInnerW - kLeftColW - kCenterColW = 320
@@ -389,8 +389,8 @@ void NativeEditor::paint (juce::Graphics& g)
     LnF::drawPaperPanel (g, aluZone);
 
     // Title (top-left of alu deck)
-    LnF::drawTitle (g, aluZone.reduced (16, 4).removeFromTop (22),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v36.1");
+    LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v37.0");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -483,7 +483,7 @@ void NativeEditor::resized()
     auto inner = bounds.withTrimmedLeft (kTeakW).withTrimmedRight (kTeakW);
 
     // ===== Top deck zone: reel deck + analog VU pair =====
-    auto deckZone = inner.withHeight (kAluH).withTrimmedTop (22).reduced (6, 2);
+    auto deckZone = inner.withHeight (kAluH).withTrimmedTop (20).reduced (4, 1);
     reelDeck.setBounds (deckZone);
 
     // 3 analog VU meters in a single horizontal row, with engraved headers
@@ -496,9 +496,9 @@ void NativeEditor::resized()
         const int gapW = juce::jmax (300, gapR - gapL);
 
         const int meterW = (gapW - 24) / 3;
-        // Reserve 14 px above for engraved header and 18 px below for counter.
-        const int meterH = juce::jmin (deckZone.getHeight() - 36, 110);
-        const int meterY = deckZone.getY() + 16;
+        // Reserve 12 px above for engraved header and 14 px below for counter.
+        const int meterH = juce::jmin (deckZone.getHeight() - 28, 96);
+        const int meterY = deckZone.getY() + 13;
 
         vuInL.setBounds (gapL,                       meterY, meterW, meterH);
         vuInR.setBounds (gapL +  meterW + 12,        meterY, meterW, meterH);
@@ -526,25 +526,25 @@ void NativeEditor::resized()
 
     cb_preset.setBounds (presetBar.reduced (0, 2));
 
-    // Skip section-label row (tighter: 14 px instead of 20)
-    blackZone.removeFromTop (14);
+    // Skip section-label row (very tight: 11 px)
+    blackZone.removeFromTop (11);
 
     // --- Three columns ---
-    auto leftCol   = blackZone.removeFromLeft (kLeftColW).reduced (8, 6);
-    auto centerCol = blackZone.removeFromLeft (kCenterColW).reduced (8, 6);
-    auto rightCol  = blackZone.reduced (8, 6);
+    auto leftCol   = blackZone.removeFromLeft (kLeftColW).reduced (8, 3);
+    auto centerCol = blackZone.removeFromLeft (kCenterColW).reduced (8, 3);
+    auto rightCol  = blackZone.reduced (8, 3);
 
     // =====================================================================
     // LEFT COLUMN: combos → toggles → transport keys
     //   (VU meters now live on the top black-metal deck — see deckZone above)
     // =====================================================================
     {
-        // 5 combo boxes (compact)
+        // 5 combo boxes (very compact)
         auto layoutCombo = [&] (juce::ComboBox& c, juce::Label& l)
         {
-            l.setBounds (leftCol.removeFromTop (10));
-            c.setBounds (leftCol.removeFromTop (18).reduced (0, 1));
-            leftCol.removeFromTop (2);
+            l.setBounds (leftCol.removeFromTop (9));
+            c.setBounds (leftCol.removeFromTop (16).reduced (0, 1));
+            leftCol.removeFromTop (1);
         };
         layoutCombo (cb_speed,   lbl_speed);
         layoutCombo (cb_monitor, lbl_monitor);
@@ -552,12 +552,12 @@ void NativeEditor::resized()
         layoutCombo (cb_radio,   lbl_radio);
         layoutCombo (cb_formula, lbl_formula);
 
-        leftCol.removeFromTop (4);
+        leftCol.removeFromTop (3);
 
         // 8 toggles in 2 rows of 4 (slim)
         const int tW = leftCol.getWidth() / 4;
-        auto togRow1 = leftCol.removeFromTop (18);
-        auto togRow2 = leftCol.removeFromTop (18);
+        auto togRow1 = leftCol.removeFromTop (17);
+        auto togRow2 = leftCol.removeFromTop (17);
         leftCol.removeFromTop (3);
         juce::ToggleButton* r1[] = { &t_echo, &t_bypass, &t_speaker, &t_sync };
         juce::ToggleButton* r2[] = { &t_loz,  &t_pa,     &t_sos,     &t_pause };
@@ -568,17 +568,17 @@ void NativeEditor::resized()
 
         // Transport: 4 keys row 1
         {
-            auto kRow = leftCol.removeFromTop (22);
+            auto kRow = leftCol.removeFromTop (20);
             const int kW = kRow.getWidth() / 4;
             k_rec1.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
             k_rec2.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
             k_trk1.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
             k_trk2.setBounds (kRow.reduced (2, 1));
         }
-        leftCol.removeFromTop (3);
+        leftCol.removeFromTop (2);
         // Transport: 3 keys row 2
         {
-            auto kRow = leftCol.removeFromTop (22);
+            auto kRow = leftCol.removeFromTop (20);
             const int kW = kRow.getWidth() / 3;
             k_spkA.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
             k_spkB.setBounds (kRow.removeFromLeft (kW).reduced (2, 1));
@@ -593,8 +593,8 @@ void NativeEditor::resized()
         const int dualW = centerCol.getWidth() / 5;
         auto layoutDual = [&] (juce::Rectangle<int> area, DualFader& f)
         {
-            f.caption.setBounds (area.removeFromTop (18));
-            area.removeFromBottom (4);
+            f.caption.setBounds (area.removeFromTop (14));
+            area.removeFromBottom (2);
             const int sw = area.getWidth() / 2;
             f.l.setBounds (area.removeFromLeft (sw).reduced (5, 0));
             f.r.setBounds (area.reduced (5, 0));
