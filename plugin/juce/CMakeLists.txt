@@ -52,6 +52,8 @@ target_sources(BC2000DL PRIVATE
     Source/WebEditor.h
     Source/NativeEditor.cpp
     Source/NativeEditor.h
+    Source/ui/BC2000LookAndFeel.cpp
+    Source/ui/BC2000LookAndFeel.h
     Source/dsp/Constants.h
     Source/dsp/Ge2N2613Stage.h
     Source/dsp/Ge2N2613Stage.cpp
