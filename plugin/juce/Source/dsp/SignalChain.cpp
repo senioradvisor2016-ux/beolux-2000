@@ -64,6 +64,7 @@ namespace bc2000dl::dsp
 
         echoL.prepare (sr);
         echoR.prepare (sr);
+        balanceMaster.prepare (sr, blockSize);
 
         // Initial speed-config
         L.recEq.setSpeed (params.speed);  R.recEq.setSpeed (params.speed);
@@ -95,6 +96,7 @@ namespace bc2000dl::dsp
             ch->dcBlock.reset();
         }
         echoL.reset(); echoR.reset();
+        balanceMaster.reset();
         phonoScratch.clear();
         radioScratch.clear();
 

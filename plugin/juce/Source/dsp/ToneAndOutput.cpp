@@ -67,24 +67,63 @@ namespace bc2000dl::dsp
     }
 
     // ---------- BalanceMaster ----------
-    void BalanceMaster::setBalance (float b) { balance = juce::jlimit (-1.0f, 1.0f, b); }
-    void BalanceMaster::setMaster  (float m) { master  = juce::jlimit ( 0.0f, 1.0f, m); }
+    void BalanceMaster::prepare (double sr, int /*maxBlock*/)
+    {
+        constexpr double kSmoothSecs = 0.010;   // 10 ms — removes zipper noise at all block sizes
+        masterSmooth.reset  (sr, kSmoothSecs);
+        balanceSmooth.reset (sr, kSmoothSecs);
+        masterSmooth.setCurrentAndTargetValue  (master);
+        balanceSmooth.setCurrentAndTargetValue (balance);
+    }
+
+    void BalanceMaster::reset()
+    {
+        masterSmooth.setCurrentAndTargetValue  (master);
+        balanceSmooth.setCurrentAndTargetValue (balance);
+    }
+
+    void BalanceMaster::setBalance (float b)
+    {
+        balance = juce::jlimit (-1.0f, 1.0f, b);
+        balanceSmooth.setTargetValue (balance);
+    }
+
+    void BalanceMaster::setMaster (float m)
+    {
+        master = juce::jlimit (0.0f, 1.0f, m);
+        masterSmooth.setTargetValue (master);
+    }
 
     void BalanceMaster::processStereo (juce::AudioBuffer<float>& buffer)
     {
         if (buffer.getNumChannels() < 2) return;
 
-        // Equal-power-pan
-        const float angle = (balance + 1.0f) * juce::MathConstants<float>::pi * 0.25f;
-        const float lGain = std::cos (angle);
-        const float rGain = std::sin (angle);
-
-        // Linear master fade — fader-position matchar dB-respons mer intuitivt.
-        // (Tidigare master*master gjorde 0.75 = -5 dB; nu 0.75 = -2.5 dB.)
-        const float masterLin = master;
-
         const int n = buffer.getNumSamples();
-        buffer.applyGain (0, 0, n, lGain * masterLin);
-        buffer.applyGain (1, 0, n, rGain * masterLin);
+
+        if (masterSmooth.isSmoothing() || balanceSmooth.isSmoothing())
+        {
+            // Per-sample path: interpolate both controls during automation transitions.
+            // This prevents zipper noise on fades and balance sweeps.
+            auto* l = buffer.getWritePointer (0);
+            auto* r = buffer.getWritePointer (1);
+            for (int i = 0; i < n; ++i)
+            {
+                const float m = masterSmooth.getNextValue();
+                const float ang = (balanceSmooth.getNextValue() + 1.0f)
+                                  * juce::MathConstants<float>::pi * 0.25f;
+                l[i] *= std::cos (ang) * m;
+                r[i] *= std::sin (ang) * m;
+            }
+        }
+        else
+        {
+            // Fast vectorised path: steady state (no automation change in flight).
+            masterSmooth.skip  (n);
+            balanceSmooth.skip (n);
+
+            const float angle   = (balance + 1.0f) * juce::MathConstants<float>::pi * 0.25f;
+            buffer.applyGain (0, 0, n, std::cos (angle) * master);
+            buffer.applyGain (1, 0, n, std::sin (angle) * master);
+        }
     }
 }

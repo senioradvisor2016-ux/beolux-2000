@@ -36,18 +36,29 @@ namespace bc2000dl::dsp
         void updateTreble();
     };
 
-    /** Stereo balance + master volume (sista stage). */
+    /** Stereo balance + master volume (sista stage).
+        Uses juce::SmoothedValue for both controls — eliminates zipper noise
+        when master fader or balance are automated.  Fast path (vectorised)
+        used when smoothing is complete; per-sample path only during transitions. */
     class BalanceMaster
     {
     public:
+        /** Call once before processing starts — sets up smoother rate. */
+        void prepare (double sampleRate, int maxBlockSize);
+        void reset();
+
         void setBalance (float bal);  // -1=L, 0=mid, +1=R
-        void setMaster (float m);     // 0–1, square-law mapping
+        void setMaster  (float m);    // 0..1 linear amplitude
 
         void processStereo (juce::AudioBuffer<float>& buffer);
 
     private:
         float balance { 0.0f };
         float master  { 0.75f };
+
+        // 10 ms smoothing — removes clicks from automation at typical block sizes
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> masterSmooth;
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> balanceSmooth;
     };
 
     /** 3-buss-mixer — summerar Mic+Phono+Radio till en utgång. */
