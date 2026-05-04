@@ -164,3 +164,60 @@ target_link_libraries(BC2000DL PRIVATE
 
 # Spara generated header med projektversion
 juce_generate_juce_header(BC2000DL)
+
+# ─────────────────────────────────────────────────────────────────
+# DSP Smoke Tests — headless konsol-app, inga GUI-beroenden
+#   Bygg:  cmake --build build --config Release --target BC2000DL_Tests
+#   Kör:   ./build/BC2000DL_Tests_artefacts/Release/BC2000DL\ Tests
+# ─────────────────────────────────────────────────────────────────
+juce_add_console_app(BC2000DL_Tests
+    PRODUCT_NAME "BC2000DL Tests"
+)
+
+target_sources(BC2000DL_Tests PRIVATE
+    Source/tests/DspSmokeTest.cpp
+    Source/dsp/Ge2N2613Stage.h
+    Source/dsp/Ge2N2613Stage.cpp
+    Source/dsp/GeLowNoiseStage.h
+    Source/dsp/GeLowNoiseStage.cpp
+    Source/dsp/EqDIN1962.h
+    Source/dsp/EqDIN1962.cpp
+    Source/dsp/TapeSaturation.h
+    Source/dsp/TapeSaturation.cpp
+    Source/dsp/Echo.h
+    Source/dsp/Echo.cpp
+    Source/dsp/ToneAndOutput.h
+    Source/dsp/ToneAndOutput.cpp
+    Source/dsp/WowFlutter.h
+    Source/dsp/WowFlutter.cpp
+    Source/dsp/MicAndPower.h
+    Source/dsp/MicAndPower.cpp
+    Source/dsp/Multiplay.h
+    Source/dsp/Multiplay.cpp
+    Source/dsp/PhonoPreamp.h
+    Source/dsp/PhonoPreamp.cpp
+    Source/dsp/SignalChain.h
+    Source/dsp/SignalChain.cpp
+    Source/presets/Presets.h
+    Source/presets/Presets.cpp
+)
+
+target_include_directories(BC2000DL_Tests PRIVATE
+    Source
+)
+
+target_compile_definitions(BC2000DL_Tests PRIVATE
+    JUCE_USE_CURL=0
+    JUCE_WEB_BROWSER=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_STANDALONE_APPLICATION=1
+)
+
+target_link_libraries(BC2000DL_Tests PRIVATE
+    juce::juce_dsp
+    juce::juce_audio_basics
+    juce::juce_core
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_warning_flags
+)

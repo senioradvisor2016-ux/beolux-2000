@@ -460,8 +460,26 @@ void BC2000DLProcessor::getStateInformation (juce::MemoryBlock& destData)
 void BC2000DLProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
+    {
         if (xml->hasTagName (apvts.state.getType()))
+        {
             apvts.replaceState (juce::ValueTree::fromXml (*xml));
+
+            // In JUCE 8, replaceState() updates the ValueTree atomics but does not
+            // always push the new values back into the AudioParameter objects themselves
+            // (getValue() can return a stale pre-restore value).  Force a full sync so
+            // DAWs and validators that read parameters immediately after setStateInformation
+            // see the correct restored values — especially critical for AudioParameterBool.
+            for (auto* p : getParameters())
+            {
+                if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (p))
+                {
+                    if (const auto* raw = apvts.getRawParameterValue (rp->paramID))
+                        rp->setValueNotifyingHost (rp->convertTo0to1 (*raw));
+                }
+            }
+        }
+    }
 }
 
 // VST3 / AU entry point

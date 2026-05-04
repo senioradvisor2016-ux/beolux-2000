@@ -55,6 +55,18 @@ namespace bc2000dl::dsp
         // Sample-för-sample-process (history-dependent)
         inline float processSample (float H) noexcept
         {
+            // NaN/Inf guard — if either the input or our own state has gone bad,
+            // reset silently and return zero.  Without this, a single NaN locks
+            // the model permanently: H_eff = H + α·NaN = NaN → L = NaN → M = NaN.
+            // The comparison-based Ms-clamp below won't catch NaN (NaN > x = false),
+            // so NaN in M would propagate for ever.
+            if (! std::isfinite (H) || ! std::isfinite (M))
+            {
+                M = 0.0;
+                H_prev = 0.0;
+                return 0.0f;
+            }
+
             const double Hd = static_cast<double> (H);
             const double H_eff = Hd + params.alpha * M;
             const double L = langevin (H_eff / params.a);
@@ -63,8 +75,13 @@ namespace bc2000dl::dsp
             const double delta = (Hd >= H_prev) ? 1.0 : -1.0;
 
             double denom = params.k * delta - params.alpha * (M_an - M);
-            if (std::abs (denom) < 1e-12)
-                denom = (denom >= 0.0 ? 1e-12 : -1e-12);
+            // Tighter clamp (1e-6 vs old 1e-12): the wider clamp allowed
+            // dM_irr_dH to reach ~2e12 producing enormous (though later clamped)
+            // magnetisation swings.  1e-6 is still far below any physical regime
+            // (k ≈ 0.07–0.13 normally keeps |denom| >> 0.001) but caps the ratio
+            // at ~2e6 × dH, preventing extreme transients on parameter switches.
+            if (std::abs (denom) < 1e-6)
+                denom = (denom >= 0.0 ? 1e-6 : -1e-6);
 
             const double dM_irr_dH = (M_an - M) / denom;
             const double dH = Hd - H_prev;

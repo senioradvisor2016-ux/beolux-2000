@@ -95,16 +95,16 @@ namespace bc2000dl::dsp
                             + buf[static_cast<size_t> (r1)] * delayFrac;
 
         // Output = input + feedback × delayed (våt + torr)
-        const float y = x + delayed * feedback;
+        // Soft-clip BOTH the output AND the feedback signal so neither the
+        // downstream record chain nor the delay buffer ever sees values > ~±1.5.
+        // Without output clipping, self-oscillating echo (fb > 0.96) could push
+        // ±2–3 into the tape/rec-eq stages, compounding into DAW-level blowup.
+        constexpr float kClipKnee = 1.5f;
+        const float yRaw = x + delayed * feedback;
+        const float y    = kClipKnee * std::tanh (yRaw / kClipKnee);  // output clipped
 
-        // Återmatning genom record-amp-kedjan modelleras här som:
-        //   1. HF-loss per pass (tape-formuleringens HF-roll-off vid playback)
-        //   2. Soft-clip-tanh (ersätter recAmp+ac126-cascadens mjuka mättnad)
-        //      → garanterar att self-osc ELASTISK växer mot stabil amplitud
-        //        istället för att divergera till numerisk overflow.
+        // Feedback signal: HF-loss per pass then another soft-clip for the buffer
         float fbSignal = hfLossFilter.processSample (y);
-        // Soft-clip vid ±1.6 → vid sustained osc landar amplituden ~±1.5
-        constexpr float kClipKnee = 1.6f;
         fbSignal = kClipKnee * std::tanh (fbSignal / kClipKnee);
 
         buf[static_cast<size_t> (writeIdx)] = fbSignal;

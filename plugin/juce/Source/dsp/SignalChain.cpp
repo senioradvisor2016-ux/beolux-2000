@@ -421,6 +421,56 @@ namespace bc2000dl::dsp
 
         balanceMaster.processStereo (buffer);
 
+        // ===== SAFETY LIMITER — last line of defence before the DAW =====
+        // Soft-knee limiter: tanh knee at ±0.95 → output always ≤ ±1.0.
+        // Also detects NaN / Inf (numerical blow-up in tape model or IIR filters)
+        // and mutes the channel rather than letting the DAW's protection kick in.
+        {
+            const int numSafe = buffer.getNumChannels();
+            for (int ch = 0; ch < numSafe; ++ch)
+            {
+                auto* data = buffer.getWritePointer (ch);
+                const int n = buffer.getNumSamples();
+                bool hasNaN = false;
+                for (int i = 0; i < n; ++i)
+                {
+                    if (! std::isfinite (data[i]))  { hasNaN = true; break; }
+                }
+                if (hasNaN)
+                {
+                    // Numerical blow-up: mute silently rather than pass ±inf to DAW.
+                    // Critically: also reset ALL IIR filter states for this channel.
+                    // Without this, a NaN that entered a filter's delay-line memory
+                    // will propagate on every subsequent block → permanent silence.
+                    buffer.clear (ch, 0, n);
+                    ChannelChain& cc = (ch == 0) ? L : R;
+                    Echo& ec         = (ch == 0) ? echoL : echoR;
+                    cc.micTrafo.reset();
+                    cc.micUw0029.reset();
+                    cc.micN2613.reset();
+                    cc.phono.reset();
+                    cc.radioUw0029.reset();
+                    cc.radioN2613.reset();
+                    cc.recEq.reset();
+                    cc.ac126_1.reset();  cc.ac126_2.reset();
+                    cc.tape.reset();
+                    cc.multiplay.reset();
+                    cc.wowFlutter.reset();
+                    cc.playEq.reset();
+                    cc.tone.reset();
+                    cc.powerAmp.reset();
+                    cc.dcBlock.reset();
+                    ec.reset();
+                }
+                else
+                {
+                    constexpr float kKnee = 0.95f;
+                    for (int i = 0; i < n; ++i)
+                        data[i] = kKnee * std::tanh (data[i] / kKnee);
+                }
+            }
+        }
+
         // Tape transport time accumulation (drives ReelDeck + counter display in UI)
         const double dt = static_cast<double> (buffer.getNumSamples()) / sampleRate;
         tapePositionSeconds.store (

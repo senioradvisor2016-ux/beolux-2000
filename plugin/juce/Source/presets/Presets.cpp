@@ -476,8 +476,8 @@ namespace bc2000dl
             .saturation_drive_r = 1.35f,
             .bass_db        = 3.0f,
             .echo_enabled   = true,
-            .echo_amount    = 0.7f,
-            .echo_amount_r  = 0.7f,
+            .echo_amount    = 0.62f,
+            .echo_amount_r  = 0.62f,
         },
         {
             .name     = "LO-FI POP",

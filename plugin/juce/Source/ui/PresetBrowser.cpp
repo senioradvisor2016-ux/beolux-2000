@@ -60,14 +60,14 @@ namespace bc2000dl::ui
     // ------------------------------------------------------------------
     //  Fonts (also defined as free functions for non-member draw helpers)
     // ------------------------------------------------------------------
-    static Font sPillFont()     { return Font (FontOptions {}.withHeight  (9.0f).withStyle ("Bold")); }
+    static Font sPillFont()     { return Font (FontOptions {}.withHeight (10.0f).withStyle ("Bold")); }
 
-    Font PresetBrowser::nameFont()     { return Font (FontOptions {}.withHeight (12.0f).withStyle ("Bold")); }
-    Font PresetBrowser::catFont()      { return Font (FontOptions {}.withHeight (11.0f).withStyle ("Bold")); }
+    Font PresetBrowser::nameFont()     { return Font (FontOptions {}.withHeight (13.5f).withStyle ("Bold")); }
+    Font PresetBrowser::catFont()      { return Font (FontOptions {}.withHeight (12.5f).withStyle ("Bold")); }
     Font PresetBrowser::pillFont()     { return sPillFont(); }
-    Font PresetBrowser::descFont()     { return Font (FontOptions {}.withHeight (10.5f)); }
-    Font PresetBrowser::infoNameFont() { return Font (FontOptions {}.withHeight (13.5f).withStyle ("Bold")); }
-    Font PresetBrowser::paramFont()    { return Font (FontOptions {}.withHeight  (9.0f)); }
+    Font PresetBrowser::descFont()     { return Font (FontOptions {}.withHeight (11.5f)); }
+    Font PresetBrowser::infoNameFont() { return Font (FontOptions {}.withHeight (15.0f).withStyle ("Bold")); }
+    Font PresetBrowser::paramFont()    { return Font (FontOptions {}.withHeight (10.0f)); }
 
     // ------------------------------------------------------------------
     //  Constructor
@@ -83,7 +83,7 @@ namespace bc2000dl::ui
         searchBox.setScrollbarsShown    (false);
         searchBox.setPopupMenuEnabled   (false);
         searchBox.setTextToShowWhenEmpty ("  🔍  Search presets...", Colour (0xff5a4e3a));
-        searchBox.setFont               (Font (FontOptions {}.withHeight (12.0f)));
+        searchBox.setFont               (Font (FontOptions {}.withHeight (13.5f)));
         searchBox.setColour (TextEditor::backgroundColourId,    pal::bgSearch);
         searchBox.setColour (TextEditor::outlineColourId,       Colours::transparentBlack);
         searchBox.setColour (TextEditor::focusedOutlineColourId,pal::amberDim);

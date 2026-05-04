@@ -34,7 +34,7 @@ namespace
     constexpr int kInnerW     = kEditorW - 2 * kTeakW;
     constexpr int kAluH       = 156;    // black-metal deck zone height
     constexpr int kDivH       = 3;      // metallic divider height
-    constexpr int kPresetH    = 28;     // preset/nav bar height
+    constexpr int kPresetH    = 40;     // preset/nav bar height
     constexpr int kLeftColW   = 400;    // left column (selectors + toggles + transport)
     constexpr int kCenterColW = 400;    // center column (5 dual-faders)
     // right column width = kInnerW - kLeftColW - kCenterColW = 356
@@ -144,11 +144,7 @@ namespace bc2000dl
         ui::InstructionCardLnF::drawReel (g, leftReel,  angleL,         isActive, supplyFill, motionL, wowIntensity);
         ui::InstructionCardLnF::drawReel (g, rightReel, -angleR * 1.0f, isActive, takeupFill, motionR, wowIntensity);
 
-        // Tape path: thin metallic line between reel rims (the actual tape)
-        const float tapeY = (float) bounds.getCentreY();
-        g.setColour (juce::Colour (0xFF807870).withAlpha (0.55f));
-        g.drawLine ((float) leftReel.getRight() - reelDiam * 0.05f, tapeY,
-                    (float) rightReel.getX()    + reelDiam * 0.05f, tapeY, 1.0f);
+        // (tape path removed — cleaner look)
     }
 
     //=========================================================================

@@ -50,6 +50,12 @@ namespace bc2000dl::dsp
     {
         currentSpeed = speed;
         updateFilters();
+        // Reset filters whose coefficients just changed to avoid stale-state
+        // transients when switching tape speed mid-session.
+        hfFilter.reset();
+        bumpFilter.reset();
+        biasReject.reset();
+        if (oversampler) oversampler->reset();  // clear FIR polyphase state too
     }
 
     void TapeSaturation::setBiasAmount (float a)        { biasAmount      = a; }
@@ -61,6 +67,15 @@ namespace bc2000dl::dsp
         {
             formula = f;
             updateFilters();
+            // Reset all internal filter states so the new formula's coefficients
+            // start from zero.  Without this, the Jiles-Atherton model can see
+            // magnetisation history that is inconsistent with the new coercivity /
+            // shape parameters, producing denormals or NaN on the first block.
+            hfFilter.reset();
+            bumpFilter.reset();
+            biasReject.reset();
+            hysteresis.reset();
+            if (oversampler) oversampler->reset();  // clear FIR polyphase state too
         }
     }
 
@@ -122,8 +137,15 @@ namespace bc2000dl::dsp
                 break;
         }
 
+        // Kläm hfCorner hårt under Nyquist. BASF vid 19 cm/s ger annars
+        // 20 000 × 1.40 = 28 000 Hz > 24 000 Hz (Nyquist @ 48 kHz).
+        // makeFirstOrderLowPass() med fc > Nyquist skapar instabila koefficienter
+        // (bilinear-tangenten går negativ) → hfFilter spottar ut silence.
+        // 0.45 × SR ger 21 600 Hz @ 48 kHz — hörbart "bright" utan instabilitet.
+        const float safeHF = static_cast<float> (
+            std::min (hfCorner, sampleRate * 0.45));
         hfFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeFirstOrderLowPass (
-            sampleRate, static_cast<float> (hfCorner));
+            sampleRate, safeHF);
 
         // Head-bump som peaking-EQ
         bumpFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter (
@@ -161,7 +183,12 @@ namespace bc2000dl::dsp
             if (biasPhase > juce::MathConstants<double>::twoPi)
                 biasPhase -= juce::MathConstants<double>::twoPi;
 
-            const float H = up[i] * satDrive + biasSig;
+            // Hard-clamp H before the J-A model.  Magnetisation physics can't
+            // produce H beyond ±5 Ms in any real tape scenario; values outside
+            // this window indicate upstream gain blow-up and would cause extreme
+            // dM/dH transients that could knock the model into a bad state.
+            const float H = juce::jlimit (-5.0f, 5.0f,
+                                           up[i] * satDrive + biasSig);
             float fluxOut = hysteresis.processSample (H);
 
             // LP @ 25 kHz tar bort bias + alias-energi

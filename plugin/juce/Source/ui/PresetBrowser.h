@@ -67,7 +67,7 @@ namespace bc2000dl::ui
         static constexpr int kInfoH     = 56;   // info panel height
         static constexpr int kCatW      = 120;  // category column width
         static constexpr int kScrollW   = 8;    // scrollbar width
-        static constexpr int kRowH      = 38;   // preset row height
+        static constexpr int kRowH      = 48;   // preset row height
 
         juce::Rectangle<int> zSearch, zCat, zList, zInfo;
 
