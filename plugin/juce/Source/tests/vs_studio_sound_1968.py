@@ -36,8 +36,19 @@ def report(spec, ok, measured, target):
         fails.append(spec)
 
 
-def configure(speed="9.5 cm/s", formula="Agfa", echo=False, echo_amt=0.0):
-    """Reset and configure plugin for next test."""
+def configure(speed="9.5 cm/s", formula="Agfa", echo=False, echo_amt=0.0,
+              wow=0.0):
+    """Reset and configure plugin for next test.
+
+    wow=0.0 by default — frequenzgangs-mätningar via dot-product-correlation
+    vid en specifik frekvens fungerar inte korrekt om signalen är frekvens-
+    modulerad (PM från wow/flutter sprider energi till sidband, så
+    correlation vid carrier-frekvensen underskattar amplitude med upp till
+    -12 dB vid β=3 enligt Bessel J0).  Real-tape-FR-mätningar kompenserar
+    för detta med tracking-filter eller bredare bin-bandbredd; pedalboard
+    har ingen sådan funktion.  Sätt wow=0 för spec-test, och testa wow
+    separat i §10 (om implementerat).
+    """
     PLUGIN.reset()
     PLUGIN.tape_formula = formula
     PLUGIN.tape_speed = speed
@@ -48,6 +59,8 @@ def configure(speed="9.5 cm/s", formula="Agfa", echo=False, echo_amt=0.0):
         PLUGIN.echo_amount = echo_amt
     if hasattr(PLUGIN, 'master_volume'):
         PLUGIN.master_volume = 0.85
+    if hasattr(PLUGIN, 'wow_flutter'):
+        PLUGIN.wow_flutter = wow
 
 
 def process_blocks(signal):
