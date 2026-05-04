@@ -15,18 +15,19 @@ namespace bc2000dl::dsp
         printBuffer.assign (static_cast<size_t> (sr * 1.5), 0.0f);
         printIdx = 0;
 
-        // 8× oversampling kring J-A-hysteres-blocket. JUCE FIR Equirripple
-        // ger nästan perfekt anti-alias upp till SR_internal/2.
+        // 8× oversampling kring J-A-hysteres-blocket. PolyphaseIIR är 4-6×
+        // snabbare än FIREquiripple och räcker för ett olinjärt block — fasvridning
+        // vid Nyquist är ej hörbar och påverkar ej harmonisk spektrumbalans.
         oversampler = std::make_unique<juce::dsp::Oversampling<float>> (
             1, kOversampleFactor,
-            juce::dsp::Oversampling<float>::filterHalfBandFIREquiripple);
+            juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
         oversampler->initProcessing (4096);  // max block-storlek
 
         // Bias-rejection LP @ 40 kHz vid oversamplad rate.
         // Höjd från 25 → 40 kHz (v62.0): 25 kHz gav -1.5 dB redan @ 20 kHz,
         // vilket åt upp HF-marginalen i §2-spec.  40 kHz ger -0.4 dB @ 20 kHz.
         // 100 kHz bias är fortfarande hårt undertryckt (>40 dB rejection)
-        // tack vare 4:e-ordningens cascade FIR-decimation + 2:a-ord LP.
+        // tack vare 3-stegs IIR-decimation + 2:a-ord LP.
         const double srOversampled = sr * (1 << kOversampleFactor);
         biasReject.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowPass (
             srOversampled, 40000.0f, 0.707f);
