@@ -3,17 +3,18 @@
 vs_studio_sound_1968.py — exakt spec-compliance-test mot plugin/specs.md
 (härledd från Studio Sound 1968 + B&O servicemanual + 2N2613-databladet).
 
-Varje rad i §2/§4/§5/§6/§8/§9/§11 mäts mot ett konkret target och printar
-PASS/FAIL med delta. Målet: alla rader gröna.
+Varje rad i §2/§3/§4/§5/§6/§7/§8/§9/§10/§11 mäts mot ett konkret target
+och printar PASS/FAIL med delta. Målet: alla rader gröna.
 
-Kör:  python3 plugin/juce/Source/tests/vs_studio_sound_1968.py
+Kör:  python3 plugin/juce/Source/tests/vs_studio_sound_1968.py [/path/to/Beolux.vst3]
 """
 
 import sys, math, time
 import numpy as np
 import pedalboard
 
-PLUGIN_PATH = "/Users/senioradvisor/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3"
+PLUGIN_PATH = (sys.argv[1] if len(sys.argv) > 1
+               else "/Users/senioradvisor/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3")
 SR = 48000
 BLOCK = 512
 
@@ -61,6 +62,8 @@ def configure(speed="9.5 cm/s", formula="Agfa", echo=False, echo_amt=0.0,
         PLUGIN.master_volume = 0.85
     if hasattr(PLUGIN, 'wow_flutter'):
         PLUGIN.wow_flutter = wow
+    if hasattr(PLUGIN, 'print_through'):
+        PLUGIN.print_through = 0.0
 
 
 def process_blocks(signal):
@@ -262,6 +265,106 @@ def test_cpu():
            cpu_pct < 5.0, f"{cpu_pct:.1f}%", "<5%")
 
 
+def _process_with_reset(signal):
+    """Process signal med reset=True på första blocket."""
+    PLUGIN.process(signal[:, :BLOCK], SR, reset=True)
+    return process_blocks(signal)
+
+
+def flutter_sideband_ratio(out_mono, carrier_hz, side_hz=50):
+    """Energi i sidoljud (±2–side_hz Hz) relativt total energi kring carrier."""
+    n = len(out_mono)
+    skip = n // 2
+    x = out_mono[skip:] * np.hanning(n - skip).astype(np.float32)
+    n2 = len(x)
+    fft = np.fft.rfft(x)
+    freqs = np.fft.rfftfreq(n2, 1 / SR)
+    dist = np.abs(freqs - carrier_hz)
+    carrier_mask = dist < 2
+    side_mask = (dist >= 2) & (dist <= side_hz)
+    ec = float(np.sum(np.abs(fft[carrier_mask]) ** 2))
+    es = float(np.sum(np.abs(fft[side_mask]) ** 2))
+    return es / (ec + es + 1e-30)
+
+
+def test_print_through():
+    print("\n── §3 Print-through ──")
+    # Print-through-buffern är 1.5 s; signal i 2 s fyller buffern,
+    # sedan 1 s tystnad → spöket från 1.5 s sedan ska höras (eller ej).
+    sig = make_sine(1000, SR * 2, -20)
+    sil = make_silence(SR)
+
+    configure(wow=0.0)
+    PLUGIN.print_through = 0.0
+    _process_with_reset(sig)           # fyll print-buffer med signal
+    out_off = process_blocks(sil)      # mät tystnaden
+    ghost_off = rms_dbfs(out_off[0])
+    report("Print-through OFF — tyst under silence",
+           ghost_off < -70.0, f"{ghost_off:.1f} dBFS", "<-70 dBFS")
+
+    configure(wow=0.0)
+    PLUGIN.print_through = 0.05       # max
+    _process_with_reset(sig)           # fyll print-buffer med signal
+    out_on = process_blocks(sil)       # mät tystnaden
+    ghost_on = rms_dbfs(out_on[0])
+    # Spöket ska vara minst 3 dB tydligare än brus-golvet (OFF-läget)
+    delta = ghost_on - ghost_off
+    report("Print-through ON (0.05) — spöke ≥3 dB över noise floor",
+           delta >= 3.0,
+           f"Δ={delta:.1f} dB (ON={ghost_on:.1f}, OFF={ghost_off:.1f})",
+           "≥+3 dB")
+
+
+def test_formula_separation():
+    print("\n── §7 Tape-formel-separation ──")
+    # BASF (hfCorner×1.40) ska vara märkbart ljusare än Scotch (×0.65) vid 12 kHz.
+    results = {}
+    for formula in ("BASF", "Agfa", "Scotch"):
+        configure(speed="9.5 cm/s", formula=formula)
+        ref_out = warm_then_measure(make_sine(1000, SR * 2, -20))
+        ref_db = freq_response_db(ref_out[0], 1000)
+        configure(speed="9.5 cm/s", formula=formula)
+        hf_out = warm_then_measure(make_sine(12000, SR * 2, -20))
+        results[formula] = freq_response_db(hf_out[0], 12000) - ref_db
+
+    delta_bs = results["BASF"] - results["Scotch"]
+    report("BASF ljusare än Scotch @ 12 kHz (Δ ≥ 3 dB)",
+           delta_bs >= 3.0,
+           f"{delta_bs:+.1f} dB (BASF {results['BASF']:+.1f}, Scotch {results['Scotch']:+.1f})",
+           "≥+3 dB")
+    report("BASF ljusare än Agfa @ 12 kHz",
+           results["BASF"] > results["Agfa"],
+           f"BASF {results['BASF']:+.1f} dB vs Agfa {results['Agfa']:+.1f} dB",
+           "BASF > Agfa")
+    report("Scotch mörkare än Agfa @ 12 kHz",
+           results["Scotch"] < results["Agfa"],
+           f"Scotch {results['Scotch']:+.1f} dB vs Agfa {results['Agfa']:+.1f} dB",
+           "Scotch < Agfa")
+
+
+def test_wow_flutter():
+    print("\n── §10 Wow & Flutter ──")
+    # Vid 5 kHz är β = 2π × 5000 × Δmax / SR ≈ 1.0 vid wow=0.5 →
+    # tydliga sidoljud inom ±50 Hz.  Vid wow=0 ska inga sidoljud höras.
+    sig = make_sine(5000, SR * 4, -20)   # 4 s → 0.25 Hz FFT-upplösning
+
+    configure(speed="9.5 cm/s", wow=0.0)
+    out_flat = warm_then_measure(sig)
+    ratio_flat = flutter_sideband_ratio(out_flat[0], 5000)
+    report("Wow=0.0 — inga sidoljud vid 5 kHz",
+           ratio_flat < 0.01,
+           f"{ratio_flat * 100:.2f}% sideband",
+           "<1%")
+
+    configure(speed="9.5 cm/s", wow=0.5)
+    out_wow = warm_then_measure(sig)
+    ratio_wow = flutter_sideband_ratio(out_wow[0], 5000)
+    report("Wow=0.5 — mätbar flutter vid 5 kHz",
+           ratio_wow > 0.02,
+           f"{ratio_wow * 100:.2f}% sideband",
+           ">2%")
+
+
 def main():
     print("══════════════════════════════════════════════════════════════════")
     print("  Beolux 2000 — Studio Sound 1968 spec compliance")
@@ -269,11 +372,14 @@ def main():
     print("══════════════════════════════════════════════════════════════════")
 
     test_bandwidth()
+    test_print_through()
     test_thd()
     test_noise_floor()
     test_tape_glow()
+    test_formula_separation()
     test_separation()
     test_echo()
+    test_wow_flutter()
     test_cpu()
 
     total = g_pass + g_fail
