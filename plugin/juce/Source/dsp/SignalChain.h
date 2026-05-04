@@ -177,7 +177,9 @@ namespace bc2000dl::dsp
         int safetyMuteBlocks { 0 };
 
         // Initial asymmetri vid prepare() — matchas sedan av setParameters() via APVTS.
-        static constexpr float kAsymmetryAmount = 0.02f;
+        // 0.008 ger ~46 dB kanalseparation per spec §8 (>45 dB target).
+        // Tidigare 0.02 → 44.8 dB, 0.012 → 44.9 dB, 0.008 → ~46 dB.
+        static constexpr float kAsymmetryAmount = 0.008f;
 
         void prepareChannel (ChannelChain& ch, double sr,
                              float asymOffset, std::uint32_t baseSeed);

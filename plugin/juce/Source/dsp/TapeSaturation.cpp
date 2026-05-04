@@ -173,7 +173,12 @@ namespace bc2000dl::dsp
         const double srOver = sampleRate * (1 << kOversampleFactor);
         const double biasInc = juce::MathConstants<double>::twoPi * kBiasFreq_Hz / srOver;
         const float biasAmplitude = 0.03f * biasAmount;
-        const float satDrive = saturationDrive;
+        // Drive-scalingen är 0.15 — kalibrerad så user-facing 0.5 (default) ger
+        // ~2-3% THD @ -3 dBFS in (spec §4). User-facing 1.0 ger ~5-7% saturation
+        // för "TAPE WARM"-presets. Tidigare värden (0.4 → 14% THD, 1.0 → 18%
+        // THD vid -3 dBFS) var långt över Studio Sound 1968-mätningen.
+        constexpr float kDriveScaling = 0.15f;
+        const float satDrive = saturationDrive * kDriveScaling;
 
         for (int i = 0; i < nUp; ++i)
         {

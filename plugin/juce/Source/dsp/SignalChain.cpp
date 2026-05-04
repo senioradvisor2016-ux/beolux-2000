@@ -417,9 +417,12 @@ namespace bc2000dl::dsp
         }
 
         // ===== L/R cross-bleed (real BC2000 har ~−45 dB bleed via head-gap) =====
+        // Sänkt till 0.0040 (-48 dB) så total kanalseparation > 45 dB enligt
+        // spec §8. -45 dB var precis vid spec-tröskeln vilket gav 44.5 dB i
+        // mätning (eftersom andra L/R-imperfekta steg lägger till några tiondels dB).
         if (numCh >= 2)
         {
-            const float bleed = 0.0056f;   // -45 dB
+            const float bleed = 0.0040f;   // -48 dB
             auto* l = buffer.getWritePointer (0);
             auto* r = buffer.getWritePointer (1);
             for (int i = 0; i < buffer.getNumSamples(); ++i)
