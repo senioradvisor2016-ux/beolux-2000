@@ -982,7 +982,8 @@ void NativeEditor::paint (juce::Graphics& g)
         // badge always lands 20 px clear of the last glyph, regardless of
         // platform font metrics.
         const float br = 13.0f;
-        const float titleTextW = lnf.logoFont (22.0f).getStringWidthFloat ("BEOLUX 2000");
+        const float titleTextW = (float) juce::GlyphArrangement::getStringWidthInt (
+                                             lnf.logoFont (22.0f), "BEOLUX 2000");
         const float bx = (float)(kTeakW + 14) + titleTextW + 20.0f + br;
         const float by = 6.0f;
 

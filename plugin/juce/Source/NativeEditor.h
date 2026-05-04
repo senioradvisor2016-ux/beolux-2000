@@ -15,7 +15,9 @@
 #include "PluginProcessor.h"
 #include "ui/BC2000LookAndFeel.h"
 
-#include <melatonin_inspector/melatonin_inspector.h>
+#if JUCE_DEBUG
+ #include <melatonin_inspector/melatonin_inspector.h>
+#endif
 
 namespace bc2000dl
 {
@@ -145,8 +147,11 @@ private:
     };
     SliderContextMenu sliderMenu;
 
-    // melatonin_inspector — Cmd+Shift+I toggles the live component inspector
+    // melatonin_inspector — Debug only. Cmd+Shift+I toggles inspector.
+    // Compiled out in Release so it never appears in a DAW.
+#if JUCE_DEBUG
     melatonin::Inspector inspector { *this };
+#endif
 
     // ---- Top deck zone: reels + 3 analog VU meters + spectrum strip ----
     bc2000dl::ReelDeck reelDeck;
