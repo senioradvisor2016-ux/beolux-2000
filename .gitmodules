@@ -1,0 +1,6 @@
+[submodule "plugin/juce/vendor/melatonin_blur"]
+	path = plugin/juce/vendor/melatonin_blur
+	url = https://github.com/sudara/melatonin_blur.git
+[submodule "plugin/juce/vendor/melatonin_inspector"]
+	path = plugin/juce/vendor/melatonin_inspector
+	url = https://github.com/sudara/melatonin_inspector.git
