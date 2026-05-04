@@ -633,7 +633,8 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
                               "Inspired by the Bang & Olufsen Beocord 2000\n"
                               "De Luxe reel-to-reel (1968-69).\n\n"
                               "DSP: Jiles-Atherton tape hysteresis · 8× oversampling\n"
-                              "23/23 PASS vs Studio-Sound + Service Manual\n\n"
+                              "Validated: pluginval VST3+AU (strict 5)\n"
+                              "Signal stability: 67/67 PASS (signal_test.py)\n\n"
                               "UI: native JUCE · hardware-accurate aesthetic\n"
                               "Teak frame · black-metal deck · 3D bullseye reels\n"
                               "Analog VU meters · melatonin Gaussian shadows")
