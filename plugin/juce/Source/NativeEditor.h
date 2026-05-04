@@ -14,6 +14,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "PluginProcessor.h"
 #include "ui/BC2000LookAndFeel.h"
+#include "ui/PresetBrowser.h"
 
 #if JUCE_DEBUG
  #include <melatonin_inspector/melatonin_inspector.h>
@@ -190,12 +191,15 @@ private:
     juce::TextButton k_spkA, k_spkB, k_mute;
 
     // ---- Header (preset + A/B + about) ----
-    juce::ComboBox  cb_preset;
+    juce::TextButton btn_preset_name { "FACTORY" };  // opens PresetBrowser on click
     juce::TextButton btn_prev { "<" }, btn_next { ">" };
     juce::TextButton btn_a { "A" }, btn_b { "B" };
     juce::TextButton btn_about { "?" };
     juce::ValueTree stateA, stateB;
     bool slotIsA { true };
+    int  currentPresetIdx { 0 };    // tracks active preset (0=FACTORY)
+
+    bc2000dl::ui::PresetBrowser presetBrowser;
 
     // ---- APVTS attachments ----
     using SAtt = juce::AudioProcessorValueTreeState::SliderAttachment;

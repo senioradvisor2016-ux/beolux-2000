@@ -571,23 +571,25 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setupKey (k_spkB, "SPK B", "speaker_int");
     setupKey (k_mute, "MUTE",  "speaker_mute");
 
-    // ---- Preset header ----
+    // ---- Preset header — UAD-style browser ----
     {
-        int pid = 1;
-        for (auto* name : { "FACTORY", "BERG · DEPECHE PAD", "BERG · DELTA SYNTH",
-                             "BERG · PROTON CRUNCH", "BERG · REEL VOCALS", "FERRO+",
-                             "CHROME", "METAL IV", "BBC J", "NAGRA", "CASSETTE 70s",
-                             "BROADCAST", "VISCONTI '74", "BUTLER MIX", "KRAFTWERK '78",
-                             "RHODES WARM", "DRUM SMASH", "VOCAL SILK", "BASS WEIGHT",
-                             "LO-FI POP", "DUB ECHO", "GLUE MASTER", "SHOEGAZE",
-                             "CRT NIGHTMARE" })
-            cb_preset.addItem (name, pid++);
-        cb_preset.setText ("FACTORY", juce::dontSendNotification);
-        cb_preset.onChange = [this] {
-            const int sel = cb_preset.getSelectedId() - 1;
-            if (sel >= 0) applyPreset (sel);
+        // Preset name button opens the floating browser overlay
+        btn_preset_name.setButtonText ("FACTORY");
+        btn_preset_name.onClick = [this]
+        {
+            presetBrowser.openBrowser (currentPresetIdx);
         };
-        addAndMakeVisible (cb_preset);
+        addAndMakeVisible (btn_preset_name);
+
+        // Browser overlay: full-width below the preset bar
+        presetBrowser.onPresetSelected = [this] (int idx)
+        {
+            currentPresetIdx = idx;
+            btn_preset_name.setButtonText (juce::String (bc2000dl::kPresets[idx].name));
+            applyPreset (idx);
+        };
+        addAndMakeVisible (presetBrowser);
+        presetBrowser.setVisible (false);
     }
 
     auto setupNav = [&] (juce::TextButton& b, int delta)
@@ -595,10 +597,11 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         addAndMakeVisible (b);
         b.onClick = [this, delta]
         {
-            const int n    = cb_preset.getNumItems();
-            int       curr = cb_preset.getSelectedId();
-            if (curr < 1) curr = 1;
-            cb_preset.setSelectedId (((curr - 1 + delta + n) % n) + 1);
+            const int next = juce::jlimit (0, bc2000dl::kNumPresets - 1,
+                                           currentPresetIdx + delta);
+            currentPresetIdx = next;
+            btn_preset_name.setButtonText (juce::String (bc2000dl::kPresets[next].name));
+            applyPreset (next);
         };
     };
     setupNav (btn_prev, -1);
@@ -643,7 +646,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     addAndMakeVisible (btn_about);
 
     // Preset bar shadow (floats the bar above the black panel)
-    for (auto* c : { static_cast<juce::Component*> (&cb_preset),
+    for (auto* c : { static_cast<juce::Component*> (&btn_preset_name),
                      static_cast<juce::Component*> (&btn_prev),
                      static_cast<juce::Component*> (&btn_next),
                      static_cast<juce::Component*> (&btn_a),
@@ -1105,7 +1108,12 @@ void NativeEditor::resized()
     btn_a.setBounds (presetBar.removeFromRight (28).reduced (1, 2));
     presetBar.removeFromRight (12);
 
-    cb_preset.setBounds (presetBar.reduced (0, 2));
+    btn_preset_name.setBounds (presetBar.reduced (0, 2));
+
+    // Browser overlay — full inner width, from below preset bar to bottom
+    const int browserY  = kAluH + kDivH + kPresetH;
+    const int browserH  = bounds.getHeight() - browserY;
+    presetBrowser.setBounds (kTeakW, browserY, kInnerW, browserH);
 
     // Skip section-label row (very tight: 11 px)
     blackZone.removeFromTop (11);
@@ -1305,13 +1313,16 @@ void NativeEditor::timerCallback()
 }
 
 //=============================================================================
-//  Presets
+//  Presets — data-driven, validated, smooth tween
 //=============================================================================
 void NativeEditor::applyPreset (int idx)
 {
-    // Tween parameter values to their new targets over ~250 ms instead of
-    // jumping. Uses a one-shot AnimationCallback running at 60Hz.
+    // Guard: clamp to valid range
+    idx = juce::jlimit (0, bc2000dl::kNumPresets - 1, idx);
+    const auto& p = bc2000dl::kPresets[idx];
     auto& v = audioProc.apvts;
+
+    // Build a list of (paramId, fromNormalized, toNormalized) tweens
     struct Tween { juce::String id; float fromN, toN; };
     auto targets = std::make_shared<std::vector<Tween>>();
 
@@ -1319,96 +1330,63 @@ void NativeEditor::applyPreset (int idx)
     {
         if (auto* prm = v.getParameter (id))
         {
-            const float toN = prm->convertTo0to1 (val);
+            const float toN   = prm->convertTo0to1 (val);
             const float fromN = prm->getValue();
             targets->push_back ({ id, fromN, toN });
         }
     };
-    auto set = [&] (const juce::String& id, float val) { plan (id, val); };
-    auto setBool = [&] (const juce::String& id, bool b) { plan (id, b ? 1.0f : 0.0f); };
 
-    // Baseline reset
-    set ("speed", 2);
-    set ("mic_gain", 0.5f);   set ("mic_gain_r",         0.5f);
-    set ("phono_gain", 0);    set ("phono_gain_r",        0);
-    set ("radio_gain", 0);    set ("radio_gain_r",        0);
-    set ("saturation_drive", 1.0f); set ("saturation_drive_r", 1.0f);
-    set ("echo_amount", 0);   set ("echo_amount_r",       0);
-    set ("bias_amount", 1.0f);
-    set ("wow_flutter", 0.3f);
-    set ("multiplay_gen", 1);
-    set ("bass_db", 0);    set ("treble_db", 0);
-    set ("balance", 0);    set ("master_volume", 0.85f);
-    setBool ("echo_enabled",    false);
-    setBool ("bypass_tape",     false);
-    setBool ("speaker_monitor", false);
-    setBool ("synchroplay",     false);
-    setBool ("pause",           false);
-    setBool ("sos_enabled",     false);
-    setBool ("pa_enabled",      false);
-    setBool ("mic_loz",         false);
+    // --- All parameters explicitly from preset data (no "baseline + delta") ---
+    plan ("speed",              (float) p.speed);
+    plan ("mic_gain",           p.mic_gain);
+    plan ("mic_gain_r",         p.mic_gain_r);
+    plan ("phono_gain",         p.phono_gain);
+    plan ("phono_gain_r",       p.phono_gain_r);
+    plan ("radio_gain",         p.radio_gain);
+    plan ("radio_gain_r",       p.radio_gain_r);
+    plan ("tape_formula",       (float) p.tape_formula);
+    plan ("saturation_drive",   p.saturation_drive);
+    plan ("saturation_drive_r", p.saturation_drive_r);
+    plan ("bias_amount",        p.bias_amount);
+    plan ("wow_flutter",        p.wow_flutter);
+    plan ("multiplay_gen",      (float) p.multiplay_gen);
+    plan ("bass_db",            p.bass_db);
+    plan ("treble_db",          p.treble_db);
+    plan ("balance",            p.balance);
+    plan ("master_volume",      p.master_volume);
+    plan ("echo_enabled",       p.echo_enabled ? 1.0f : 0.0f);
+    plan ("echo_amount",        p.echo_amount);
+    plan ("echo_amount_r",      p.echo_amount_r);
+    // Presets never activate these — always reset to safe defaults
+    plan ("bypass_tape",        0.0f);
+    plan ("speaker_monitor",    0.0f);
+    plan ("synchroplay",        0.0f);
+    plan ("pause",              0.0f);
+    plan ("sos_enabled",        0.0f);
+    plan ("pa_enabled",         0.0f);
+    plan ("mic_loz",            0.0f);
 
-    switch (idx)
+    // ---- Smooth 250 ms tween (15 frames at ~60 Hz) ----
+    // Capture `this` (not &vRef) — vRef is a local stack variable that would
+    // dangle after applyPreset() returns.  `this` stays alive for the editor's
+    // full lifetime, which is always longer than the 250 ms animation.
+    constexpr int kFrames = 15;
+    for (int f = 1; f <= kFrames; ++f)
     {
-        case  1: set ("tape_formula", 1); set ("speed", 1);
-                  set ("saturation_drive", 1.6f); set ("saturation_drive_r", 1.6f);
-                  set ("echo_amount", 0.25f); set ("echo_amount_r", 0.25f);
-                  setBool ("echo_enabled", true); set ("bass_db", 2.5f); break;
-        case  2: set ("tape_formula", 2);
-                  set ("saturation_drive", 1.85f); set ("saturation_drive_r", 1.85f);
-                  set ("bias_amount", 0.85f); break;
-        case  3: set ("tape_formula", 2); set ("speed", 0);
-                  set ("saturation_drive", 1.95f); set ("saturation_drive_r", 1.95f);
-                  set ("bias_amount", 0.75f); break;
-        case  4: set ("tape_formula", 0); set ("speed", 2);
-                  set ("saturation_drive", 1.3f); set ("saturation_drive_r", 1.3f);
-                  set ("treble_db", 1.0f); break;
-        case  5: set ("tape_formula", 0); set ("saturation_drive", 1.4f); break;
-        case  6: set ("tape_formula", 1); break;
-        case  7: set ("tape_formula", 2); set ("saturation_drive", 1.5f); break;
-        case  8: set ("speed", 2); set ("bias_amount", 1.0f); break;
-        case  9: set ("speed", 1); set ("wow_flutter", 0.5f); break;
-        case 10: set ("tape_formula", 1); set ("speed", 0);
-                  set ("wow_flutter", 0.8f); set ("saturation_drive", 1.6f); break;
-        case 11: set ("speed", 2); break;
-        case 12: set ("tape_formula", 1); set ("speed", 2);
-                  set ("saturation_drive", 1.45f); set ("bass_db", 1.5f); break;
-        case 13: set ("treble_db", 0.8f); set ("bass_db", 1.2f); break;
-        case 14: set ("tape_formula", 1); set ("speed", 1);
-                  set ("echo_amount", 0.4f); setBool ("echo_enabled", true); break;
-        case 15: set ("treble_db", -1.0f); set ("bass_db", 1.5f);
-                  set ("saturation_drive", 1.3f); break;
-        case 16: set ("saturation_drive", 1.95f); set ("saturation_drive_r", 1.95f); break;
-        case 17: set ("saturation_drive", 1.15f); set ("treble_db", 1.5f); break;
-        case 18: set ("bass_db", 4.0f); set ("saturation_drive", 1.4f); break;
-        case 19: set ("tape_formula", 2); set ("speed", 0); set ("wow_flutter", 1.2f); break;
-        case 20: set ("echo_amount", 0.7f); set ("echo_amount_r", 0.7f);
-                  setBool ("echo_enabled", true); set ("bass_db", 3.0f); break;
-        case 21: set ("saturation_drive", 1.25f); break;
-        case 22: set ("echo_amount", 0.55f); setBool ("echo_enabled", true);
-                  set ("treble_db", -0.5f); break;
-        case 23: set ("wow_flutter", 1.8f); set ("multiplay_gen", 4);
-                  set ("saturation_drive", 1.7f); break;
-        default: break;
-    }
+        const float t  = (float) f / (float) kFrames;
+        const float e  = t * t * (3.0f - 2.0f * t);   // smoothstep
+        const bool last = (f == kFrames);
 
-    // ---- Schedule a smooth 250 ms tween (15 frames at 60Hz) ----
-    constexpr int totalFrames = 15;
-    auto& vRef = audioProc.apvts;
-    for (int f = 1; f <= totalFrames; ++f)
-    {
-        const float t = (float) f / (float) totalFrames;
-        const float e = t * t * (3.0f - 2.0f * t);   // smoothstep
-        const bool last = (f == totalFrames);
         juce::Timer::callAfterDelay (16 * f,
-            [&vRef, targets, e, last]
+            [this, targets, e, last]
             {
                 for (const auto& tw : *targets)
-                    if (auto* prm = vRef.getParameter (tw.id))
+                    if (auto* prm = audioProc.apvts.getParameter (tw.id))
                     {
-                        const float val = last ? tw.toN
-                                                : juce::jlimit (0.0f, 1.0f,
-                                                    tw.fromN + (tw.toN - tw.fromN) * e);
+                        const float val = last
+                            ? tw.toN
+                            : juce::jlimit (0.0f, 1.0f,
+                                tw.fromN + (tw.toN - tw.fromN) * e);
                         prm->setValueNotifyingHost (val);
                     }
             });

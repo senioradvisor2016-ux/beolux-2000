@@ -94,6 +94,10 @@ target_sources(BC2000DL PRIVATE
     Source/ui/AssetRegistry.cpp
     Source/ui/UADStyleSelector.h
     Source/ui/UADStyleSelector.cpp
+    Source/ui/PresetBrowser.h
+    Source/ui/PresetBrowser.cpp
+    Source/presets/Presets.h
+    Source/presets/Presets.cpp
 )
 
 target_compile_definitions(BC2000DL PRIVATE
