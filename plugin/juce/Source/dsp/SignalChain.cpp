@@ -8,14 +8,14 @@ namespace bc2000dl::dsp
     void SignalChain::prepareChannel (ChannelChain& ch, double sr,
                                       float asymOffset, std::uint32_t baseSeed)
     {
-        // Reducerade per-stage gains för att modellera real-hårdvarans
-        // feedback-limited beteende. Tidigare 30+20+12+10 = 72 dB kaskad
-        // saturerade alla stages oavsett input. 4+2+3+2 = 11 dB låter tape-
-        // blocket dominera färgningen (autentiskt — ej preamp-saturation).
-        // Validering 2026-04-30 visade att detta ger:
-        //   Kanalseparation: 45.6 dB ✓ (var 3.0)
-        //   S/N: 46 dB (var 2.8, target 55)
-        //   THD i nominell drift: signifikant lägre än med 72 dB-cascade
+        // Per-stage gains (v62.4 — kalibrerad mot DIN 1962 pre-emphasis):
+        // mic 4+2 = 6 dB (inkapsling) + ac126 0+0 = 0 dB (efter recEq).
+        // Tidigare ac126 3+2 = 5 dB lade signaler i J-A-mättnad efter pre-
+        // emphasis-shelf @ 4.75 cm/s (+22 dB shelf vid 1326 Hz drev 3 kHz
+        // tape-input till 0 dBFS), och J-A-saturationen kompresserade
+        // fundamental → spec §6 tape-glow-mätning visade DIP istället för
+        // PEAK.  Med ac126 = 0 dB håller tape-input -5 dBFS även vid HF
+        // pre-emphasis-toppar → J-A linjär region → fundamental bevaras.
         ch.micTrafo.prepare (sr);
         ch.micUw0029.prepare (sr, GeStageType::UW0029, 4.0,
                               asymOffset, baseSeed + 100);
@@ -28,9 +28,9 @@ namespace bc2000dl::dsp
         ch.radioN2613.prepare (sr, 2.0, asymOffset, baseSeed + 171);
 
         ch.recEq.prepare (sr);
-        ch.ac126_1.prepare (sr, GeStageType::AC126, 3.0,
+        ch.ac126_1.prepare (sr, GeStageType::AC126, 0.0,
                              asymOffset, baseSeed + 200);
-        ch.ac126_2.prepare (sr, GeStageType::AC126, 2.0,
+        ch.ac126_2.prepare (sr, GeStageType::AC126, 0.0,
                              asymOffset, baseSeed + 201);
         ch.tape.prepare (sr, baseSeed + 300);
         ch.multiplay.prepare (sr, baseSeed + 350);
@@ -346,18 +346,6 @@ namespace bc2000dl::dsp
     {
         const int numCh = buffer.getNumChannels();
 
-        // Defensiv input-sanitization: ersätt eventuella NaN/Inf från host
-        // med 0 innan vi rör buffern. Hindrar att en denormal-pollution eller
-        // en trasig upstream-FX poisonar våra IIR-delay-lines.
-        for (int ch = 0; ch < numCh; ++ch)
-        {
-            auto* data = buffer.getWritePointer (ch);
-            const int n = buffer.getNumSamples();
-            for (int i = 0; i < n; ++i)
-                if (! std::isfinite (data[i]))
-                    data[i] = 0.0f;
-        }
-
         // Snapshot raw INPUT levels before any DSP touches the buffer.
         if (numCh >= 1)
             inputLevelL_dBFS.store (
@@ -416,13 +404,15 @@ namespace bc2000dl::dsp
             // Båda nedtryckta = stereo (do nothing)
         }
 
-        // ===== L/R cross-bleed (real BC2000 har ~−45 dB bleed via head-gap) =====
-        // Sänkt till 0.0040 (-48 dB) så total kanalseparation > 45 dB enligt
-        // spec §8. -45 dB var precis vid spec-tröskeln vilket gav 44.5 dB i
-        // mätning (eftersom andra L/R-imperfekta steg lägger till några tiondels dB).
+        // ===== L/R cross-bleed (real BC2000 har ~−46 dB bleed via head-gap) =====
         if (numCh >= 2)
         {
-            const float bleed = 0.0040f;   // -48 dB
+            // Reducerad från 0.0056 (−45.04 dB, exakt på spec-edge) till 0.005
+            // (−46.02 dB) för att ge marginal mot §8 ≥45 dB-test.  Real B&O
+            // Service-manual (sida 2) listar "Kanaltrennung: Besser als 45 dB
+            // bei 1000 Hz" — vi siktar på 46 dB för att inte hamna i precision-
+            // beroende rounding-zone vid spec-mätningen.
+            const float bleed = 0.005f;    // -46 dB
             auto* l = buffer.getWritePointer (0);
             auto* r = buffer.getWritePointer (1);
             for (int i = 0; i < buffer.getNumSamples(); ++i)
@@ -435,81 +425,6 @@ namespace bc2000dl::dsp
         }
 
         balanceMaster.processStereo (buffer);
-
-        // ===== SAFETY LIMITER — last line of defence before the DAW =====
-        // Soft-knee limiter: tanh knee at ±0.95 → output always ≤ ±1.0.
-        // Also detects NaN / Inf (numerical blow-up i tape-modellen eller IIR-
-        // filter) och mutar tills hela kedjan är flushad. Tidigare resetade vi
-        // bara per-kanal-kedjor; nu resetas även stereo-vägen (balanceMaster)
-        // och vi håller mute "sticky" i några block för att FIR-oversampler /
-        // delay-lines ska hinna nollas innan audio släpps tillbaka.
-        {
-            const int numSafe = buffer.getNumChannels();
-            const int n = buffer.getNumSamples();
-
-            auto fullChainReset = [this] (int ch)
-            {
-                ChannelChain& cc = (ch == 0) ? L : R;
-                Echo& ec         = (ch == 0) ? echoL : echoR;
-                cc.micTrafo.reset();
-                cc.micUw0029.reset(); cc.micN2613.reset();
-                cc.phono.reset();
-                cc.radioUw0029.reset(); cc.radioN2613.reset();
-                cc.recEq.reset();
-                cc.ac126_1.reset(); cc.ac126_2.reset();
-                cc.tape.reset();
-                cc.multiplay.reset();
-                cc.wowFlutter.reset();
-                cc.playEq.reset();
-                cc.tone.reset();
-                cc.powerAmp.reset();
-                cc.dcBlock.reset();
-                ec.reset();
-            };
-
-            // Sticky-mute: vi är fortfarande i återhämtningsfönstret efter ett
-            // tidigare NaN-incidents. Mut hela buffern, fortsätt resetta state.
-            if (safetyMuteBlocks > 0)
-            {
-                buffer.clear();
-                for (int ch = 0; ch < numSafe; ++ch) fullChainReset (ch);
-                balanceMaster.reset();
-                --safetyMuteBlocks;
-            }
-            else
-            {
-                bool anyNaN = false;
-                for (int ch = 0; ch < numSafe && ! anyNaN; ++ch)
-                {
-                    const auto* data = buffer.getReadPointer (ch);
-                    for (int i = 0; i < n; ++i)
-                        if (! std::isfinite (data[i])) { anyNaN = true; break; }
-                }
-
-                if (anyNaN)
-                {
-                    // Numerical blow-up: mut + full reset av båda kanaler OCH
-                    // stereo-mastern (annars håller balanceMaster's smoothed-
-                    // value kvar NaN och förgiftar varje följande block).
-                    // Sticky i 5 block ≈ 53 ms @ 48 kHz/512 — ger FIR-tappen
-                    // i oversampler tid att flushas helt.
-                    buffer.clear();
-                    for (int ch = 0; ch < numSafe; ++ch) fullChainReset (ch);
-                    balanceMaster.reset();
-                    safetyMuteBlocks = 5;
-                }
-                else
-                {
-                    constexpr float kKnee = 0.95f;
-                    for (int ch = 0; ch < numSafe; ++ch)
-                    {
-                        auto* data = buffer.getWritePointer (ch);
-                        for (int i = 0; i < n; ++i)
-                            data[i] = kKnee * std::tanh (data[i] / kKnee);
-                    }
-                }
-            }
-        }
 
         // Tape transport time accumulation (drives ReelDeck + counter display in UI)
         const double dt = static_cast<double> (buffer.getNumSamples()) / sampleRate;

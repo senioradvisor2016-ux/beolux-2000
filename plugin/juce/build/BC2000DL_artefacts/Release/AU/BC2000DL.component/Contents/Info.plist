@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist>
+  <dict>
+    <key>CFBundleExecutable</key>
+    <string>BC2000DL</string>
+    <key>CFBundleIconFile</key>
+    <string></string>
+    <key>CFBundleIdentifier</key>
+    <string>com.bc2000dl.audio.plugin</string>
+    <key>CFBundleName</key>
+    <string>BC2000DL</string>
+    <key>CFBundleDisplayName</key>
+    <string>BC2000DL</string>
+    <key>CFBundlePackageType</key>
+    <string>BNDL</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>0.1.0</string>
+    <key>NSHumanReadableCopyright</key>
+    <string></string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>AudioComponents</key>
+    <array>
+      <dict>
+        <key>name</key>
+        <string>BC2000DL Audio: BC2000DL</string>
+        <key>description</key>
+        <string>Danish Tape 2000 &#8212; VST/AU emulation of a 1968 reel-to-reel</string>
+        <key>factoryFunction</key>
+        <string>BC2000DLAUFactory</string>
+        <key>manufacturer</key>
+        <string>BcAU</string>
+        <key>type</key>
+        <string>aufx</string>
+        <key>subtype</key>
+        <string>Bc2k</string>
+        <key>version</key>
+        <integer>256</integer>
+        <key>resourceUsage</key>
+        <dict>
+          <key>network.client</key>
+          <true/>
+          <key>temporary-exception.files.all.read-write</key>
+          <true/>
+        </dict>
+      </dict>
+    </array>
+  </dict>
+</plist>

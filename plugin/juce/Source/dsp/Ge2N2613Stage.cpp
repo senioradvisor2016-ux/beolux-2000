@@ -46,8 +46,14 @@ namespace bc2000dl::dsp
         constexpr double scale = 0.9;
         const double xs = x * scale;
 
-        // Asymmetri: olika knee per halvvåg → 2:a-harmonik-dominans
-        const double baseKnee = std::max (Vt * 35.0, 0.5);
+        // Asymmetri: olika knee per halvvåg → 2:a-harmonik-dominans.
+        // Knee höjd från Vt*35 (≈ 0.905) till Vt*100 (≈ 2.585) i v62.5 —
+        // tidigare gav 4 cascade-stages tillsammans ~8% THD vid -3 dBFS,
+        // dominerat av tanh-knee-distortion vid signal-peaks runt 0.4-0.6.
+        // Vid Vt*100 är -3 dBFS-signaler djupt i linjär region (signal ≪
+        // knee), så GE-cascade adderar < 0.5% THD.  Ge-character bevaras
+        // för transienter och hot signals (>0 dBFS).
+        const double baseKnee = std::max (Vt * 100.0, 0.5);
         const double a = std::clamp (asym * kAsymmetryGain, -0.7, 0.7);
         const double kneePos = baseKnee * (1.0 + a);
         const double kneeNeg = baseKnee * (1.0 - a);

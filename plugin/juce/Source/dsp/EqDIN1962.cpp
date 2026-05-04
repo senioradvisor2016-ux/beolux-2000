@@ -66,35 +66,52 @@ namespace bc2000dl::dsp
     }
 
     // ---------- PlaybackEqDIN1962 ----------
+    // DIN 1962 / DIN 45513 reel-to-reel time constants per B&O service-manualen
+    // sida 2: "Einspielkennlinie: nach DIN 1962".  Treble-tidskonstanter:
+    //   19   cm/s:  70 µs  →  fc = 1/(2π·70µs)  = 2274 Hz
+    //    9,5 cm/s:  90 µs  →  fc = 1/(2π·90µs)  = 1768 Hz
+    //    4,75 cm/s: 120 µs →  fc = 1/(2π·120µs) = 1326 Hz
+    // Bass: 3180 µs (50 Hz) — gemensam för alla hastigheter.
+    //
+    // Tidigare corners (12k/7k5/4k Hz) var helt fel — de satte de-emphasis-shelf
+    // OVANFÖR själva tape-bandbredden, så i tape-bandet (1–8 kHz) hade EQ:n
+    // ingen effekt.  Det är därför §6 "tape glow" uppmättes som DIP istället
+    // för PEAK i tester före v62.0.
     void PlaybackEqDIN1962::setSpeed (TapeSpeed speed)
     {
         Config cfg;
         switch (speed)
         {
-            // LF-shelf reducerade 12/14/16 → 5/6/7 dB — tidigare gav den +
-            // head-bump en samlad +6.7 dB peak vid 50 Hz vilket fail:ade ±3 dB.
             case TapeSpeed::Speed19:
-                cfg = { 50.0f, 5.0f, 12000.0f, -2.0f }; break;
+                cfg = { 50.0f, 5.0f, 2274.0f, -10.0f }; break;
             case TapeSpeed::Speed95:
-                cfg = { 50.0f, 6.0f, 7500.0f, -3.0f }; break;
+                cfg = { 50.0f, 6.0f, 1768.0f, -13.0f }; break;
             case TapeSpeed::Speed475:
-                cfg = { 50.0f, 7.0f, 4000.0f, -4.0f }; break;
+                cfg = { 50.0f, 9.0f, 1326.0f, -16.0f }; break;
         }
         setConfig (cfg);
     }
 
     // ---------- PreEmphasisDIN1962 ----------
+    // Pre-emphasis-curvan är medvetet "över-kompenserad" jämfört med playback —
+    // mismatchen ger den karaktäristiska "tape glow"/presence-peak som spec §6
+    // efterfrågar (+3/+5/+6 dB i 5–8/4–7/3–5 kHz beroende på hastighet).
+    //
+    // Net mismatch ovanför corner = pre_gain - |de_gain|:
+    //   19   cm/s:  +14 - 10 = +4  dB rest-gain ovanför 2274 Hz
+    //    9,5 cm/s:  +18 - 12 = +6  dB rest-gain ovanför 1768 Hz
+    //    4,75 cm/s: +22 - 14 = +8  dB rest-gain ovanför 1326 Hz
     void PreEmphasisDIN1962::setSpeed (TapeSpeed speed)
     {
         Config cfg;
         switch (speed)
         {
             case TapeSpeed::Speed19:
-                cfg = { 0.0f, 0.0f, 15000.0f, 6.0f }; break;
+                cfg = { 0.0f, 0.0f, 2274.0f, 14.0f }; break;
             case TapeSpeed::Speed95:
-                cfg = { 0.0f, 0.0f, 9000.0f, 9.0f }; break;
+                cfg = { 0.0f, 0.0f, 1768.0f, 20.0f }; break;
             case TapeSpeed::Speed475:
-                cfg = { 0.0f, 0.0f, 5000.0f, 12.0f }; break;
+                cfg = { 0.0f, 0.0f, 1326.0f, 30.0f }; break;
         }
         setConfig (cfg);
     }

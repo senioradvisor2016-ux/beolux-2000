@@ -1,0 +1,10 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/cmake_install.cmake",
+		"/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/modules/cmake_install.cmake",
+		"/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/extras/Build/cmake_install.cmake",
+		"/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/extras/Build/juceaide/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

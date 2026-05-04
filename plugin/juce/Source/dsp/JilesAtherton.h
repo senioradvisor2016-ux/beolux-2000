@@ -55,17 +55,9 @@ namespace bc2000dl::dsp
         // Sample-för-sample-process (history-dependent)
         inline float processSample (float H) noexcept
         {
-            // NaN/Inf guard — if either the input or our own state has gone bad,
-            // reset silently and return zero.  Without this, a single NaN locks
-            // the model permanently: H_eff = H + α·NaN = NaN → L = NaN → M = NaN.
-            // The comparison-based Ms-clamp below won't catch NaN (NaN > x = false),
-            // so NaN in M would propagate for ever.
-            if (! std::isfinite (H) || ! std::isfinite (M))
-            {
-                M = 0.0;
-                H_prev = 0.0;
-                return 0.0f;
-            }
+            // NaN-guard på input — annars förorenar M/H_prev permanent
+            if (! std::isfinite (H))
+                H = 0.0f;
 
             const double Hd = static_cast<double> (H);
             const double H_eff = Hd + params.alpha * M;
@@ -74,25 +66,37 @@ namespace bc2000dl::dsp
 
             const double delta = (Hd >= H_prev) ? 1.0 : -1.0;
 
-            double denom = params.k * delta - params.alpha * (M_an - M);
-            // Tighter clamp (1e-6 vs old 1e-12): the wider clamp allowed
-            // dM_irr_dH to reach ~2e12 producing enormous (though later clamped)
-            // magnetisation swings.  1e-6 is still far below any physical regime
-            // (k ≈ 0.07–0.13 normally keeps |denom| >> 0.001) but caps the ratio
-            // at ~2e6 × dH, preventing extreme transients on parameter switches.
-            if (std::abs (denom) < 1e-6)
-                denom = (denom >= 0.0 ? 1e-6 : -1e-6);
+            // Robustare denom-guard.  Vid små k (BASF=0.07) och stora |M_an-M|
+            // kan denom byta tecken över ett sample, vilket ger explosiv
+            // dM/dH och numerisk drift.  Använd k som golv (≥ k/2).
+            const double rawDenom = params.k * delta - params.alpha * (M_an - M);
+            const double minDenom = params.k * 0.5;  // tillräckligt för stabilitet
+            double denom = rawDenom;
+            if (std::abs (denom) < minDenom)
+                denom = (denom >= 0.0 ? minDenom : -minDenom);
 
             const double dM_irr_dH = (M_an - M) / denom;
             const double dH = Hd - H_prev;
-            M += dM_irr_dH * dH;
+            const double dMnew = dM_irr_dH * dH;
+
+            // Begränsa per-sample-förändring för stabilitet
+            const double dMclamped = std::max (-0.5, std::min (0.5, dMnew));
+            M += dMclamped;
 
             // Klippa till fysikaliska gränser
             if (M >  params.Ms) M =  params.Ms;
             if (M < -params.Ms) M = -params.Ms;
 
             const double M_rev = params.c * (M_an - M);
-            const double out = M + M_rev;
+            double out = M + M_rev;
+
+            // Slutlig NaN-guard — om något ändå läcker igenom, returnera
+            // 0 och nollställ state så nästa sample kan börja från ren grund.
+            if (! std::isfinite (out))
+            {
+                out = 0.0;
+                M = 0.0;
+            }
 
             H_prev = Hd;
             return static_cast<float> (out);

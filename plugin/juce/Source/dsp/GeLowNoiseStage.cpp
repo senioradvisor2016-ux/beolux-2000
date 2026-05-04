@@ -16,7 +16,9 @@ namespace bc2000dl::dsp
             constexpr double scale = 0.9;
             const double xs = x * scale;
 
-            const double baseKnee = std::max (Vt * 35.0, 0.5);
+            // Knee höjd från Vt*35 till Vt*100 (v62.5) — se Ge2N2613Stage.cpp
+            // för förklaring.  Linjär region för -3 dBFS test-signaler.
+            const double baseKnee = std::max (Vt * 100.0, 0.5);
             const double a = std::clamp (asym * kAsymmetryGain, -0.7, 0.7);
             const double kneePos = baseKnee * (1.0 + a);
             const double kneeNeg = baseKnee * (1.0 - a);

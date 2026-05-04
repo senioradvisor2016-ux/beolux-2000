@@ -1,0 +1,6 @@
+# Hashes of file build rules.
+39db6c17e49a56c4501be1c51ff1dcd1 BC2000DL_artefacts/JuceLibraryCode/BC2000DL_AU/PkgInfo
+f9b0247469411d52d299f0bbff52685d BC2000DL_artefacts/JuceLibraryCode/BC2000DL_Standalone/PkgInfo
+1b7a63d38655d60f41c2b32ca61f5784 BC2000DL_artefacts/JuceLibraryCode/BC2000DL_VST3/PkgInfo
+2b2df64fe9f72ed3f50056471939a324 BC2000DL_artefacts/JuceLibraryCode/JuceHeader.h
+6ca04aa8ef9a2f4be013979842c9ce93 juce_binarydata_BC2000DL_Assets/JuceLibraryCode/BinaryData1.cpp

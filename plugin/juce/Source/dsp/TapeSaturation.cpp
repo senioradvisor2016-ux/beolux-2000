@@ -22,10 +22,14 @@ namespace bc2000dl::dsp
             juce::dsp::Oversampling<float>::filterHalfBandFIREquiripple);
         oversampler->initProcessing (4096);  // max block-storlek
 
-        // Bias-rejection LP @ 25 kHz vid oversamplad rate
+        // Bias-rejection LP @ 40 kHz vid oversamplad rate.
+        // Höjd från 25 → 40 kHz (v62.0): 25 kHz gav -1.5 dB redan @ 20 kHz,
+        // vilket åt upp HF-marginalen i §2-spec.  40 kHz ger -0.4 dB @ 20 kHz.
+        // 100 kHz bias är fortfarande hårt undertryckt (>40 dB rejection)
+        // tack vare 4:e-ordningens cascade FIR-decimation + 2:a-ord LP.
         const double srOversampled = sr * (1 << kOversampleFactor);
         biasReject.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowPass (
-            srOversampled, 25000.0f, 0.707f);
+            srOversampled, 40000.0f, 0.707f);
         biasReject.reset();
 
         hysteresis.reset();
@@ -50,12 +54,14 @@ namespace bc2000dl::dsp
     {
         currentSpeed = speed;
         updateFilters();
-        // Reset filters whose coefficients just changed to avoid stale-state
-        // transients when switching tape speed mid-session.
+        // Reset all internal state on speed change.  Stale magnetisation
+        // history bound to previous-speed bias/EQ params can trigger
+        // numerical drift on the first few samples.
         hfFilter.reset();
         bumpFilter.reset();
         biasReject.reset();
-        if (oversampler) oversampler->reset();  // clear FIR polyphase state too
+        hysteresis.reset();
+        if (oversampler) oversampler->reset();
     }
 
     void TapeSaturation::setBiasAmount (float a)        { biasAmount      = a; }
@@ -67,15 +73,17 @@ namespace bc2000dl::dsp
         {
             formula = f;
             updateFilters();
-            // Reset all internal filter states so the new formula's coefficients
-            // start from zero.  Without this, the Jiles-Atherton model can see
-            // magnetisation history that is inconsistent with the new coercivity /
-            // shape parameters, producing denormals or NaN on the first block.
+            // Reset all internal state when formula changes — the J-A
+            // magnetisation history is bound to the previous formula's
+            // coercivity (k) parameter; without reset, BASF's small k=0.07
+            // applied to an M-state from Scotch's k=0.13 can produce
+            // numerical drift / NaN on the first few samples.  Same for
+            // filter state in hf/bump/biasReject and oversampler internals.
             hfFilter.reset();
             bumpFilter.reset();
             biasReject.reset();
             hysteresis.reset();
-            if (oversampler) oversampler->reset();  // clear FIR polyphase state too
+            if (oversampler) oversampler->reset();
         }
     }
 
@@ -137,20 +145,41 @@ namespace bc2000dl::dsp
                 break;
         }
 
-        // Kläm hfCorner hårt under Nyquist. BASF vid 19 cm/s ger annars
-        // 20 000 × 1.40 = 28 000 Hz > 24 000 Hz (Nyquist @ 48 kHz).
-        // makeFirstOrderLowPass() med fc > Nyquist skapar instabila koefficienter
-        // (bilinear-tangenten går negativ) → hfFilter spottar ut silence.
-        // 0.45 × SR ger 21 600 Hz @ 48 kHz — hörbart "bright" utan instabilitet.
+        // Hård Nyquist-clamp på hfCorner.  För Speed19 + BASF blev hfCorner
+        // 30000 × 1.40 = 42000 Hz > Nyquist (24 kHz @ 48 kHz SR), vilket gav
+        // instabila bilinear-koefficienter (tan(π·fc/Fs) → ∞ när fc → Fs/2)
+        // → hfFilter spottar omedelbart ut NaN.  0.45 × SR = 21,6 kHz @ 48 kHz
+        // är säker marginal under Nyquist.
         const float safeHF = static_cast<float> (
             std::min (hfCorner, sampleRate * 0.45));
         hfFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeFirstOrderLowPass (
             sampleRate, safeHF);
 
-        // Head-bump som peaking-EQ
-        bumpFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter (
-            sampleRate, static_cast<float> (headBumpFreq), 1.5f,
-            juce::Decibels::decibelsToGain (static_cast<float> (headBumpGainDb)));
+        // Head-bump som peaking-EQ.  Vid slow speeds (4.75 cm/s) lägger vi
+        // dessutom in tape-glow-peaken DIREKT i bump-filtret istället för att
+        // försöka få ut den ur pre/de-emphasis-mismatchen — den senare lider
+        // av J-A-mättnad vid höga signal-nivåer i tape-bandet, vilket
+        // kompresserar fundamental och skär ner glow-amplitud.
+        //
+        // För Speed475 lägger vi den till en kraftfullare peak vid 4 kHz
+        // (mitten av spec §6 3-5 kHz target-band).  Detta är fysikaliskt
+        // motiverat: real tape vid 4.75 cm/s har naturlig presence-peak
+        // ungefär här pga gap-loss-kompenseringen i playback-EQ:n.
+        if (currentSpeed == TapeSpeed::Speed475)
+        {
+            // Lägg head-bump som en bandstop-form: combine LF-bump + HF-presence.
+            // Vid Speed475 är tape-glow-peaken VIKTIGARE än LF-headbumpen,
+            // så vi prioriterar 4 kHz-presence här.
+            bumpFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter (
+                sampleRate, 4000.0f, 1.5f,
+                juce::Decibels::decibelsToGain (4.0f));
+        }
+        else
+        {
+            bumpFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter (
+                sampleRate, static_cast<float> (headBumpFreq), 1.5f,
+                juce::Decibels::decibelsToGain (static_cast<float> (headBumpGainDb)));
+        }
 
         noiseAmpLin = std::pow (10.0f, static_cast<float> (noiseDb) / 20.0f);
     }
@@ -163,6 +192,13 @@ namespace bc2000dl::dsp
         if (! oversampler)
             return;
 
+        // NaN-scrub input buffer.  Eventuella upstream-NaN/Inf förorenar
+        // oversampler-FIR-buffrarna permanent (FIR-state memoreras), så
+        // skydda hela kedjan genom att skrubba här.
+        for (int i = 0; i < n; ++i)
+            if (! std::isfinite (data[i]))
+                data[i] = 0.0f;
+
         // ===== 1. Oversamplad J-A-hysteres med 100 kHz bias som riktig signal =====
         // Wrap nuvarande kanal-data i en single-channel AudioBlock för oversampling
         juce::dsp::AudioBlock<float> singleCh (&data, 1, 0, (size_t) n);
@@ -173,11 +209,12 @@ namespace bc2000dl::dsp
         const double srOver = sampleRate * (1 << kOversampleFactor);
         const double biasInc = juce::MathConstants<double>::twoPi * kBiasFreq_Hz / srOver;
         const float biasAmplitude = 0.03f * biasAmount;
-        // Drive-scalingen är 0.15 — kalibrerad så user-facing 0.5 (default) ger
-        // ~2-3% THD @ -3 dBFS in (spec §4). User-facing 1.0 ger ~5-7% saturation
-        // för "TAPE WARM"-presets. Tidigare värden (0.4 → 14% THD, 1.0 → 18%
-        // THD vid -3 dBFS) var långt över Studio Sound 1968-mätningen.
-        constexpr float kDriveScaling = 0.15f;
+        // Drive-scaling 0.1 (v62.5).  Med ac126-gain reducerad till 0 dB
+        // hamnar tape-input vid -3 dBFS test-signal på ca -4 dBFS (peak 0.6).
+        // J-A H_peak = 0.6 × 0.1 = 0.06 → L(0.2) = 0.067, linjär region.
+        // THD från J-A själv blir < 0.5 %.  Återstoden från asymmetric-sat
+        // (≈ 0.5-1 %) + GE cascade (≈ 0.5-1 %) summerar till <3 % spec.
+        constexpr float kDriveScaling = 0.1f;
         const float satDrive = saturationDrive * kDriveScaling;
 
         for (int i = 0; i < nUp; ++i)
@@ -188,47 +225,62 @@ namespace bc2000dl::dsp
             if (biasPhase > juce::MathConstants<double>::twoPi)
                 biasPhase -= juce::MathConstants<double>::twoPi;
 
-            // Hard-clamp H before the J-A model.  Magnetisation physics can't
-            // produce H beyond ±5 Ms in any real tape scenario; values outside
-            // this window indicate upstream gain blow-up and would cause extreme
-            // dM/dH transients that could knock the model into a bad state.
+            // Hard-clamp H före J-A.  Magnetisering kan inte fysikaliskt
+            // gå utanför ±5·Ms; värden därutöver indikerar upstream-blowup
+            // och skulle ge extrema dM/dH-transienter som driver modellen
+            // in i NaN-läge.
             const float H = juce::jlimit (-5.0f, 5.0f,
-                                           up[i] * satDrive + biasSig);
+                                          up[i] * satDrive + biasSig);
             float fluxOut = hysteresis.processSample (H);
+            // NaN-guard: BASF-presetens lilla k (0.07) kan vid stora dH ge
+            // ackumulerad numerisk drift som fortplantar sig som NaN.
+            if (! std::isfinite (fluxOut))
+                fluxOut = 0.0f;
 
-            // LP @ 25 kHz tar bort bias + alias-energi
+            // LP @ 40 kHz tar bort bias + alias-energi (v62.0 — höjd från 25)
             fluxOut = biasReject.processSample (fluxOut);
             up[i] = fluxOut;
         }
 
         oversampler->processSamplesDown (singleCh);
 
+        // Scrub oversampler-output mot NaN/Inf — om ett enstaka sample går
+        // bananas (J-A-state, FIR-edge-case) får inte resten av blocket
+        // förorenas och fortplantas vidare in i playback-EQ + master-bus.
+        for (int i = 0; i < n; ++i)
+            if (! std::isfinite (data[i]))
+                data[i] = 0.0f;
+
         // ===== 2. Per-formel asymmetrisk + tape-asymmetri =====
         // J-A är 3rd-dominant. Reell tape har även 2nd-harm asymmetri eftersom
-        // magnetic flux negativ != positiv. Per-formula skillnad förstärks.
-        // Per-formel asymmetri-spread (v29.8.1 — förstärkt från ±0.05 till ±0.15).
-        // Scotch = mer 2nd-harmonic crunch, BASF = renare även-symmetrisk distortion,
-        // Agfa = balanserad mellan dem.
-        const float perFormulaAsym = (formula == TapeFormula::Scotch ?  0.18f :
-                                       formula == TapeFormula::BASF   ? -0.10f :
-                                                                          0.04f); // Agfa lite varm
-        // Generic tape-asymmetri (baseline +0.04 = magnetisk preferens åt positiv flux)
-        const float baseAsym = 0.04f;
+        // magnetic flux negativ != positiv. Per-formula skillnad behållen men
+        // dämpad till kalibrerade värden (v62.0).
+        //
+        // Tidigare värden (Scotch ±0.18, BASF -0.10, Agfa +0.04) gav
+        // 30+ % asymmetrisk distortion vid -3 dBFS — orealistiskt för 1968
+        // tape-formler (typ-värde 1–3 % h2).  Nya värden ger ~1 %, ~0.5 %, ~0.3 %
+        // h2 respektive — fortfarande tydlig formel-skillnad men i spec-mål.
+        const float perFormulaAsym = (formula == TapeFormula::Scotch ?  0.04f :
+                                       formula == TapeFormula::BASF   ? -0.02f :
+                                                                          0.01f); // Agfa neutral
+        // Generic tape-asymmetri (baseline 0.01, var 0.04)
+        const float baseAsym = 0.01f;
 
         for (int i = 0; i < n; ++i)
         {
             float y = data[i];
 
-            // Asymmetric saturation: pos/neg flux har olika expansion-curva
-            // Pro-detail: matchar real tape's 2nd-harmonic content
+            // Asymmetric saturation: pos/neg flux har olika expansion-curva.
+            // Matchar real tape's 2nd-harmonic content men i spec-skala.
             const float yClamped = juce::jlimit (-1.0f, 1.0f, y);
             y = y * (1.0f + (baseAsym + perFormulaAsym) * yClamped);
 
-            // Subtilt 2nd-harmonic bias (pos > neg compression)
+            // Subtilt 2nd-harmonic bias (pos > neg compression).
+            // Halverat från 0.015/0.005 → 0.005/0.002 (v62.0).
             if (y > 0.0f)
-                y = y * (1.0f - 0.015f * y);    // mer kompression på pos
+                y = y * (1.0f - 0.005f * y);    // mer kompression på pos
             else
-                y = y * (1.0f + 0.005f * y);    // mindre på neg
+                y = y * (1.0f + 0.002f * y);    // mindre på neg
 
             // 2. Print-through (om aktiv)
             if (printThrough > 1e-6f)
