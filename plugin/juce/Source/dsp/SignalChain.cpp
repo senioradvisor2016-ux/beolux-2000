@@ -346,6 +346,18 @@ namespace bc2000dl::dsp
     {
         const int numCh = buffer.getNumChannels();
 
+        // Defensiv input-sanitization: ersätt eventuella NaN/Inf från host
+        // med 0 innan vi rör buffern. Hindrar att en denormal-pollution eller
+        // en trasig upstream-FX poisonar våra IIR-delay-lines.
+        for (int ch = 0; ch < numCh; ++ch)
+        {
+            auto* data = buffer.getWritePointer (ch);
+            const int n = buffer.getNumSamples();
+            for (int i = 0; i < n; ++i)
+                if (! std::isfinite (data[i]))
+                    data[i] = 0.0f;
+        }
+
         // Snapshot raw INPUT levels before any DSP touches the buffer.
         if (numCh >= 1)
             inputLevelL_dBFS.store (
@@ -423,50 +435,75 @@ namespace bc2000dl::dsp
 
         // ===== SAFETY LIMITER — last line of defence before the DAW =====
         // Soft-knee limiter: tanh knee at ±0.95 → output always ≤ ±1.0.
-        // Also detects NaN / Inf (numerical blow-up in tape model or IIR filters)
-        // and mutes the channel rather than letting the DAW's protection kick in.
+        // Also detects NaN / Inf (numerical blow-up i tape-modellen eller IIR-
+        // filter) och mutar tills hela kedjan är flushad. Tidigare resetade vi
+        // bara per-kanal-kedjor; nu resetas även stereo-vägen (balanceMaster)
+        // och vi håller mute "sticky" i några block för att FIR-oversampler /
+        // delay-lines ska hinna nollas innan audio släpps tillbaka.
         {
             const int numSafe = buffer.getNumChannels();
-            for (int ch = 0; ch < numSafe; ++ch)
+            const int n = buffer.getNumSamples();
+
+            auto fullChainReset = [this] (int ch)
             {
-                auto* data = buffer.getWritePointer (ch);
-                const int n = buffer.getNumSamples();
-                bool hasNaN = false;
-                for (int i = 0; i < n; ++i)
+                ChannelChain& cc = (ch == 0) ? L : R;
+                Echo& ec         = (ch == 0) ? echoL : echoR;
+                cc.micTrafo.reset();
+                cc.micUw0029.reset(); cc.micN2613.reset();
+                cc.phono.reset();
+                cc.radioUw0029.reset(); cc.radioN2613.reset();
+                cc.recEq.reset();
+                cc.ac126_1.reset(); cc.ac126_2.reset();
+                cc.tape.reset();
+                cc.multiplay.reset();
+                cc.wowFlutter.reset();
+                cc.playEq.reset();
+                cc.tone.reset();
+                cc.powerAmp.reset();
+                cc.dcBlock.reset();
+                ec.reset();
+            };
+
+            // Sticky-mute: vi är fortfarande i återhämtningsfönstret efter ett
+            // tidigare NaN-incidents. Mut hela buffern, fortsätt resetta state.
+            if (safetyMuteBlocks > 0)
+            {
+                buffer.clear();
+                for (int ch = 0; ch < numSafe; ++ch) fullChainReset (ch);
+                balanceMaster.reset();
+                --safetyMuteBlocks;
+            }
+            else
+            {
+                bool anyNaN = false;
+                for (int ch = 0; ch < numSafe && ! anyNaN; ++ch)
                 {
-                    if (! std::isfinite (data[i]))  { hasNaN = true; break; }
+                    const auto* data = buffer.getReadPointer (ch);
+                    for (int i = 0; i < n; ++i)
+                        if (! std::isfinite (data[i])) { anyNaN = true; break; }
                 }
-                if (hasNaN)
+
+                if (anyNaN)
                 {
-                    // Numerical blow-up: mute silently rather than pass ±inf to DAW.
-                    // Critically: also reset ALL IIR filter states for this channel.
-                    // Without this, a NaN that entered a filter's delay-line memory
-                    // will propagate on every subsequent block → permanent silence.
-                    buffer.clear (ch, 0, n);
-                    ChannelChain& cc = (ch == 0) ? L : R;
-                    Echo& ec         = (ch == 0) ? echoL : echoR;
-                    cc.micTrafo.reset();
-                    cc.micUw0029.reset();
-                    cc.micN2613.reset();
-                    cc.phono.reset();
-                    cc.radioUw0029.reset();
-                    cc.radioN2613.reset();
-                    cc.recEq.reset();
-                    cc.ac126_1.reset();  cc.ac126_2.reset();
-                    cc.tape.reset();
-                    cc.multiplay.reset();
-                    cc.wowFlutter.reset();
-                    cc.playEq.reset();
-                    cc.tone.reset();
-                    cc.powerAmp.reset();
-                    cc.dcBlock.reset();
-                    ec.reset();
+                    // Numerical blow-up: mut + full reset av båda kanaler OCH
+                    // stereo-mastern (annars håller balanceMaster's smoothed-
+                    // value kvar NaN och förgiftar varje följande block).
+                    // Sticky i 5 block ≈ 53 ms @ 48 kHz/512 — ger FIR-tappen
+                    // i oversampler tid att flushas helt.
+                    buffer.clear();
+                    for (int ch = 0; ch < numSafe; ++ch) fullChainReset (ch);
+                    balanceMaster.reset();
+                    safetyMuteBlocks = 5;
                 }
                 else
                 {
                     constexpr float kKnee = 0.95f;
-                    for (int i = 0; i < n; ++i)
-                        data[i] = kKnee * std::tanh (data[i] / kKnee);
+                    for (int ch = 0; ch < numSafe; ++ch)
+                    {
+                        auto* data = buffer.getWritePointer (ch);
+                        for (int i = 0; i < n; ++i)
+                            data[i] = kKnee * std::tanh (data[i] / kKnee);
+                    }
                 }
             }
         }

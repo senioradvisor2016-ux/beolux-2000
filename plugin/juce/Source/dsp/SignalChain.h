@@ -171,6 +171,11 @@ namespace bc2000dl::dsp
         Echo echoL, echoR;
         BalanceMaster balanceMaster;
 
+        // Sticky safety-mute: när NaN/Inf har detekterats i output, fortsätter
+        // vi muta i N block för att låta hela kedjan (FIR-oversampler, IIR-states,
+        // delay lines) flushas innan vi börjar släppa igenom audio igen.
+        int safetyMuteBlocks { 0 };
+
         // Initial asymmetri vid prepare() — matchas sedan av setParameters() via APVTS.
         static constexpr float kAsymmetryAmount = 0.02f;
 
