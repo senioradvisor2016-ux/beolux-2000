@@ -14,7 +14,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SOURCE_DIR="$REPO_ROOT/plugin/juce"
 BUILD_DIR="$SOURCE_DIR/build"
 REAPER_APP="/Applications/REAPER.app"
-TARGET="BC2000DL"
+TARGET="BC2000DL_All"
 CONFIG="${CONFIG:-Release}"
 JOBS="$(sysctl -n hw.ncpu 2>/dev/null || echo 4)"
 
