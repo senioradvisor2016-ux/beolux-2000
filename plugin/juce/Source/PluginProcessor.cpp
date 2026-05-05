@@ -4,6 +4,7 @@
 #include "PluginEditor.h"
 #include "WebEditor.h"
 #include "NativeEditor.h"
+#include "presets/Presets.h"
 #include <cstring>
 
 namespace
@@ -326,128 +327,54 @@ juce::AudioProcessorEditor* BC2000DLProcessor::createEditor()
     return new NativeEditor (*this);
 }
 
-// ============================================================================
-//  Factory presets — values are 0..1 normalized (passed to setValueNotifyingHost)
-// ============================================================================
-namespace {
-struct PresetEntry { const char* id; float value01; };
-struct Preset { const char* name; std::vector<PresetEntry> values; };
-
-// Helper: build preset with sensible defaults + overrides.
-// Reduces boilerplate so 36 presets fit cleanly.
-static Preset mk(const char* name, std::initializer_list<PresetEntry> overrides)
-{
-    Preset p;
-    p.name = name;
-    // Sensible neutral baseline
-    p.values = {
-        {"speed", 0.5f}, {"tape_formula", 0.5f},
-        {"mic_gain", 0.5f}, {"mic_gain_r", 0.5f},
-        {"phono_gain", 0.5f}, {"phono_gain_r", 0.5f},
-        {"radio_gain", 0.5f}, {"radio_gain_r", 0.5f},
-        {"saturation_drive", 0.5f}, {"saturation_drive_r", 0.5f},
-        {"echo_amount", 0.0f}, {"echo_amount_r", 0.0f},
-        {"treble_db", 0.5f}, {"bass_db", 0.5f}, {"balance", 0.5f},
-        {"bias_amount", 0.5f}, {"wow_flutter", 0.0f},
-        {"echo_enabled", 0.0f}, {"bypass_tape", 0.0f},
-        {"synchroplay", 0.0f}, {"multiplay_gen", 0.0f},
-        {"phono_mode", 0.0f}, {"radio_mode", 0.0f},
-        {"monitor_mode", 0.0f}, {"mic_loz", 1.0f},
-    };
-    for (const auto& o : overrides)
-    {
-        for (auto& kv : p.values)
-        {
-            if (std::strcmp (kv.id, o.id) == 0)
-            {
-                kv.value01 = o.value01;
-                break;
-            }
-        }
-    }
-    return p;
-}
-
-const std::vector<Preset>& factoryPresets()
-{
-    static const std::vector<Preset> P = {
-        // ===== A — INIT =====
-        mk("00 · INIT FACTORY",      {{"saturation_drive", 0.5f}, {"saturation_drive_r", 0.5f}}),
-        mk("01 · INIT CLEAN",        {{"saturation_drive", 0.2f}, {"saturation_drive_r", 0.2f}, {"speed", 1.0f}}),
-
-        // ===== B — TAPE CHARACTER =====
-        mk("10 · TAPE WARM",         {{"tape_formula", 0.0f}, {"saturation_drive", 0.65f}, {"saturation_drive_r", 0.65f}, {"treble_db", 0.42f}, {"bass_db", 0.62f}, {"bias_amount", 0.55f}, {"wow_flutter", 0.15f}}),
-        mk("11 · TAPE NEUTRAL",      {{"tape_formula", 0.5f}, {"saturation_drive", 0.5f}, {"saturation_drive_r", 0.5f}, {"bias_amount", 0.5f}, {"wow_flutter", 0.05f}}),
-        mk("12 · TAPE BRIGHT",       {{"tape_formula", 1.0f}, {"saturation_drive", 0.45f}, {"saturation_drive_r", 0.45f}, {"treble_db", 0.65f}, {"bass_db", 0.45f}, {"bias_amount", 0.45f}}),
-        mk("13 · SATURATED 2 INCH",  {{"tape_formula", 0.0f}, {"saturation_drive", 0.85f}, {"saturation_drive_r", 0.85f}, {"treble_db", 0.45f}, {"bass_db", 0.6f}, {"bias_amount", 0.65f}, {"wow_flutter", 0.25f}, {"speed", 0.0f}}),
-        mk("14 · CRUSHED CASSETTE",  {{"tape_formula", 0.5f}, {"saturation_drive", 0.95f}, {"saturation_drive_r", 0.95f}, {"treble_db", 0.35f}, {"bass_db", 0.45f}, {"wow_flutter", 0.55f}, {"speed", 0.0f}, {"bias_amount", 0.7f}}),
-        mk("15 · 1968 DEMO",         {{"tape_formula", 0.0f}, {"saturation_drive", 0.55f}, {"saturation_drive_r", 0.55f}, {"treble_db", 0.5f}, {"bass_db", 0.55f}, {"bias_amount", 0.5f}, {"wow_flutter", 0.18f}, {"speed", 0.5f}}),
-
-        // ===== C — RADIO / PHONO =====
-        mk("20 · RADIO BRIGHT",      {{"tape_formula", 1.0f}, {"radio_gain", 0.7f}, {"radio_gain_r", 0.7f}, {"saturation_drive", 0.4f}, {"saturation_drive_r", 0.4f}, {"treble_db", 0.7f}, {"bass_db", 0.45f}, {"speed", 1.0f}, {"radio_mode", 1.0f}}),
-        mk("21 · RADIO MID",         {{"radio_gain", 0.6f}, {"radio_gain_r", 0.6f}, {"saturation_drive", 0.5f}, {"saturation_drive_r", 0.5f}, {"treble_db", 0.55f}, {"bass_db", 0.55f}, {"speed", 0.5f}}),
-        mk("22 · PHONO RIAA WARM",   {{"phono_gain", 0.65f}, {"phono_gain_r", 0.65f}, {"saturation_drive", 0.55f}, {"saturation_drive_r", 0.55f}, {"treble_db", 0.45f}, {"bass_db", 0.6f}, {"phono_mode", 0.0f}, {"tape_formula", 0.0f}}),
-        mk("23 · PHONO CERAMIC",     {{"phono_gain", 0.55f}, {"phono_gain_r", 0.55f}, {"saturation_drive", 0.45f}, {"saturation_drive_r", 0.45f}, {"treble_db", 0.5f}, {"bass_db", 0.5f}, {"phono_mode", 1.0f}}),
-
-        // ===== D — VOCAL / MIC =====
-        mk("30 · VOCAL AIR",         {{"mic_gain", 0.62f}, {"mic_gain_r", 0.62f}, {"saturation_drive", 0.45f}, {"saturation_drive_r", 0.45f}, {"treble_db", 0.65f}, {"bass_db", 0.5f}, {"mic_loz", 0.0f}}),
-        mk("31 · VOCAL BODY",        {{"mic_gain", 0.65f}, {"mic_gain_r", 0.65f}, {"saturation_drive", 0.6f}, {"saturation_drive_r", 0.6f}, {"treble_db", 0.42f}, {"bass_db", 0.65f}, {"tape_formula", 0.0f}}),
-        mk("32 · VOCAL CLOSE",       {{"mic_gain", 0.7f}, {"mic_gain_r", 0.7f}, {"saturation_drive", 0.55f}, {"saturation_drive_r", 0.55f}, {"treble_db", 0.55f}, {"bass_db", 0.5f}, {"mic_loz", 1.0f}}),
-        mk("33 · LO-FI INTERVIEW",   {{"mic_gain", 0.55f}, {"mic_gain_r", 0.55f}, {"saturation_drive", 0.7f}, {"saturation_drive_r", 0.7f}, {"treble_db", 0.4f}, {"bass_db", 0.4f}, {"wow_flutter", 0.4f}, {"speed", 0.0f}}),
-
-        // ===== E — DRUMS =====
-        mk("40 · DRUM ROOM",         {{"saturation_drive", 0.7f}, {"saturation_drive_r", 0.7f}, {"treble_db", 0.55f}, {"bass_db", 0.55f}, {"bias_amount", 0.55f}, {"speed", 0.5f}}),
-        mk("41 · DRUM SMACK",        {{"saturation_drive", 0.85f}, {"saturation_drive_r", 0.85f}, {"treble_db", 0.6f}, {"bass_db", 0.6f}, {"bias_amount", 0.7f}, {"speed", 1.0f}}),
-        mk("42 · DRUM LOFI",         {{"saturation_drive", 0.65f}, {"saturation_drive_r", 0.65f}, {"treble_db", 0.4f}, {"bass_db", 0.5f}, {"wow_flutter", 0.3f}, {"speed", 0.0f}, {"bias_amount", 0.6f}}),
-        mk("43 · KICK WEIGHT",       {{"saturation_drive", 0.7f}, {"saturation_drive_r", 0.7f}, {"treble_db", 0.4f}, {"bass_db", 0.75f}, {"bias_amount", 0.55f}}),
-
-        // ===== F — BASS / GUITAR =====
-        mk("50 · BASS GLUE",         {{"saturation_drive", 0.65f}, {"saturation_drive_r", 0.65f}, {"treble_db", 0.4f}, {"bass_db", 0.7f}, {"bias_amount", 0.55f}}),
-        mk("51 · GUITAR DIRT",       {{"saturation_drive", 0.85f}, {"saturation_drive_r", 0.85f}, {"treble_db", 0.55f}, {"bass_db", 0.5f}, {"bias_amount", 0.65f}}),
-        mk("52 · GUITAR CLEAN",      {{"saturation_drive", 0.4f}, {"saturation_drive_r", 0.4f}, {"treble_db", 0.6f}, {"bass_db", 0.5f}, {"bias_amount", 0.5f}, {"speed", 1.0f}}),
-        mk("53 · ACOUSTIC SHIMMER",  {{"saturation_drive", 0.35f}, {"saturation_drive_r", 0.35f}, {"treble_db", 0.7f}, {"bass_db", 0.5f}, {"speed", 1.0f}, {"tape_formula", 1.0f}}),
-
-        // ===== G — ECHO / DUB =====
-        mk("60 · ECHO SHORT",        {{"echo_amount", 0.45f}, {"echo_amount_r", 0.45f}, {"echo_enabled", 1.0f}, {"saturation_drive", 0.5f}, {"saturation_drive_r", 0.5f}, {"speed", 1.0f}}),
-        mk("61 · ECHO MEDIUM",       {{"echo_amount", 0.6f}, {"echo_amount_r", 0.6f}, {"echo_enabled", 1.0f}, {"saturation_drive", 0.55f}, {"saturation_drive_r", 0.55f}, {"treble_db", 0.42f}, {"speed", 0.5f}}),
-        mk("62 · ECHO LONG",         {{"echo_amount", 0.75f}, {"echo_amount_r", 0.75f}, {"echo_enabled", 1.0f}, {"saturation_drive", 0.55f}, {"saturation_drive_r", 0.55f}, {"treble_db", 0.4f}, {"bass_db", 0.55f}, {"speed", 0.0f}}),
-        mk("63 · DUB CHAMBER",       {{"echo_amount", 0.7f}, {"echo_amount_r", 0.7f}, {"echo_enabled", 1.0f}, {"saturation_drive", 0.7f}, {"saturation_drive_r", 0.7f}, {"treble_db", 0.4f}, {"bass_db", 0.65f}, {"wow_flutter", 0.3f}, {"speed", 0.0f}, {"tape_formula", 0.0f}}),
-        mk("64 · ECHO WOBBLE",       {{"echo_amount", 0.55f}, {"echo_amount_r", 0.55f}, {"echo_enabled", 1.0f}, {"saturation_drive", 0.5f}, {"saturation_drive_r", 0.5f}, {"wow_flutter", 0.65f}, {"speed", 0.0f}}),
-
-        // ===== H — VINTAGE / FX =====
-        mk("70 · 70S RADIO",         {{"saturation_drive", 0.55f}, {"saturation_drive_r", 0.55f}, {"treble_db", 0.55f}, {"bass_db", 0.42f}, {"wow_flutter", 0.15f}, {"speed", 0.5f}, {"tape_formula", 1.0f}}),
-        mk("71 · OLD MOVIE",         {{"saturation_drive", 0.65f}, {"saturation_drive_r", 0.65f}, {"treble_db", 0.35f}, {"bass_db", 0.45f}, {"wow_flutter", 0.5f}, {"speed", 0.0f}, {"tape_formula", 0.0f}}),
-        mk("72 · TELEPHONE",         {{"saturation_drive", 0.8f}, {"saturation_drive_r", 0.8f}, {"treble_db", 0.65f}, {"bass_db", 0.25f}, {"wow_flutter", 0.2f}, {"speed", 0.0f}, {"bias_amount", 0.7f}}),
-        mk("73 · 4-TRACK BOUNCE",    {{"saturation_drive", 0.65f}, {"saturation_drive_r", 0.65f}, {"treble_db", 0.45f}, {"bass_db", 0.55f}, {"wow_flutter", 0.2f}, {"multiplay_gen", 0.5f}, {"synchroplay", 1.0f}, {"speed", 0.5f}}),
-        mk("74 · GHOST TAPE",        {{"saturation_drive", 0.5f}, {"saturation_drive_r", 0.5f}, {"treble_db", 0.4f}, {"bass_db", 0.4f}, {"wow_flutter", 0.85f}, {"echo_amount", 0.4f}, {"echo_amount_r", 0.4f}, {"echo_enabled", 1.0f}, {"speed", 0.0f}}),
-
-        // ===== I — UTILITY =====
-        mk("80 · BYPASS REFERENCE",  {{"bypass_tape", 1.0f}, {"saturation_drive", 0.5f}, {"saturation_drive_r", 0.5f}}),
-        mk("81 · DRIVE SWEEP TEST",  {{"saturation_drive", 0.75f}, {"saturation_drive_r", 0.75f}, {"echo_amount", 0.0f}, {"echo_amount_r", 0.0f}, {"speed", 0.5f}}),
-        mk("82 · MASTER POLISH",     {{"saturation_drive", 0.4f}, {"saturation_drive_r", 0.4f}, {"treble_db", 0.55f}, {"bass_db", 0.55f}, {"bias_amount", 0.5f}, {"speed", 1.0f}, {"tape_formula", 0.5f}}),
-    };
-    return P;
-}
-} // anon namespace
-
-int BC2000DLProcessor::getNumPrograms() { return (int) factoryPresets().size(); }
+int BC2000DLProcessor::getNumPrograms()  { return bc2000dl::kNumPresets; }
 int BC2000DLProcessor::getCurrentProgram() { return currentProgramIndex; }
 
 const juce::String BC2000DLProcessor::getProgramName (int index)
 {
-    const auto& P = factoryPresets();
-    if (index < 0 || index >= (int) P.size()) return {};
-    return juce::String (P[(size_t) index].name);
+    if (index < 0 || index >= bc2000dl::kNumPresets) return {};
+    return juce::String (bc2000dl::kPresets[index].name);
 }
 
 void BC2000DLProcessor::setCurrentProgram (int index)
 {
-    const auto& P = factoryPresets();
-    if (index < 0 || index >= (int) P.size()) return;
+    if (index < 0 || index >= bc2000dl::kNumPresets) return;
     currentProgramIndex = index;
-    for (const auto& kv : P[(size_t) index].values)
-        if (auto* prm = apvts.getParameter (kv.id))
-            prm->setValueNotifyingHost (juce::jlimit (0.0f, 1.0f, kv.value01));
+    const auto& p = bc2000dl::kPresets[index];
+
+    auto set = [&] (const juce::String& id, float actualVal)
+    {
+        if (auto* prm = apvts.getParameter (id))
+            prm->setValueNotifyingHost (prm->convertTo0to1 (actualVal));
+    };
+
+    set ("speed",              (float) p.speed);
+    set ("tape_formula",       (float) p.tape_formula);
+    set ("mic_gain",           p.mic_gain);
+    set ("mic_gain_r",         p.mic_gain_r);
+    set ("phono_gain",         p.phono_gain);
+    set ("phono_gain_r",       p.phono_gain_r);
+    set ("radio_gain",         p.radio_gain);
+    set ("radio_gain_r",       p.radio_gain_r);
+    set ("saturation_drive",   p.saturation_drive);
+    set ("saturation_drive_r", p.saturation_drive_r);
+    set ("bias_amount",        p.bias_amount);
+    set ("wow_flutter",        p.wow_flutter);
+    set ("multiplay_gen",      (float) p.multiplay_gen);
+    set ("bass_db",            p.bass_db);
+    set ("treble_db",          p.treble_db);
+    set ("balance",            p.balance);
+    set ("master_volume",      p.master_volume);
+    set ("echo_enabled",       p.echo_enabled ? 1.0f : 0.0f);
+    set ("echo_amount",        p.echo_amount);
+    set ("echo_amount_r",      p.echo_amount_r);
+    // Nollställ alltid transienta tillstånd — förhindrar kvar-mute efter pause
+    set ("bypass_tape",     0.0f);
+    set ("pause",           0.0f);
+    set ("speaker_monitor", 0.0f);
+    set ("synchroplay",     0.0f);
+    set ("sos_enabled",     0.0f);
+    set ("pa_enabled",      0.0f);
 }
 
 void BC2000DLProcessor::getStateInformation (juce::MemoryBlock& destData)
@@ -465,17 +392,17 @@ void BC2000DLProcessor::setStateInformation (const void* data, int sizeInBytes)
         {
             apvts.replaceState (juce::ValueTree::fromXml (*xml));
 
-            // In JUCE 8, replaceState() updates the ValueTree atomics but does not
-            // always push the new values back into the AudioParameter objects themselves
-            // (getValue() can return a stale pre-restore value).  Force a full sync so
-            // DAWs and validators that read parameters immediately after setStateInformation
-            // see the correct restored values — especially critical for AudioParameterBool.
-            for (auto* p : getParameters())
+            // JUCE 8: replaceState() updates the ValueTree synchronously but the
+            // AudioParameter getValue() can remain stale (atomic not yet propagated).
+            // Read directly from the restored ValueTree children — that data is always
+            // current — and push to setValueNotifyingHost so DAWs/validators see the
+            // correct restored values immediately, including AudioParameterBool.
+            for (auto child : apvts.state)
             {
-                if (auto* rp = dynamic_cast<juce::RangedAudioParameter*> (p))
+                if (child.hasType ("PARAM"))
                 {
-                    if (const auto* raw = apvts.getRawParameterValue (rp->paramID))
-                        rp->setValueNotifyingHost (rp->convertTo0to1 (*raw));
+                    if (auto* prm = apvts.getParameter (child["id"].toString()))
+                        prm->setValueNotifyingHost ((float) child["value"]);
                 }
             }
         }
