@@ -52,7 +52,7 @@ add_executable(juce_tools::juceaide IMPORTED)
 # Import target "juce_tools::juceaide" for configuration "Debug"
 set_property(TARGET juce_tools::juceaide APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
 set_target_properties(juce_tools::juceaide PROPERTIES
-  IMPORTED_LOCATION_DEBUG "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/extras/Build/juceaide/juceaide_artefacts/Debug/juceaide"
+  IMPORTED_LOCATION_DEBUG "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/tools/extras/Build/juceaide/juceaide_artefacts/Debug/juceaide"
   )
 
 # This file does not depend on other imported targets which have

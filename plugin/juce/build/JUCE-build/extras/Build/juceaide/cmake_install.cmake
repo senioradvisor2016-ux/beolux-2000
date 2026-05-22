@@ -38,12 +38,12 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/JUCE-8.0.6" TYPE PROGRAM FILES "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/extras/Build/juceaide/juceaide_artefacts/Debug/juceaide")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/JUCE-8.0.6" TYPE PROGRAM FILES "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/tools/extras/Build/juceaide/juceaide_artefacts/Debug/juceaide")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/extras/Build/juceaide/install_local_manifest.txt"
+  file(WRITE "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/extras/Build/juceaide/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

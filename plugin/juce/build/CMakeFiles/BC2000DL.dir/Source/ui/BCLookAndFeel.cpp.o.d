@@ -1,6 +1,6 @@
 CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o: \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BCLookAndFeel.cpp \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BCLookAndFeel.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/BCLookAndFeel.cpp \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/BCLookAndFeel.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.h \
   /Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.h \
   /Users/senioradvisor/JUCE/modules/juce_core/juce_core.h \
@@ -1379,6 +1379,6 @@ CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o: \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/layout/juce_GridItem.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/layout/juce_Grid.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/native/juce_ScopedDPIAwarenessDisabler.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BCColours.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/juce_binarydata_BC2000DL_Assets/JuceLibraryCode/BinaryData.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/AssetRegistry.h
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/BCColours.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/build/juce_binarydata_BC2000DL_Assets/JuceLibraryCode/BinaryData.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/AssetRegistry.h

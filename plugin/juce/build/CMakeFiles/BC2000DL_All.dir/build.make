@@ -53,10 +53,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce"
+CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build"
+CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build"
 
 # Utility rule file for BC2000DL_All.
 
@@ -81,6 +81,6 @@ CMakeFiles/BC2000DL_All.dir/clean:
 .PHONY : CMakeFiles/BC2000DL_All.dir/clean
 
 CMakeFiles/BC2000DL_All.dir/depend:
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles/BC2000DL_All.dir/DependInfo.cmake" "--color=$(COLOR)" BC2000DL_All
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles/BC2000DL_All.dir/DependInfo.cmake" "--color=$(COLOR)" BC2000DL_All
 .PHONY : CMakeFiles/BC2000DL_All.dir/depend
 

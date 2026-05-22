@@ -1,6 +1,6 @@
 CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o: \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/PhonoPreamp.cpp \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/PhonoPreamp.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/PhonoPreamp.cpp \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/PhonoPreamp.h \
   /Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.h \
   /Users/senioradvisor/JUCE/modules/juce_core/juce_core.h \
   /Users/senioradvisor/JUCE/modules/juce_core/system/juce_TargetPlatform.h \
@@ -1240,6 +1240,6 @@ CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o: \
   /Users/senioradvisor/JUCE/modules/juce_dsp/widgets/juce_Limiter.h \
   /Users/senioradvisor/JUCE/modules/juce_dsp/widgets/juce_Phaser.h \
   /Users/senioradvisor/JUCE/modules/juce_dsp/widgets/juce_Chorus.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Constants.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Ge2N2613Stage.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/GeLowNoiseStage.h
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Constants.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Ge2N2613Stage.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/GeLowNoiseStage.h

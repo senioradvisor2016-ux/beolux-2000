@@ -1024,6 +1024,14 @@ void NativeEditor::paint (juce::Graphics& g)
         // tiny highlight glint on bezel
         g.setColour (juce::Colours::white.withAlpha (0.55f));
         g.fillEllipse (bx - br * 0.4f, by + br * 0.05f, br * 0.4f, br * 0.18f);
+
+        // Version-text till höger om medaljongen — silver silkscreen, alltid synlig
+        g.setColour (juce::Colour (0xFFD8D8E0));
+        g.setFont (LnF::monoFont (11.0f));
+        g.drawText ("v" + juce::String (JucePlugin_VersionString),
+            juce::Rectangle<float> (bx + br + 8.0f, by, 70.0f, br * 2)
+                .toNearestInt(),
+            juce::Justification::centredLeft, false);
     }
 
     // ===== Window vignette (last layer — sells "professional product photo") =====
@@ -1333,15 +1341,25 @@ void NativeEditor::applyPreset (int idx)
         }
     };
 
+    // Diskreta parametrar (choice/enum) sätts direkt — tweening av dessa
+    // triggar setSpeed()/setFormula() flera gånger under 250 ms vilket
+    // resetar oversampler och filter upprepade gånger → sustained silence.
+    auto setNow = [&] (const juce::String& id, float val)
+    {
+        if (auto* prm = v.getParameter (id))
+            prm->setValueNotifyingHost (prm->convertTo0to1 (val));
+    };
+
     // --- All parameters explicitly from preset data (no "baseline + delta") ---
-    plan ("speed",              (float) p.speed);
+    setNow ("speed",        (float) p.speed);
+    setNow ("tape_formula", (float) p.tape_formula);
     plan ("mic_gain",           p.mic_gain);
     plan ("mic_gain_r",         p.mic_gain_r);
     plan ("phono_gain",         p.phono_gain);
     plan ("phono_gain_r",       p.phono_gain_r);
     plan ("radio_gain",         p.radio_gain);
     plan ("radio_gain_r",       p.radio_gain_r);
-    plan ("tape_formula",       (float) p.tape_formula);
+    // tape_formula already set via setNow() above
     plan ("saturation_drive",   p.saturation_drive);
     plan ("saturation_drive_r", p.saturation_drive_r);
     plan ("bias_amount",        p.bias_amount);

@@ -1,6 +1,6 @@
 CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o: \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/ToneAndOutput.cpp \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/ToneAndOutput.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/ToneAndOutput.cpp \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/ToneAndOutput.h \
   /Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.h \
   /Users/senioradvisor/JUCE/modules/juce_core/juce_core.h \
   /Users/senioradvisor/JUCE/modules/juce_core/system/juce_TargetPlatform.h \

@@ -1,6 +1,6 @@
 CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o: \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/VUMeter.cpp \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/VUMeter.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/VUMeter.cpp \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/VUMeter.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/atomic \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config_site \
@@ -1379,5 +1379,5 @@ CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o: \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/layout/juce_GridItem.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/layout/juce_Grid.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/native/juce_ScopedDPIAwarenessDisabler.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BCColours.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/AssetRegistry.h
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/BCColours.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/AssetRegistry.h

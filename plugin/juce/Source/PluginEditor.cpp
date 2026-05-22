@@ -538,6 +538,16 @@ void BC2000DLEditor::paint (juce::Graphics& g)
 
     // Inget extra här — preset-meny + A/B-knapparna har egna LookAndFeel-färger
     juce::ignoreUnused (header);
+
+    // ----- Versions-text i footer (höger kant) -----
+    {
+        auto footer = getLocalBounds().removeFromBottom (kFooterH)
+                          .withTrimmedLeft (kCheekW).withTrimmedRight (kCheekW + 12);
+        g.setFont (juce::Font (10.5f, juce::Font::italic));
+        g.setColour (juce::Colour (0xFFA08050));
+        g.drawText ("v" + juce::String (JucePlugin_VersionString),
+                    footer, juce::Justification::centredRight, false);
+    }
 }
 
 void BC2000DLEditor::resized()
@@ -848,16 +858,19 @@ void BC2000DLEditor::showAboutDialog()
         << "  • Per-source DSP routing (mic/phono/radio parallel)\n"
         << "\n"
         << "VALIDATED\n"
-        << "  • 21/21 PASS vs B&O Service Manual specs\n"
-        << "  • 21/21 PASS vs Studio-Sound 1968 measurements\n"
-        << "  • Apple AU validation (auval): PASSED\n"
+        << "  • 29/29 PASS vs B&O Service Manual + Studio-Sound 1968\n"
+        << "  • pluginval strictness 10: 40/40 PASS\n"
+        << "  • REAPER integration: 9/9 PASS\n"
         << "\n"
         << "TECHNOLOGY\n"
         << "  • JUCE 8 framework\n"
         << "  • Universal Binary (arm64 + x86_64)\n"
         << "  • macOS 14+ (Sonoma and later)\n"
         << "  • Filmstrip rendering (UAD-pattern)\n"
-        << "  • CPU: ~0.6% per instance @ 96 kHz Apple Silicon\n"
+        << "  • CPU: ~3.7 % per instance @ 48 kHz Apple Silicon\n"
+        << "\n"
+        << "VERSION\n"
+        << "  • " << JucePlugin_VersionString << "\n"
         << "\n"
         << "CREDITS\n"
         << "  • DSP from B&O service manual + Studio-Sound 1968-09\n"

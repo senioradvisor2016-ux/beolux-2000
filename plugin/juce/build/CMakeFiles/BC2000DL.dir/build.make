@@ -53,10 +53,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce"
+CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build"
+CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build"
 
 # Include any dependencies generated for this target.
 include CMakeFiles/BC2000DL.dir/depend.make
@@ -70,380 +70,380 @@ include CMakeFiles/BC2000DL.dir/progress.make
 include CMakeFiles/BC2000DL.dir/flags.make
 
 BC2000DL_artefacts/JuceLibraryCode/JuceHeader.h: BC2000DL_artefacts/JuceLibraryCode/Release/Defs.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Generating BC2000DL_artefacts/JuceLibraryCode/JuceHeader.h"
-	JUCE-build/tools/extras/Build/juceaide/juceaide_artefacts/Debug/juceaide header "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/BC2000DL_artefacts/JuceLibraryCode/Release/Defs.txt" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/BC2000DL_artefacts/JuceLibraryCode/JuceHeader.h"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Generating BC2000DL_artefacts/JuceLibraryCode/JuceHeader.h"
+	JUCE-build/tools/extras/Build/juceaide/juceaide_artefacts/Debug/juceaide header "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/BC2000DL_artefacts/JuceLibraryCode/Release/Defs.txt" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/BC2000DL_artefacts/JuceLibraryCode/JuceHeader.h"
 
 CMakeFiles/BC2000DL.dir/codegen:
 .PHONY : CMakeFiles/BC2000DL.dir/codegen
 
 CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/PluginProcessor.cpp
+CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/PluginProcessor.cpp
 CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/PluginProcessor.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/PluginProcessor.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/PluginProcessor.cpp" > CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/PluginProcessor.cpp" > CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/PluginProcessor.cpp" -o CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/PluginProcessor.cpp" -o CMakeFiles/BC2000DL.dir/Source/PluginProcessor.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/PluginEditor.cpp
+CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/PluginEditor.cpp
 CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/PluginEditor.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/PluginEditor.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/PluginEditor.cpp" > CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/PluginEditor.cpp" > CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/PluginEditor.cpp" -o CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/PluginEditor.cpp" -o CMakeFiles/BC2000DL.dir/Source/PluginEditor.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/WebEditor.cpp
+CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/WebEditor.cpp
 CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/WebEditor.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/WebEditor.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/WebEditor.cpp" > CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/WebEditor.cpp" > CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/WebEditor.cpp" -o CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/WebEditor.cpp" -o CMakeFiles/BC2000DL.dir/Source/WebEditor.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/NativeEditor.cpp
+CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/NativeEditor.cpp
 CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/NativeEditor.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/NativeEditor.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/NativeEditor.cpp" > CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/NativeEditor.cpp" > CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/NativeEditor.cpp" -o CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/NativeEditor.cpp" -o CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BC2000LookAndFeel.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/BC2000LookAndFeel.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BC2000LookAndFeel.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/BC2000LookAndFeel.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BC2000LookAndFeel.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/BC2000LookAndFeel.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BC2000LookAndFeel.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/BC2000LookAndFeel.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Ge2N2613Stage.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Ge2N2613Stage.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Ge2N2613Stage.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/Ge2N2613Stage.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Ge2N2613Stage.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/Ge2N2613Stage.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Ge2N2613Stage.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/Ge2N2613Stage.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/GeLowNoiseStage.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/GeLowNoiseStage.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/GeLowNoiseStage.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/GeLowNoiseStage.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/GeLowNoiseStage.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/GeLowNoiseStage.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/GeLowNoiseStage.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/GeLowNoiseStage.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/EqDIN1962.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/EqDIN1962.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/EqDIN1962.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/EqDIN1962.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/EqDIN1962.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/EqDIN1962.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/EqDIN1962.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/EqDIN1962.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/TapeSaturation.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/TapeSaturation.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/TapeSaturation.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/TapeSaturation.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/TapeSaturation.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/TapeSaturation.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/TapeSaturation.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/TapeSaturation.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Echo.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Echo.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Echo.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/Echo.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Echo.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/Echo.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Echo.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/Echo.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/ToneAndOutput.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/ToneAndOutput.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/ToneAndOutput.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/ToneAndOutput.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/ToneAndOutput.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/ToneAndOutput.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/ToneAndOutput.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/ToneAndOutput.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/WowFlutter.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/WowFlutter.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/WowFlutter.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/WowFlutter.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/WowFlutter.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/WowFlutter.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/WowFlutter.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/WowFlutter.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/MicAndPower.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/MicAndPower.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/MicAndPower.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/MicAndPower.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/MicAndPower.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/MicAndPower.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/MicAndPower.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/MicAndPower.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Multiplay.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Multiplay.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Multiplay.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/Multiplay.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Multiplay.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/Multiplay.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Multiplay.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/Multiplay.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/PhonoPreamp.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/PhonoPreamp.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/PhonoPreamp.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/PhonoPreamp.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/PhonoPreamp.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/PhonoPreamp.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/PhonoPreamp.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/PhonoPreamp.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/SignalChain.cpp
+CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/SignalChain.cpp
 CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/SignalChain.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/SignalChain.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/SignalChain.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/SignalChain.cpp" > CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/SignalChain.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/dsp/SignalChain.cpp" -o CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BCLookAndFeel.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/BCLookAndFeel.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BCLookAndFeel.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/BCLookAndFeel.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BCLookAndFeel.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/BCLookAndFeel.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BCLookAndFeel.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/BCLookAndFeel.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/BCLookAndFeel.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/VUMeter.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/VUMeter.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/VUMeter.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/VUMeter.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/VUMeter.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/VUMeter.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/VUMeter.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/VUMeter.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/VUMeter.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/HybridHeroPanel.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/HybridHeroPanel.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/HybridHeroPanel.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/HybridHeroPanel.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/HybridHeroPanel.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/HybridHeroPanel.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/HybridHeroPanel.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/HybridHeroPanel.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/HybridHeroPanel.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/TransportLever.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/TransportLever.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/TransportLever.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/TransportLever.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/TransportLever.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/TransportLever.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/TransportLever.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/TransportLever.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/TransportLever.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/DualSlideFader.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/DualSlideFader.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/DualSlideFader.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/DualSlideFader.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/DualSlideFader.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/DualSlideFader.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/DualSlideFader.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/DualSlideFader.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/DualSlideFader.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/PhotorealReel.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/PhotorealReel.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/PhotorealReel.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/PhotorealReel.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/PhotorealReel.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/PhotorealReel.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/PhotorealReel.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/PhotorealReel.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/PhotorealReel.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/AssetRegistry.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/AssetRegistry.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/AssetRegistry.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/AssetRegistry.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/AssetRegistry.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/AssetRegistry.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/AssetRegistry.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/AssetRegistry.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/AssetRegistry.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/UADStyleSelector.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/UADStyleSelector.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/UADStyleSelector.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/UADStyleSelector.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/UADStyleSelector.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/UADStyleSelector.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/UADStyleSelector.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/UADStyleSelector.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/UADStyleSelector.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/PresetBrowser.cpp
+CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/PresetBrowser.cpp
 CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/PresetBrowser.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/PresetBrowser.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/PresetBrowser.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/PresetBrowser.cpp" > CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/PresetBrowser.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/ui/PresetBrowser.cpp" -o CMakeFiles/BC2000DL.dir/Source/ui/PresetBrowser.cpp.s
 
 CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/presets/Presets.cpp
+CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/presets/Presets.cpp
 CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/presets/Presets.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o -MF CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o.d -o CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/presets/Presets.cpp"
 
 CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/presets/Presets.cpp" > CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/presets/Presets.cpp" > CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.i
 
 CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/presets/Presets.cpp" -o CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/Source/presets/Presets.cpp" -o CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.s
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o: /Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o -c /Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.i: cmake_force
@@ -457,7 +457,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/j
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o: /Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o -c /Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.i: cmake_force
@@ -471,7 +471,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/j
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.i: cmake_force
@@ -485,7 +485,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_processors/j
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o: /Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o -c /Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.i: cmake_force
@@ -499,7 +499,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o: /Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o -c /Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.i: cmake_force
@@ -513,7 +513,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gu
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o: /Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o -c /Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.i: cmake_force
@@ -527,7 +527,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_grap
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c.o: /Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_34) "Building C object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_34) "Building C object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c.o"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c.o -c /Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics_Sheenbidi.c.i: cmake_force
@@ -541,7 +541,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_grap
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm.o: /Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm.o -c /Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.mm.i: cmake_force
@@ -555,7 +555,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_graphics/juce_grap
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.o: /Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.o -c /Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.i: cmake_force
@@ -569,7 +569,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_events/juce_events
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o: /Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_37) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_37) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o -c /Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.i: cmake_force
@@ -583,7 +583,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_Com
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o: /Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_38) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_38) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o -c /Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.i: cmake_force
@@ -597,7 +597,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.o: /Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_39) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_39) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.o -c /Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.i: cmake_force
@@ -611,7 +611,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_data_structures/ju
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_40) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_40) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.i: cmake_force
@@ -625,7 +625,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_41) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_41) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.i: cmake_force
@@ -639,7 +639,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_a
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_42) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_42) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.i: cmake_force
@@ -653,7 +653,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_43) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_43) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.i: cmake_force
@@ -667,7 +667,7 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_devices/juce
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o: CMakeFiles/BC2000DL.dir/flags.make
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o: /Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_44) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_44) "Building CXX object CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o -MF CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o.d -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o -c /Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm
 
 CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.i: cmake_force
@@ -679,32 +679,32 @@ CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.s:
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm -o CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.s
 
 CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin_blur.cpp
+CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin_blur.cpp
 CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_45) "Building CXX object CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o -MF CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o.d -o CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin_blur.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_45) "Building CXX object CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o -MF CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o.d -o CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/vendor/melatonin_blur/melatonin_blur.cpp"
 
 CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin_blur.cpp" > CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/vendor/melatonin_blur/melatonin_blur.cpp" > CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.i
 
 CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin_blur.cpp" -o CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/vendor/melatonin_blur/melatonin_blur.cpp" -o CMakeFiles/BC2000DL.dir/vendor/melatonin_blur/melatonin_blur.cpp.s
 
 CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o: CMakeFiles/BC2000DL.dir/flags.make
-CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_inspector/melatonin_inspector.cpp
+CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o: /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_inspector/melatonin_inspector.cpp
 CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o: CMakeFiles/BC2000DL.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_46) "Building CXX object CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o -MF CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o.d -o CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_inspector/melatonin_inspector.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_46) "Building CXX object CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o -MF CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o.d -o CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o -c "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/vendor/melatonin_inspector/melatonin_inspector.cpp"
 
 CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_inspector/melatonin_inspector.cpp" > CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/vendor/melatonin_inspector/melatonin_inspector.cpp" > CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.i
 
 CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_inspector/melatonin_inspector.cpp" -o CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/vendor/melatonin_inspector/melatonin_inspector.cpp" -o CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.s
 
 # Object files for target BC2000DL
 BC2000DL_OBJECTS = \
@@ -804,7 +804,7 @@ BC2000DL_artefacts/Release/libBeolux\ 2000_SharedCode.a: CMakeFiles/BC2000DL.dir
 BC2000DL_artefacts/Release/libBeolux\ 2000_SharedCode.a: CMakeFiles/BC2000DL.dir/vendor/melatonin_inspector/melatonin_inspector.cpp.o
 BC2000DL_artefacts/Release/libBeolux\ 2000_SharedCode.a: CMakeFiles/BC2000DL.dir/build.make
 BC2000DL_artefacts/Release/libBeolux\ 2000_SharedCode.a: CMakeFiles/BC2000DL.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_47) "Linking CXX static library \"BC2000DL_artefacts/Release/libBeolux 2000_SharedCode.a\""
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_47) "Linking CXX static library \"BC2000DL_artefacts/Release/libBeolux 2000_SharedCode.a\""
 	$(CMAKE_COMMAND) -P CMakeFiles/BC2000DL.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/BC2000DL.dir/link.txt --verbose=$(VERBOSE)
 
@@ -817,6 +817,6 @@ CMakeFiles/BC2000DL.dir/clean:
 .PHONY : CMakeFiles/BC2000DL.dir/clean
 
 CMakeFiles/BC2000DL.dir/depend: BC2000DL_artefacts/JuceLibraryCode/JuceHeader.h
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles/BC2000DL.dir/DependInfo.cmake" "--color=$(COLOR)" BC2000DL
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles/BC2000DL.dir/DependInfo.cmake" "--color=$(COLOR)" BC2000DL
 .PHONY : CMakeFiles/BC2000DL.dir/depend
 

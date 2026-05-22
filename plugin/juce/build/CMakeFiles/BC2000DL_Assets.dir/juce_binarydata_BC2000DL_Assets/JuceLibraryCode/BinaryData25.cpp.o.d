@@ -1,5 +1,5 @@
 CMakeFiles/BC2000DL_Assets.dir/juce_binarydata_BC2000DL_Assets/JuceLibraryCode/BinaryData25.cpp.o: \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/juce_binarydata_BC2000DL_Assets/JuceLibraryCode/BinaryData25.cpp \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/build/juce_binarydata_BC2000DL_Assets/JuceLibraryCode/BinaryData25.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/cstring \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config_site \

@@ -43,7 +43,7 @@ namespace ProjectInfo
 {
     const char* const  projectName    = "Beolux 2000";
     const char* const  companyName    = "Soundboys";
-    const char* const  versionString  = "0.1.0";
-    const int          versionNumber  =  0x100;
+    const char* const  versionString  = "0.60.1";
+    const int          versionNumber  =  0x3c01;
 }
 #endif

@@ -39,18 +39,18 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/modules/cmake_install.cmake")
+  include("/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/tools/modules/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/extras/Build/cmake_install.cmake")
+  include("/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/tools/extras/Build/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/JUCE-8.0.6" TYPE FILE FILES
-    "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/JUCEConfigVersion.cmake"
-    "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/JUCEConfig.cmake"
+    "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/tools/JUCEConfigVersion.cmake"
+    "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/tools/JUCEConfig.cmake"
     "/Users/senioradvisor/JUCE/extras/Build/CMake/JUCECheckAtomic.cmake"
     "/Users/senioradvisor/JUCE/extras/Build/CMake/JUCEHelperTargets.cmake"
     "/Users/senioradvisor/JUCE/extras/Build/CMake/JUCEModuleSupport.cmake"
@@ -73,7 +73,7 @@ endif()
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/install_local_manifest.txt"
+  file(WRITE "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/tools/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
 if(CMAKE_INSTALL_COMPONENT)
@@ -89,6 +89,6 @@ else()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/tools/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

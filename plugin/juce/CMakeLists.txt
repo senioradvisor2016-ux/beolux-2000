@@ -28,6 +28,7 @@ endif()
 
 # Plugin-target
 juce_add_plugin(BC2000DL
+    VERSION                  ${PROJECT_VERSION}
     COMPANY_NAME             "Soundboys"
     BUNDLE_ID                "com.soundboys.beolux2000.plugin"
     IS_SYNTH                 FALSE

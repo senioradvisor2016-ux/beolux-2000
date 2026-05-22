@@ -57,10 +57,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce"
+CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build"
+CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build//CMakeFiles/progress.marks"
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build//CMakeFiles/progress.marks"
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -158,7 +158,7 @@ preinstall/fast:
 
 # clear depends
 depend:
-	$(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
+	$(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
@@ -252,6 +252,19 @@ BC2000DL_Assets: cmake_check_build_system
 BC2000DL_Assets/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Assets.dir/build.make CMakeFiles/BC2000DL_Assets.dir/build
 .PHONY : BC2000DL_Assets/fast
+
+#=============================================================================
+# Target rules for targets named BC2000DL_Tests
+
+# Build rule for target.
+BC2000DL_Tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BC2000DL_Tests
+.PHONY : BC2000DL_Tests
+
+# fast build rule for target.
+BC2000DL_Tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/build
+.PHONY : BC2000DL_Tests/fast
 
 Source/NativeEditor.o: Source/NativeEditor.cpp.o
 .PHONY : Source/NativeEditor.o
@@ -355,6 +368,7 @@ Source/dsp/Echo.o: Source/dsp/Echo.cpp.o
 # target to build an object file
 Source/dsp/Echo.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/Echo.cpp.o
 .PHONY : Source/dsp/Echo.cpp.o
 
 Source/dsp/Echo.i: Source/dsp/Echo.cpp.i
@@ -363,6 +377,7 @@ Source/dsp/Echo.i: Source/dsp/Echo.cpp.i
 # target to preprocess a source file
 Source/dsp/Echo.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/Echo.cpp.i
 .PHONY : Source/dsp/Echo.cpp.i
 
 Source/dsp/Echo.s: Source/dsp/Echo.cpp.s
@@ -371,6 +386,7 @@ Source/dsp/Echo.s: Source/dsp/Echo.cpp.s
 # target to generate assembly for a file
 Source/dsp/Echo.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/Echo.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/Echo.cpp.s
 .PHONY : Source/dsp/Echo.cpp.s
 
 Source/dsp/EqDIN1962.o: Source/dsp/EqDIN1962.cpp.o
@@ -379,6 +395,7 @@ Source/dsp/EqDIN1962.o: Source/dsp/EqDIN1962.cpp.o
 # target to build an object file
 Source/dsp/EqDIN1962.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/EqDIN1962.cpp.o
 .PHONY : Source/dsp/EqDIN1962.cpp.o
 
 Source/dsp/EqDIN1962.i: Source/dsp/EqDIN1962.cpp.i
@@ -387,6 +404,7 @@ Source/dsp/EqDIN1962.i: Source/dsp/EqDIN1962.cpp.i
 # target to preprocess a source file
 Source/dsp/EqDIN1962.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/EqDIN1962.cpp.i
 .PHONY : Source/dsp/EqDIN1962.cpp.i
 
 Source/dsp/EqDIN1962.s: Source/dsp/EqDIN1962.cpp.s
@@ -395,6 +413,7 @@ Source/dsp/EqDIN1962.s: Source/dsp/EqDIN1962.cpp.s
 # target to generate assembly for a file
 Source/dsp/EqDIN1962.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/EqDIN1962.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/EqDIN1962.cpp.s
 .PHONY : Source/dsp/EqDIN1962.cpp.s
 
 Source/dsp/Ge2N2613Stage.o: Source/dsp/Ge2N2613Stage.cpp.o
@@ -403,6 +422,7 @@ Source/dsp/Ge2N2613Stage.o: Source/dsp/Ge2N2613Stage.cpp.o
 # target to build an object file
 Source/dsp/Ge2N2613Stage.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/Ge2N2613Stage.cpp.o
 .PHONY : Source/dsp/Ge2N2613Stage.cpp.o
 
 Source/dsp/Ge2N2613Stage.i: Source/dsp/Ge2N2613Stage.cpp.i
@@ -411,6 +431,7 @@ Source/dsp/Ge2N2613Stage.i: Source/dsp/Ge2N2613Stage.cpp.i
 # target to preprocess a source file
 Source/dsp/Ge2N2613Stage.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/Ge2N2613Stage.cpp.i
 .PHONY : Source/dsp/Ge2N2613Stage.cpp.i
 
 Source/dsp/Ge2N2613Stage.s: Source/dsp/Ge2N2613Stage.cpp.s
@@ -419,6 +440,7 @@ Source/dsp/Ge2N2613Stage.s: Source/dsp/Ge2N2613Stage.cpp.s
 # target to generate assembly for a file
 Source/dsp/Ge2N2613Stage.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/Ge2N2613Stage.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/Ge2N2613Stage.cpp.s
 .PHONY : Source/dsp/Ge2N2613Stage.cpp.s
 
 Source/dsp/GeLowNoiseStage.o: Source/dsp/GeLowNoiseStage.cpp.o
@@ -427,6 +449,7 @@ Source/dsp/GeLowNoiseStage.o: Source/dsp/GeLowNoiseStage.cpp.o
 # target to build an object file
 Source/dsp/GeLowNoiseStage.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/GeLowNoiseStage.cpp.o
 .PHONY : Source/dsp/GeLowNoiseStage.cpp.o
 
 Source/dsp/GeLowNoiseStage.i: Source/dsp/GeLowNoiseStage.cpp.i
@@ -435,6 +458,7 @@ Source/dsp/GeLowNoiseStage.i: Source/dsp/GeLowNoiseStage.cpp.i
 # target to preprocess a source file
 Source/dsp/GeLowNoiseStage.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/GeLowNoiseStage.cpp.i
 .PHONY : Source/dsp/GeLowNoiseStage.cpp.i
 
 Source/dsp/GeLowNoiseStage.s: Source/dsp/GeLowNoiseStage.cpp.s
@@ -443,6 +467,7 @@ Source/dsp/GeLowNoiseStage.s: Source/dsp/GeLowNoiseStage.cpp.s
 # target to generate assembly for a file
 Source/dsp/GeLowNoiseStage.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/GeLowNoiseStage.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/GeLowNoiseStage.cpp.s
 .PHONY : Source/dsp/GeLowNoiseStage.cpp.s
 
 Source/dsp/MicAndPower.o: Source/dsp/MicAndPower.cpp.o
@@ -451,6 +476,7 @@ Source/dsp/MicAndPower.o: Source/dsp/MicAndPower.cpp.o
 # target to build an object file
 Source/dsp/MicAndPower.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/MicAndPower.cpp.o
 .PHONY : Source/dsp/MicAndPower.cpp.o
 
 Source/dsp/MicAndPower.i: Source/dsp/MicAndPower.cpp.i
@@ -459,6 +485,7 @@ Source/dsp/MicAndPower.i: Source/dsp/MicAndPower.cpp.i
 # target to preprocess a source file
 Source/dsp/MicAndPower.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/MicAndPower.cpp.i
 .PHONY : Source/dsp/MicAndPower.cpp.i
 
 Source/dsp/MicAndPower.s: Source/dsp/MicAndPower.cpp.s
@@ -467,6 +494,7 @@ Source/dsp/MicAndPower.s: Source/dsp/MicAndPower.cpp.s
 # target to generate assembly for a file
 Source/dsp/MicAndPower.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/MicAndPower.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/MicAndPower.cpp.s
 .PHONY : Source/dsp/MicAndPower.cpp.s
 
 Source/dsp/Multiplay.o: Source/dsp/Multiplay.cpp.o
@@ -475,6 +503,7 @@ Source/dsp/Multiplay.o: Source/dsp/Multiplay.cpp.o
 # target to build an object file
 Source/dsp/Multiplay.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/Multiplay.cpp.o
 .PHONY : Source/dsp/Multiplay.cpp.o
 
 Source/dsp/Multiplay.i: Source/dsp/Multiplay.cpp.i
@@ -483,6 +512,7 @@ Source/dsp/Multiplay.i: Source/dsp/Multiplay.cpp.i
 # target to preprocess a source file
 Source/dsp/Multiplay.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/Multiplay.cpp.i
 .PHONY : Source/dsp/Multiplay.cpp.i
 
 Source/dsp/Multiplay.s: Source/dsp/Multiplay.cpp.s
@@ -491,6 +521,7 @@ Source/dsp/Multiplay.s: Source/dsp/Multiplay.cpp.s
 # target to generate assembly for a file
 Source/dsp/Multiplay.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/Multiplay.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/Multiplay.cpp.s
 .PHONY : Source/dsp/Multiplay.cpp.s
 
 Source/dsp/PhonoPreamp.o: Source/dsp/PhonoPreamp.cpp.o
@@ -499,6 +530,7 @@ Source/dsp/PhonoPreamp.o: Source/dsp/PhonoPreamp.cpp.o
 # target to build an object file
 Source/dsp/PhonoPreamp.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/PhonoPreamp.cpp.o
 .PHONY : Source/dsp/PhonoPreamp.cpp.o
 
 Source/dsp/PhonoPreamp.i: Source/dsp/PhonoPreamp.cpp.i
@@ -507,6 +539,7 @@ Source/dsp/PhonoPreamp.i: Source/dsp/PhonoPreamp.cpp.i
 # target to preprocess a source file
 Source/dsp/PhonoPreamp.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/PhonoPreamp.cpp.i
 .PHONY : Source/dsp/PhonoPreamp.cpp.i
 
 Source/dsp/PhonoPreamp.s: Source/dsp/PhonoPreamp.cpp.s
@@ -515,6 +548,7 @@ Source/dsp/PhonoPreamp.s: Source/dsp/PhonoPreamp.cpp.s
 # target to generate assembly for a file
 Source/dsp/PhonoPreamp.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/PhonoPreamp.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/PhonoPreamp.cpp.s
 .PHONY : Source/dsp/PhonoPreamp.cpp.s
 
 Source/dsp/SignalChain.o: Source/dsp/SignalChain.cpp.o
@@ -523,6 +557,7 @@ Source/dsp/SignalChain.o: Source/dsp/SignalChain.cpp.o
 # target to build an object file
 Source/dsp/SignalChain.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/SignalChain.cpp.o
 .PHONY : Source/dsp/SignalChain.cpp.o
 
 Source/dsp/SignalChain.i: Source/dsp/SignalChain.cpp.i
@@ -531,6 +566,7 @@ Source/dsp/SignalChain.i: Source/dsp/SignalChain.cpp.i
 # target to preprocess a source file
 Source/dsp/SignalChain.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/SignalChain.cpp.i
 .PHONY : Source/dsp/SignalChain.cpp.i
 
 Source/dsp/SignalChain.s: Source/dsp/SignalChain.cpp.s
@@ -539,6 +575,7 @@ Source/dsp/SignalChain.s: Source/dsp/SignalChain.cpp.s
 # target to generate assembly for a file
 Source/dsp/SignalChain.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/SignalChain.cpp.s
 .PHONY : Source/dsp/SignalChain.cpp.s
 
 Source/dsp/TapeSaturation.o: Source/dsp/TapeSaturation.cpp.o
@@ -547,6 +584,7 @@ Source/dsp/TapeSaturation.o: Source/dsp/TapeSaturation.cpp.o
 # target to build an object file
 Source/dsp/TapeSaturation.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/TapeSaturation.cpp.o
 .PHONY : Source/dsp/TapeSaturation.cpp.o
 
 Source/dsp/TapeSaturation.i: Source/dsp/TapeSaturation.cpp.i
@@ -555,6 +593,7 @@ Source/dsp/TapeSaturation.i: Source/dsp/TapeSaturation.cpp.i
 # target to preprocess a source file
 Source/dsp/TapeSaturation.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/TapeSaturation.cpp.i
 .PHONY : Source/dsp/TapeSaturation.cpp.i
 
 Source/dsp/TapeSaturation.s: Source/dsp/TapeSaturation.cpp.s
@@ -563,6 +602,7 @@ Source/dsp/TapeSaturation.s: Source/dsp/TapeSaturation.cpp.s
 # target to generate assembly for a file
 Source/dsp/TapeSaturation.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/TapeSaturation.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/TapeSaturation.cpp.s
 .PHONY : Source/dsp/TapeSaturation.cpp.s
 
 Source/dsp/ToneAndOutput.o: Source/dsp/ToneAndOutput.cpp.o
@@ -571,6 +611,7 @@ Source/dsp/ToneAndOutput.o: Source/dsp/ToneAndOutput.cpp.o
 # target to build an object file
 Source/dsp/ToneAndOutput.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/ToneAndOutput.cpp.o
 .PHONY : Source/dsp/ToneAndOutput.cpp.o
 
 Source/dsp/ToneAndOutput.i: Source/dsp/ToneAndOutput.cpp.i
@@ -579,6 +620,7 @@ Source/dsp/ToneAndOutput.i: Source/dsp/ToneAndOutput.cpp.i
 # target to preprocess a source file
 Source/dsp/ToneAndOutput.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/ToneAndOutput.cpp.i
 .PHONY : Source/dsp/ToneAndOutput.cpp.i
 
 Source/dsp/ToneAndOutput.s: Source/dsp/ToneAndOutput.cpp.s
@@ -587,6 +629,7 @@ Source/dsp/ToneAndOutput.s: Source/dsp/ToneAndOutput.cpp.s
 # target to generate assembly for a file
 Source/dsp/ToneAndOutput.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/ToneAndOutput.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/ToneAndOutput.cpp.s
 .PHONY : Source/dsp/ToneAndOutput.cpp.s
 
 Source/dsp/WowFlutter.o: Source/dsp/WowFlutter.cpp.o
@@ -595,6 +638,7 @@ Source/dsp/WowFlutter.o: Source/dsp/WowFlutter.cpp.o
 # target to build an object file
 Source/dsp/WowFlutter.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/WowFlutter.cpp.o
 .PHONY : Source/dsp/WowFlutter.cpp.o
 
 Source/dsp/WowFlutter.i: Source/dsp/WowFlutter.cpp.i
@@ -603,6 +647,7 @@ Source/dsp/WowFlutter.i: Source/dsp/WowFlutter.cpp.i
 # target to preprocess a source file
 Source/dsp/WowFlutter.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/WowFlutter.cpp.i
 .PHONY : Source/dsp/WowFlutter.cpp.i
 
 Source/dsp/WowFlutter.s: Source/dsp/WowFlutter.cpp.s
@@ -611,6 +656,7 @@ Source/dsp/WowFlutter.s: Source/dsp/WowFlutter.cpp.s
 # target to generate assembly for a file
 Source/dsp/WowFlutter.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/dsp/WowFlutter.cpp.s
 .PHONY : Source/dsp/WowFlutter.cpp.s
 
 Source/presets/Presets.o: Source/presets/Presets.cpp.o
@@ -619,6 +665,7 @@ Source/presets/Presets.o: Source/presets/Presets.cpp.o
 # target to build an object file
 Source/presets/Presets.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/presets/Presets.cpp.o
 .PHONY : Source/presets/Presets.cpp.o
 
 Source/presets/Presets.i: Source/presets/Presets.cpp.i
@@ -627,6 +674,7 @@ Source/presets/Presets.i: Source/presets/Presets.cpp.i
 # target to preprocess a source file
 Source/presets/Presets.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/presets/Presets.cpp.i
 .PHONY : Source/presets/Presets.cpp.i
 
 Source/presets/Presets.s: Source/presets/Presets.cpp.s
@@ -635,7 +683,32 @@ Source/presets/Presets.s: Source/presets/Presets.cpp.s
 # target to generate assembly for a file
 Source/presets/Presets.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Source/presets/Presets.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/presets/Presets.cpp.s
 .PHONY : Source/presets/Presets.cpp.s
+
+Source/tests/DspSmokeTest.o: Source/tests/DspSmokeTest.cpp.o
+.PHONY : Source/tests/DspSmokeTest.o
+
+# target to build an object file
+Source/tests/DspSmokeTest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/tests/DspSmokeTest.cpp.o
+.PHONY : Source/tests/DspSmokeTest.cpp.o
+
+Source/tests/DspSmokeTest.i: Source/tests/DspSmokeTest.cpp.i
+.PHONY : Source/tests/DspSmokeTest.i
+
+# target to preprocess a source file
+Source/tests/DspSmokeTest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/tests/DspSmokeTest.cpp.i
+.PHONY : Source/tests/DspSmokeTest.cpp.i
+
+Source/tests/DspSmokeTest.s: Source/tests/DspSmokeTest.cpp.s
+.PHONY : Source/tests/DspSmokeTest.s
+
+# target to generate assembly for a file
+Source/tests/DspSmokeTest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Source/tests/DspSmokeTest.cpp.s
+.PHONY : Source/tests/DspSmokeTest.cpp.s
 
 Source/ui/AssetRegistry.o: Source/ui/AssetRegistry.cpp.o
 .PHONY : Source/ui/AssetRegistry.o
@@ -883,6 +956,7 @@ Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.o: Users/se
 # target to build an object file
 Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o
 .PHONY : Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o
 
 Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.i: Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.i
@@ -891,6 +965,7 @@ Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.i: Users/se
 # target to preprocess a source file
 Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.i
 .PHONY : Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.i
 
 Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.s: Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.s
@@ -899,6 +974,7 @@ Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.s: Users/se
 # target to generate assembly for a file
 Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.s
 .PHONY : Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.s
 
 Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.o: Users/senioradvisor/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o
@@ -931,6 +1007,7 @@ Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.o: Users/
 # target to build an object file
 Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o
 .PHONY : Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o
 
 Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.i: Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.i
@@ -939,6 +1016,7 @@ Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.i: Users/
 # target to preprocess a source file
 Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.i
 .PHONY : Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.i
 
 Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.s: Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.s
@@ -947,6 +1025,7 @@ Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.s: Users/
 # target to generate assembly for a file
 Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.s
 .PHONY : Users/senioradvisor/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.s
 
 Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/VST3/juce_VST3ManifestHelper.o: Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/VST3/juce_VST3ManifestHelper.mm.o
@@ -1405,6 +1484,7 @@ Users/senioradvisor/JUCE/modules/juce_core/juce_core.o: Users/senioradvisor/JUCE
 # target to build an object file
 Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o
 .PHONY : Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.o
 
 Users/senioradvisor/JUCE/modules/juce_core/juce_core.i: Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.i
@@ -1413,6 +1493,7 @@ Users/senioradvisor/JUCE/modules/juce_core/juce_core.i: Users/senioradvisor/JUCE
 # target to preprocess a source file
 Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.i
 .PHONY : Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.i
 
 Users/senioradvisor/JUCE/modules/juce_core/juce_core.s: Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.s
@@ -1421,6 +1502,7 @@ Users/senioradvisor/JUCE/modules/juce_core/juce_core.s: Users/senioradvisor/JUCE
 # target to generate assembly for a file
 Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.s
 .PHONY : Users/senioradvisor/JUCE/modules/juce_core/juce_core.mm.s
 
 Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.o: Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o
@@ -1429,6 +1511,7 @@ Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.o: Users/se
 # target to build an object file
 Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o
 .PHONY : Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o
 
 Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.i: Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.i
@@ -1437,6 +1520,7 @@ Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.i: Users/se
 # target to preprocess a source file
 Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.i
 .PHONY : Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.i
 
 Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.s: Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.s
@@ -1445,6 +1529,7 @@ Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.s: Users/se
 # target to generate assembly for a file
 Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.s
 .PHONY : Users/senioradvisor/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.s
 
 Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.o: Users/senioradvisor/JUCE/modules/juce_data_structures/juce_data_structures.mm.o
@@ -1477,6 +1562,7 @@ Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.o: Users/senioradvisor/JUCE/m
 # target to build an object file
 Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o
 .PHONY : Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.o
 
 Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.i: Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.i
@@ -1485,6 +1571,7 @@ Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.i: Users/senioradvisor/JUCE/m
 # target to preprocess a source file
 Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.i
 .PHONY : Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.i
 
 Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.s: Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.s
@@ -1493,6 +1580,7 @@ Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.s: Users/senioradvisor/JUCE/m
 # target to generate assembly for a file
 Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.s
 .PHONY : Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.mm.s
 
 Users/senioradvisor/JUCE/modules/juce_events/juce_events.o: Users/senioradvisor/JUCE/modules/juce_events/juce_events.mm.o
@@ -2376,6 +2464,7 @@ help:
 	@echo "... BC2000DL_AU"
 	@echo "... BC2000DL_Assets"
 	@echo "... BC2000DL_Standalone"
+	@echo "... BC2000DL_Tests"
 	@echo "... BC2000DL_VST3"
 	@echo "... juce_vst3_helper"
 	@echo "... Source/NativeEditor.o"
@@ -2426,6 +2515,9 @@ help:
 	@echo "... Source/presets/Presets.o"
 	@echo "... Source/presets/Presets.i"
 	@echo "... Source/presets/Presets.s"
+	@echo "... Source/tests/DspSmokeTest.o"
+	@echo "... Source/tests/DspSmokeTest.i"
+	@echo "... Source/tests/DspSmokeTest.s"
 	@echo "... Source/ui/AssetRegistry.o"
 	@echo "... Source/ui/AssetRegistry.i"
 	@echo "... Source/ui/AssetRegistry.s"
@@ -2644,7 +2736,7 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	$(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
+	$(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

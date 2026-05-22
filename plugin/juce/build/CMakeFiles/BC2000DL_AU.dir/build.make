@@ -53,10 +53,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce"
+CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build"
+CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build"
 
 # Include any dependencies generated for this target.
 include CMakeFiles/BC2000DL_AU.dir/depend.make
@@ -70,8 +70,8 @@ include CMakeFiles/BC2000DL_AU.dir/progress.make
 include CMakeFiles/BC2000DL_AU.dir/flags.make
 
 BC2000DL_artefacts/JuceLibraryCode/BC2000DL_AU/PkgInfo:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Generating BC2000DL_artefacts/JuceLibraryCode/BC2000DL_AU/PkgInfo"
-	JUCE-build/tools/extras/Build/juceaide/juceaide_artefacts/Debug/juceaide pkginfo AU "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/BC2000DL_artefacts/JuceLibraryCode/BC2000DL_AU/PkgInfo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Generating BC2000DL_artefacts/JuceLibraryCode/BC2000DL_AU/PkgInfo"
+	JUCE-build/tools/extras/Build/juceaide/juceaide_artefacts/Debug/juceaide pkginfo AU "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/BC2000DL_artefacts/JuceLibraryCode/BC2000DL_AU/PkgInfo"
 
 CMakeFiles/BC2000DL_AU.dir/codegen:
 .PHONY : CMakeFiles/BC2000DL_AU.dir/codegen
@@ -79,7 +79,7 @@ CMakeFiles/BC2000DL_AU.dir/codegen:
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.i: cmake_force
@@ -93,7 +93,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.i: cmake_force
@@ -107,7 +107,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.i: cmake_force
@@ -121,7 +121,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.i: cmake_force
@@ -135,7 +135,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.i: cmake_force
@@ -149,7 +149,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.i: cmake_force
@@ -163,7 +163,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.i: cmake_force
@@ -177,7 +177,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.i: cmake_force
@@ -191,7 +191,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.i: cmake_force
@@ -205,7 +205,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.i: cmake_force
@@ -219,7 +219,7 @@ CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_cl
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o: CMakeFiles/BC2000DL_AU.dir/flags.make
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o: /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o: CMakeFiles/BC2000DL_AU.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o -MF CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o.d -o CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o -c /Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm
 
 CMakeFiles/BC2000DL_AU.dir/Users/senioradvisor/JUCE/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.i: cmake_force
@@ -262,11 +262,11 @@ BC2000DL_artefacts/Release/AU/Beolux\ 2000.component/Contents/MacOS/Beolux\ 2000
 BC2000DL_artefacts/Release/AU/Beolux\ 2000.component/Contents/MacOS/Beolux\ 2000: BC2000DL_artefacts/Release/libBeolux\ 2000_SharedCode.a
 BC2000DL_artefacts/Release/AU/Beolux\ 2000.component/Contents/MacOS/Beolux\ 2000: libBC2000DL_Assets.a
 BC2000DL_artefacts/Release/AU/Beolux\ 2000.component/Contents/MacOS/Beolux\ 2000: CMakeFiles/BC2000DL_AU.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX CFBundle shared module \"BC2000DL_artefacts/Release/AU/Beolux 2000.component/Contents/MacOS/Beolux 2000\""
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX CFBundle shared module \"BC2000DL_artefacts/Release/AU/Beolux 2000.component/Contents/MacOS/Beolux 2000\""
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/BC2000DL_AU.dir/link.txt --verbose=$(VERBOSE)
-	/opt/homebrew/bin/cmake -E copy "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/BC2000DL_artefacts/JuceLibraryCode/BC2000DL_AU/PkgInfo" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/BC2000DL_artefacts/Release/AU/Beolux 2000.component/Contents"
-	/opt/homebrew/bin/cmake "-Dsrc=/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/BC2000DL_artefacts/Release/AU/Beolux 2000.component" -P /Users/senioradvisor/JUCE/extras/Build/CMake/checkBundleSigning.cmake
-	/opt/homebrew/bin/cmake "-Dsrc=/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/BC2000DL_artefacts/Release/AU/Beolux 2000.component" -Ddest=/Users/senioradvisor/Library/Audio/Plug-Ins/Components -P /Users/senioradvisor/JUCE/extras/Build/CMake/copyDir.cmake
+	/opt/homebrew/bin/cmake -E copy "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/BC2000DL_artefacts/JuceLibraryCode/BC2000DL_AU/PkgInfo" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/BC2000DL_artefacts/Release/AU/Beolux 2000.component/Contents"
+	/opt/homebrew/bin/cmake "-Dsrc=/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/BC2000DL_artefacts/Release/AU/Beolux 2000.component" -P /Users/senioradvisor/JUCE/extras/Build/CMake/checkBundleSigning.cmake
+	/opt/homebrew/bin/cmake "-Dsrc=/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/BC2000DL_artefacts/Release/AU/Beolux 2000.component" -Ddest=/Users/senioradvisor/Library/Audio/Plug-Ins/Components -P /Users/senioradvisor/JUCE/extras/Build/CMake/copyDir.cmake
 
 # Rule to build all files generated by this target.
 CMakeFiles/BC2000DL_AU.dir/build: BC2000DL_artefacts/Release/AU/Beolux\ 2000.component/Contents/MacOS/Beolux\ 2000
@@ -277,6 +277,6 @@ CMakeFiles/BC2000DL_AU.dir/clean:
 .PHONY : CMakeFiles/BC2000DL_AU.dir/clean
 
 CMakeFiles/BC2000DL_AU.dir/depend: BC2000DL_artefacts/JuceLibraryCode/BC2000DL_AU/PkgInfo
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles/BC2000DL_AU.dir/DependInfo.cmake" "--color=$(COLOR)" BC2000DL_AU
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles/BC2000DL_AU.dir/DependInfo.cmake" "--color=$(COLOR)" BC2000DL_AU
 .PHONY : CMakeFiles/BC2000DL_AU.dir/depend
 

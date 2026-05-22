@@ -54,10 +54,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce"
+CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build"
+CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build"
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -69,6 +69,7 @@ all: CMakeFiles/BC2000DL_AU.dir/all
 all: CMakeFiles/BC2000DL_VST3.dir/all
 all: CMakeFiles/juce_vst3_helper.dir/all
 all: CMakeFiles/BC2000DL_Assets.dir/all
+all: CMakeFiles/BC2000DL_Tests.dir/all
 all: JUCE-build/all
 .PHONY : all
 
@@ -79,6 +80,7 @@ codegen: CMakeFiles/BC2000DL_AU.dir/codegen
 codegen: CMakeFiles/BC2000DL_VST3.dir/codegen
 codegen: CMakeFiles/juce_vst3_helper.dir/codegen
 codegen: CMakeFiles/BC2000DL_Assets.dir/codegen
+codegen: CMakeFiles/BC2000DL_Tests.dir/codegen
 codegen: JUCE-build/codegen
 .PHONY : codegen
 
@@ -94,6 +96,7 @@ clean: CMakeFiles/BC2000DL_AU.dir/clean
 clean: CMakeFiles/BC2000DL_VST3.dir/clean
 clean: CMakeFiles/juce_vst3_helper.dir/clean
 clean: CMakeFiles/BC2000DL_Assets.dir/clean
+clean: CMakeFiles/BC2000DL_Tests.dir/clean
 clean: JUCE-build/clean
 .PHONY : clean
 
@@ -184,14 +187,14 @@ JUCE-build/modules/clean:
 CMakeFiles/BC2000DL.dir/all: CMakeFiles/BC2000DL_Assets.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39 "Built target BC2000DL"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34 "Built target BC2000DL"
 .PHONY : CMakeFiles/BC2000DL.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/BC2000DL.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 65
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 56
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/BC2000DL.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
 .PHONY : CMakeFiles/BC2000DL.dir/rule
 
 # Convenience name for target.
@@ -201,7 +204,7 @@ BC2000DL: CMakeFiles/BC2000DL.dir/rule
 # codegen rule for target.
 CMakeFiles/BC2000DL.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL.dir/build.make CMakeFiles/BC2000DL.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39 "Finished codegen for target BC2000DL"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34 "Finished codegen for target BC2000DL"
 .PHONY : CMakeFiles/BC2000DL.dir/codegen
 
 # clean rule for target.
@@ -218,14 +221,14 @@ CMakeFiles/BC2000DL_All.dir/all: CMakeFiles/BC2000DL_AU.dir/all
 CMakeFiles/BC2000DL_All.dir/all: CMakeFiles/BC2000DL_VST3.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_All.dir/build.make CMakeFiles/BC2000DL_All.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_All.dir/build.make CMakeFiles/BC2000DL_All.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num= "Built target BC2000DL_All"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num= "Built target BC2000DL_All"
 .PHONY : CMakeFiles/BC2000DL_All.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/BC2000DL_All.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 100
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 86
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/BC2000DL_All.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
 .PHONY : CMakeFiles/BC2000DL_All.dir/rule
 
 # Convenience name for target.
@@ -237,7 +240,7 @@ CMakeFiles/BC2000DL_All.dir/codegen: CMakeFiles/BC2000DL_Standalone.dir/all
 CMakeFiles/BC2000DL_All.dir/codegen: CMakeFiles/BC2000DL_AU.dir/all
 CMakeFiles/BC2000DL_All.dir/codegen: CMakeFiles/BC2000DL_VST3.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_All.dir/build.make CMakeFiles/BC2000DL_All.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num= "Finished codegen for target BC2000DL_All"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num= "Finished codegen for target BC2000DL_All"
 .PHONY : CMakeFiles/BC2000DL_All.dir/codegen
 
 # clean rule for target.
@@ -253,14 +256,14 @@ CMakeFiles/BC2000DL_Standalone.dir/all: CMakeFiles/BC2000DL.dir/all
 CMakeFiles/BC2000DL_Standalone.dir/all: CMakeFiles/BC2000DL_Assets.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Standalone.dir/build.make CMakeFiles/BC2000DL_Standalone.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Standalone.dir/build.make CMakeFiles/BC2000DL_Standalone.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=77,78,79,80,81,82,83,84,85,86,87 "Built target BC2000DL_Standalone"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=66,67,68,69,70,71,72,73,74,75 "Built target BC2000DL_Standalone"
 .PHONY : CMakeFiles/BC2000DL_Standalone.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/BC2000DL_Standalone.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 76
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 66
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/BC2000DL_Standalone.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
 .PHONY : CMakeFiles/BC2000DL_Standalone.dir/rule
 
 # Convenience name for target.
@@ -270,7 +273,7 @@ BC2000DL_Standalone: CMakeFiles/BC2000DL_Standalone.dir/rule
 # codegen rule for target.
 CMakeFiles/BC2000DL_Standalone.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Standalone.dir/build.make CMakeFiles/BC2000DL_Standalone.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=77,78,79,80,81,82,83,84,85,86,87 "Finished codegen for target BC2000DL_Standalone"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=66,67,68,69,70,71,72,73,74,75 "Finished codegen for target BC2000DL_Standalone"
 .PHONY : CMakeFiles/BC2000DL_Standalone.dir/codegen
 
 # clean rule for target.
@@ -286,14 +289,14 @@ CMakeFiles/BC2000DL_AU.dir/all: CMakeFiles/BC2000DL.dir/all
 CMakeFiles/BC2000DL_AU.dir/all: CMakeFiles/BC2000DL_Assets.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_AU.dir/build.make CMakeFiles/BC2000DL_AU.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_AU.dir/build.make CMakeFiles/BC2000DL_AU.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=40,41,42,43,44,45,46,47,48,49,50 "Built target BC2000DL_AU"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=35,36,37,38,39,40,41,42,43 "Built target BC2000DL_AU"
 .PHONY : CMakeFiles/BC2000DL_AU.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/BC2000DL_AU.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 76
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 65
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/BC2000DL_AU.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
 .PHONY : CMakeFiles/BC2000DL_AU.dir/rule
 
 # Convenience name for target.
@@ -303,7 +306,7 @@ BC2000DL_AU: CMakeFiles/BC2000DL_AU.dir/rule
 # codegen rule for target.
 CMakeFiles/BC2000DL_AU.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_AU.dir/build.make CMakeFiles/BC2000DL_AU.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=40,41,42,43,44,45,46,47,48,49,50 "Finished codegen for target BC2000DL_AU"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=35,36,37,38,39,40,41,42,43 "Finished codegen for target BC2000DL_AU"
 .PHONY : CMakeFiles/BC2000DL_AU.dir/codegen
 
 # clean rule for target.
@@ -320,14 +323,14 @@ CMakeFiles/BC2000DL_VST3.dir/all: CMakeFiles/juce_vst3_helper.dir/all
 CMakeFiles/BC2000DL_VST3.dir/all: CMakeFiles/BC2000DL_Assets.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_VST3.dir/build.make CMakeFiles/BC2000DL_VST3.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_VST3.dir/build.make CMakeFiles/BC2000DL_VST3.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=88,89,90,91,92,93,94,95,96,97,98 "Built target BC2000DL_VST3"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=90,91,92,93,94,95,96,97,98 "Built target BC2000DL_VST3"
 .PHONY : CMakeFiles/BC2000DL_VST3.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/BC2000DL_VST3.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 78
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 67
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/BC2000DL_VST3.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
 .PHONY : CMakeFiles/BC2000DL_VST3.dir/rule
 
 # Convenience name for target.
@@ -337,7 +340,7 @@ BC2000DL_VST3: CMakeFiles/BC2000DL_VST3.dir/rule
 # codegen rule for target.
 CMakeFiles/BC2000DL_VST3.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_VST3.dir/build.make CMakeFiles/BC2000DL_VST3.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=88,89,90,91,92,93,94,95,96,97,98 "Finished codegen for target BC2000DL_VST3"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=90,91,92,93,94,95,96,97,98 "Finished codegen for target BC2000DL_VST3"
 .PHONY : CMakeFiles/BC2000DL_VST3.dir/codegen
 
 # clean rule for target.
@@ -352,14 +355,14 @@ CMakeFiles/BC2000DL_VST3.dir/clean:
 CMakeFiles/juce_vst3_helper.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/juce_vst3_helper.dir/build.make CMakeFiles/juce_vst3_helper.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/juce_vst3_helper.dir/build.make CMakeFiles/juce_vst3_helper.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=99,100 "Built target juce_vst3_helper"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=99,100 "Built target juce_vst3_helper"
 .PHONY : CMakeFiles/juce_vst3_helper.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/juce_vst3_helper.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 2
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/juce_vst3_helper.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
 .PHONY : CMakeFiles/juce_vst3_helper.dir/rule
 
 # Convenience name for target.
@@ -369,7 +372,7 @@ juce_vst3_helper: CMakeFiles/juce_vst3_helper.dir/rule
 # codegen rule for target.
 CMakeFiles/juce_vst3_helper.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/juce_vst3_helper.dir/build.make CMakeFiles/juce_vst3_helper.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=99,100 "Finished codegen for target juce_vst3_helper"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=99,100 "Finished codegen for target juce_vst3_helper"
 .PHONY : CMakeFiles/juce_vst3_helper.dir/codegen
 
 # clean rule for target.
@@ -384,14 +387,14 @@ CMakeFiles/juce_vst3_helper.dir/clean:
 CMakeFiles/BC2000DL_Assets.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Assets.dir/build.make CMakeFiles/BC2000DL_Assets.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Assets.dir/build.make CMakeFiles/BC2000DL_Assets.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76 "Built target BC2000DL_Assets"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65 "Built target BC2000DL_Assets"
 .PHONY : CMakeFiles/BC2000DL_Assets.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/BC2000DL_Assets.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 26
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 22
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/BC2000DL_Assets.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
 .PHONY : CMakeFiles/BC2000DL_Assets.dir/rule
 
 # Convenience name for target.
@@ -401,7 +404,7 @@ BC2000DL_Assets: CMakeFiles/BC2000DL_Assets.dir/rule
 # codegen rule for target.
 CMakeFiles/BC2000DL_Assets.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Assets.dir/build.make CMakeFiles/BC2000DL_Assets.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" --progress-num=51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76 "Finished codegen for target BC2000DL_Assets"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65 "Finished codegen for target BC2000DL_Assets"
 .PHONY : CMakeFiles/BC2000DL_Assets.dir/codegen
 
 # clean rule for target.
@@ -410,13 +413,45 @@ CMakeFiles/BC2000DL_Assets.dir/clean:
 .PHONY : CMakeFiles/BC2000DL_Assets.dir/clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/BC2000DL_Tests.dir
+
+# All Build rule for target.
+CMakeFiles/BC2000DL_Tests.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=76,77,78,79,80,81,82,83,84,85,86,87,88,89 "Built target BC2000DL_Tests"
+.PHONY : CMakeFiles/BC2000DL_Tests.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/BC2000DL_Tests.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 14
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/BC2000DL_Tests.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
+.PHONY : CMakeFiles/BC2000DL_Tests.dir/rule
+
+# Convenience name for target.
+BC2000DL_Tests: CMakeFiles/BC2000DL_Tests.dir/rule
+.PHONY : BC2000DL_Tests
+
+# codegen rule for target.
+CMakeFiles/BC2000DL_Tests.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" --progress-num=76,77,78,79,80,81,82,83,84,85,86,87,88,89 "Finished codegen for target BC2000DL_Tests"
+.PHONY : CMakeFiles/BC2000DL_Tests.dir/codegen
+
+# clean rule for target.
+CMakeFiles/BC2000DL_Tests.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BC2000DL_Tests.dir/build.make CMakeFiles/BC2000DL_Tests.dir/clean
+.PHONY : CMakeFiles/BC2000DL_Tests.dir/clean
+
+#=============================================================================
 # Special targets to cleanup operation of make.
 
 # Special rule to run CMake to check the build system integrity.
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	$(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
+	$(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

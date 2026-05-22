@@ -1,6 +1,6 @@
 CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o: \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/SignalChain.cpp \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/SignalChain.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/SignalChain.cpp \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/SignalChain.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/atomic \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config_site \
@@ -1240,15 +1240,15 @@ CMakeFiles/BC2000DL.dir/Source/dsp/SignalChain.cpp.o: \
   /Users/senioradvisor/JUCE/modules/juce_dsp/widgets/juce_Limiter.h \
   /Users/senioradvisor/JUCE/modules/juce_dsp/widgets/juce_Phaser.h \
   /Users/senioradvisor/JUCE/modules/juce_dsp/widgets/juce_Chorus.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Constants.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Ge2N2613Stage.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/GeLowNoiseStage.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/EqDIN1962.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/TapeSaturation.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/JilesAtherton.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Echo.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/ToneAndOutput.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/WowFlutter.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/MicAndPower.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Multiplay.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/PhonoPreamp.h
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Constants.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Ge2N2613Stage.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/GeLowNoiseStage.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/EqDIN1962.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/TapeSaturation.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/JilesAtherton.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Echo.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/ToneAndOutput.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/WowFlutter.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/MicAndPower.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Multiplay.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/PhonoPreamp.h

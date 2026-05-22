@@ -61,13 +61,30 @@ namespace bc2000dl::dsp
         std::unique_ptr<juce::dsp::Oversampling<float>> oversampler;
         JilesAtherton hysteresis;
         juce::dsp::IIR::Filter<float> biasReject;  // LP @ 25 kHz
-        double biasPhase { 0.0 };
+
+        // Bias-oscillator: 2D-rotation (4 muls + 2 adds per sample) istället för
+        // std::sin(phase) (~5–10 ns × 768k samples/s = significant CPU).
+        // (cos_state, sin_state) roteras med (cos_step, sin_step) per sample.
+        // Konstant unit-amplitud (om cos²+sin²=1 vid init) — ingen drift.
+        double biasCosState { 1.0 }, biasSinState { 0.0 };
+        double biasCosStep  { 1.0 }, biasSinStep  { 0.0 };
         static constexpr double kBiasFreq_Hz = 100000.0;
         static constexpr int    kOversampleFactor = 3;  // 2^3 = 8×
 
         // Brusgenerator — LCG Gaussian (30× snabbare än mt19937)
         std::uint32_t lcgState { 0u };
         float noiseAmpLin { 0.0f };
+
+        // DC-block för J-A remanens (en-pol HP, ~10 Hz)
+        float dcBlockX1 { 0.0f }, dcBlockY1 { 0.0f };
+
+        // Tyst-ingångsdetektor: om n_sil block i rad är under tröskeln
+        // nollställs J-A-state för att eliminera M_r-remanens.
+        // Konstant bias demagnetiserar inte i prakktiken (krävs avtagande
+        // amplitud), så vi simulerar erasure-effekten digitalt.
+        int silenceBlockCount { 0 };
+        static constexpr int   kSilenceHoldBlocks = 1;
+        static constexpr float kSilenceThreshPow  = 1e-9f; // ~−90 dBFS/sample
 
         // Print-through delay-buffer (~1.5 s)
         std::vector<float> printBuffer;

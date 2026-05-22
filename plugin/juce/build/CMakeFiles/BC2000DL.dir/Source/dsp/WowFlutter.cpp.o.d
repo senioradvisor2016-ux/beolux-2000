@@ -1,6 +1,6 @@
 CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o: \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/WowFlutter.cpp \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/WowFlutter.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/WowFlutter.cpp \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/WowFlutter.h \
   /Users/senioradvisor/JUCE/modules/juce_audio_basics/juce_audio_basics.h \
   /Users/senioradvisor/JUCE/modules/juce_core/juce_core.h \
   /Users/senioradvisor/JUCE/modules/juce_core/system/juce_TargetPlatform.h \
@@ -1192,4 +1192,4 @@ CMakeFiles/BC2000DL.dir/Source/dsp/WowFlutter.cpp.o: \
   /Users/senioradvisor/JUCE/modules/juce_audio_basics/utilities/juce_AudioWorkgroup.h \
   /Users/senioradvisor/JUCE/modules/juce_audio_basics/midi/ump/juce_UMPBytesOnGroup.h \
   /Users/senioradvisor/JUCE/modules/juce_audio_basics/midi/ump/juce_UMPDeviceInfo.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Constants.h
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Constants.h

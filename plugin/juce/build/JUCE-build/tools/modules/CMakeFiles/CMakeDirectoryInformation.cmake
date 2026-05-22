@@ -3,7 +3,7 @@
 
 # Relative path conversion top directories.
 set(CMAKE_RELATIVE_PATH_TOP_SOURCE "/Users/senioradvisor/JUCE")
-set(CMAKE_RELATIVE_PATH_TOP_BINARY "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/tools")
+set(CMAKE_RELATIVE_PATH_TOP_BINARY "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/tools")
 
 # Force unix paths in dependencies.
 set(CMAKE_FORCE_UNIX_PATHS 1)

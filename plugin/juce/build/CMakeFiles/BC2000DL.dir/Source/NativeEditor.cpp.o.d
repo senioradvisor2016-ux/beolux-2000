@@ -1,6 +1,6 @@
 CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o: \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/NativeEditor.cpp \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/NativeEditor.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/NativeEditor.cpp \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/NativeEditor.h \
   /Users/senioradvisor/JUCE/modules/juce_audio_utils/juce_audio_utils.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.h \
   /Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.h \
@@ -1534,8 +1534,8 @@ CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o: \
   /Users/senioradvisor/JUCE/modules/juce_audio_utils/players/juce_AudioProcessorPlayer.h \
   /Users/senioradvisor/JUCE/modules/juce_audio_utils/audio_cd/juce_AudioCDBurner.h \
   /Users/senioradvisor/JUCE/modules/juce_audio_utils/audio_cd/juce_AudioCDReader.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/PluginProcessor.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/SignalChain.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/PluginProcessor.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/SignalChain.h \
   /Users/senioradvisor/JUCE/modules/juce_dsp/juce_dsp.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/arm_neon.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/arm_bf16.h \
@@ -1584,25 +1584,25 @@ CMakeFiles/BC2000DL.dir/Source/NativeEditor.cpp.o: \
   /Users/senioradvisor/JUCE/modules/juce_dsp/widgets/juce_Limiter.h \
   /Users/senioradvisor/JUCE/modules/juce_dsp/widgets/juce_Phaser.h \
   /Users/senioradvisor/JUCE/modules/juce_dsp/widgets/juce_Chorus.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Constants.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Ge2N2613Stage.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/GeLowNoiseStage.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/EqDIN1962.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/TapeSaturation.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/JilesAtherton.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Echo.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/ToneAndOutput.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/WowFlutter.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/MicAndPower.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/Multiplay.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/dsp/PhonoPreamp.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BC2000LookAndFeel.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/PresetBrowser.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/../presets/Presets.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin_blur.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/cached_blur.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/shadows.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/internal/cached_shadows.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/internal/rendered_single_channel_shadow.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/blur_demo_component.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/../melatonin_blur.h
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Constants.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Ge2N2613Stage.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/GeLowNoiseStage.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/EqDIN1962.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/TapeSaturation.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/JilesAtherton.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Echo.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/ToneAndOutput.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/WowFlutter.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/MicAndPower.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/Multiplay.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/dsp/PhonoPreamp.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/BC2000LookAndFeel.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/PresetBrowser.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/../presets/Presets.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin_blur.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/cached_blur.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/shadows.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/internal/cached_shadows.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/internal/rendered_single_channel_shadow.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/blur_demo_component.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/../melatonin_blur.h

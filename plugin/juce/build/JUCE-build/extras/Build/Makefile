@@ -57,10 +57,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce"
+CMAKE_SOURCE_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build"
+CMAKE_BINARY_DIR = "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -132,14 +132,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/JUCE-build/extras/Build//CMakeFiles/progress.marks"
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 JUCE-build/extras/Build/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles" 0
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/JUCE-build/extras/Build//CMakeFiles/progress.marks"
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 JUCE-build/extras/Build/all
+	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 JUCE-build/extras/Build/clean
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 JUCE-build/extras/Build/clean
 .PHONY : clean
 
 # The main clean target
@@ -148,18 +148,18 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 JUCE-build/extras/Build/preinstall
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 JUCE-build/extras/Build/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 JUCE-build/extras/Build/preinstall
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 JUCE-build/extras/Build/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Help Target
@@ -185,7 +185,7 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
-	cd "/Users/senioradvisor/BEOOCORD 2000 DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/build" && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(CMAKE_COMMAND) -P "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build/CMakeFiles/VerifyGlobs.cmake"
+	cd "/Users/senioradvisor/BEOOCORD 2000 DL/plugin/juce/build" && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

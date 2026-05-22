@@ -1,6 +1,6 @@
 CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o: \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BC2000LookAndFeel.cpp \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/Source/ui/BC2000LookAndFeel.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/BC2000LookAndFeel.cpp \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/Source/ui/BC2000LookAndFeel.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/juce_gui_basics.h \
   /Users/senioradvisor/JUCE/modules/juce_graphics/juce_graphics.h \
   /Users/senioradvisor/JUCE/modules/juce_core/juce_core.h \
@@ -1379,13 +1379,13 @@ CMakeFiles/BC2000DL.dir/Source/ui/BC2000LookAndFeel.cpp.o: \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/layout/juce_GridItem.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/layout/juce_Grid.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_basics/native/juce_ScopedDPIAwarenessDisabler.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin_blur.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/cached_blur.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/shadows.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/internal/cached_shadows.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/internal/rendered_single_channel_shadow.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/blur_demo_component.h \
-  /Users/senioradvisor/BEOOCORD\ 2000\ DL/.claude/worktrees/determined-davinci-e72208/plugin/juce/vendor/melatonin_blur/melatonin/../melatonin_blur.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin_blur.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/cached_blur.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/shadows.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/internal/cached_shadows.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/internal/rendered_single_channel_shadow.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/blur_demo_component.h \
+  /Users/senioradvisor/BEOOCORD\ 2000\ DL/plugin/juce/vendor/melatonin_blur/melatonin/../melatonin_blur.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_extra/juce_gui_extra.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_extra/documents/juce_FileBasedDocument.h \
   /Users/senioradvisor/JUCE/modules/juce_gui_extra/code_editor/juce_CodeDocument.h \

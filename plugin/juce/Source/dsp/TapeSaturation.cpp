@@ -34,7 +34,14 @@ namespace bc2000dl::dsp
         biasReject.reset();
 
         hysteresis.reset();
-        biasPhase = 0.0;
+
+        // Bias-oscillator: förberäkna rotations-steg.  ω = 2π·f_bias/sr_over.
+        // Init (cos,sin) = (1,0) → start vid sin-phase 0 (matchar gamla biasPhase=0).
+        const double omega = juce::MathConstants<double>::twoPi * kBiasFreq_Hz / srOversampled;
+        biasCosStep  = std::cos (omega);
+        biasSinStep  = std::sin (omega);
+        biasCosState = 1.0;
+        biasSinState = 0.0;
 
         updateFilters();
     }
@@ -45,10 +52,13 @@ namespace bc2000dl::dsp
         bumpFilter.reset();
         biasReject.reset();
         hysteresis.reset();   // clears J-A magnetisation history
-        biasPhase = 0.0;
+        biasCosState = 1.0;
+        biasSinState = 0.0;
         if (oversampler) oversampler->reset();
         std::fill (printBuffer.begin(), printBuffer.end(), 0.0f);
         printIdx = 0;
+        dcBlockX1 = dcBlockY1 = 0.0f;
+        silenceBlockCount = 0;
     }
 
     void TapeSaturation::setSpeed (TapeSpeed speed)
@@ -200,6 +210,33 @@ namespace bc2000dl::dsp
             if (! std::isfinite (data[i]))
                 data[i] = 0.0f;
 
+        // Tyst-ingångsgating: räkna block under tröskeln och nollställ J-A-state.
+        // Kontinuerlig konstant-amplituds-bias demagnetiserar INTE M_r i J-A-modellen
+        // (kräver avtagande amplitud, som en riktigt erase-head).  Vi simulerar
+        // erasure-effekten: efter kSilenceHoldBlocks tysta block sätts M = 0.
+        {
+            float blockPow = 0.0f;
+            for (int i = 0; i < n; ++i)
+                blockPow += data[i] * data[i];
+            if (blockPow / static_cast<float> (n) < kSilenceThreshPow)
+            {
+                if (++silenceBlockCount >= kSilenceHoldBlocks)
+                {
+                    hysteresis.reset();
+                    biasReject.reset();
+                    hfFilter.reset();
+                    bumpFilter.reset();
+                    if (oversampler) oversampler->reset();
+                    dcBlockX1 = dcBlockY1 = 0.0f;
+                    silenceBlockCount = kSilenceHoldBlocks;  // klipp mot overflow
+                }
+            }
+            else
+            {
+                silenceBlockCount = 0;
+            }
+        }
+
         // ===== 1. Oversamplad J-A-hysteres med 100 kHz bias som riktig signal =====
         // Wrap nuvarande kanal-data i en single-channel AudioBlock för oversampling
         juce::dsp::AudioBlock<float> singleCh (&data, 1, 0, (size_t) n);
@@ -207,9 +244,16 @@ namespace bc2000dl::dsp
 
         const int nUp = (int) upBlock.getNumSamples();
         auto* up = upBlock.getChannelPointer (0);
-        const double srOver = sampleRate * (1 << kOversampleFactor);
-        const double biasInc = juce::MathConstants<double>::twoPi * kBiasFreq_Hz / srOver;
         const float biasAmplitude = 0.03f * biasAmount;
+        // Renormalisera oscillator-state mot drift (1 sqrt per block, försumbart).
+        // Numerisk avrundning i 4-mul-rotationen ackumuleras till |state|≠1 över tid;
+        // 1/sqrt(c²+s²) trimmar tillbaka utan att påverka frekvensen.
+        {
+            const double mag2 = biasCosState * biasCosState + biasSinState * biasSinState;
+            const double inv  = 1.0 / std::sqrt (mag2);
+            biasCosState *= inv;
+            biasSinState *= inv;
+        }
         // Drive-scaling 0.1 (v62.5).  Med ac126-gain reducerad till 0 dB
         // hamnar tape-input vid -3 dBFS test-signal på ca -4 dBFS (peak 0.6).
         // J-A H_peak = 0.6 × 0.1 = 0.06 → L(0.2) = 0.067, linjär region.
@@ -218,13 +262,21 @@ namespace bc2000dl::dsp
         constexpr float kDriveScaling = 0.1f;
         const float satDrive = saturationDrive * kDriveScaling;
 
+        // Lokal kopia av oscillator-state — låter compilern hålla i register.
+        double oscC = biasCosState;
+        double oscS = biasSinState;
+        const double cw = biasCosStep;
+        const double sw = biasSinStep;
+
         for (int i = 0; i < nUp; ++i)
         {
-            // Audio + bias-sinus → J-A
-            const float biasSig = biasAmplitude * std::sin ((float) biasPhase);
-            biasPhase += biasInc;
-            if (biasPhase > juce::MathConstants<double>::twoPi)
-                biasPhase -= juce::MathConstants<double>::twoPi;
+            // Bias-sinus via 2D-rotation: (c,s) → (c·cw − s·sw, s·cw + c·sw).
+            // 4 muls + 2 adds, ingen std::sin per sample.
+            const float biasSig = biasAmplitude * static_cast<float> (oscS);
+            const double newC = oscC * cw - oscS * sw;
+            const double newS = oscS * cw + oscC * sw;
+            oscC = newC;
+            oscS = newS;
 
             // Hard-clamp H före J-A.  Magnetisering kan inte fysikaliskt
             // gå utanför ±5·Ms; värden därutöver indikerar upstream-blowup
@@ -243,14 +295,35 @@ namespace bc2000dl::dsp
             up[i] = fluxOut;
         }
 
+        // Skriv tillbaka oscillator-state inför nästa block.
+        biasCosState = oscC;
+        biasSinState = oscS;
+
         oversampler->processSamplesDown (singleCh);
 
-        // Scrub oversampler-output mot NaN/Inf — om ett enstaka sample går
-        // bananas (J-A-state, FIR-edge-case) får inte resten av blocket
-        // förorenas och fortplantas vidare in i playback-EQ + master-bus.
+        // Scrub + DC-block + makeup gain.
+        // J-A:s linjära susceptibilitet χ₀ = Ms/(3a) ≈ 1 för alla formler
+        // (Agfa 1.11, BASF 1.19, Scotch 0.98) → gain ≈ kDriveScaling = 0.1 (−20 dB).
+        // 1/kDriveScaling återställer unity; fel < 1 dB per formel.
+        //
+        // DC-block (~10 Hz en-pol HP) tar bort J-A:s remanensmagnetisering M_r
+        // innan makeup-gainen förstärker den.  Verkliga bandspelarhuvuden är
+        // AC-kopplade (transformator/kondensator) — detta är fysikaliskt korrekt.
+        // 10 Hz cutoff: kostar <0.2 dB vid 50 Hz (inom testbudget), tar bort
+        // remanenstail (~50 ms tidskonstant → energi under ~20 Hz).
+        constexpr float kMakeup  = 1.0f / kDriveScaling;
+        const float     dcCoeff  = 1.0f - juce::MathConstants<float>::twoPi
+                                          * 10.0f / static_cast<float> (sampleRate);
         for (int i = 0; i < n; ++i)
+        {
             if (! std::isfinite (data[i]))
                 data[i] = 0.0f;
+            const float x = data[i];
+            data[i]  = x - dcBlockX1 + dcCoeff * dcBlockY1;
+            dcBlockX1 = x;
+            dcBlockY1 = data[i];
+            data[i] *= kMakeup;
+        }
 
         // ===== 2. Per-formel asymmetrisk + tape-asymmetri =====
         // J-A är 3rd-dominant. Reell tape har även 2nd-harm asymmetri eftersom
