@@ -53,6 +53,9 @@ target_sources(BC2000DL PRIVATE
     Source/WebEditor.h
     Source/NativeEditor.cpp
     Source/NativeEditor.h
+    Source/WireframeEditor.cpp
+    Source/WireframeEditor.h
+    Source/ui/FontAudioIcons.h
     Source/ui/BC2000LookAndFeel.cpp
     Source/ui/BC2000LookAndFeel.h
     Source/dsp/Constants.h
@@ -113,6 +116,7 @@ target_compile_definitions(BC2000DL PRIVATE
 # Ett enda target → en BinaryData.h, inga include-konflikter.
 juce_add_binary_data(BC2000DL_Assets SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/../web/beoflux.html
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/fontaudio.ttf
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/knob_chrome_filmstrip.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/fader_thumb_chrome.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/assets/walnut_bezel.png

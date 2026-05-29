@@ -769,8 +769,10 @@ void NativeEditor::paint (juce::Graphics& g)
     auto aluZone = inner.withHeight (kAluH);
     LnF::drawPaperPanel (g, aluZone);
 
-    // Title (top-left of alu deck)
-    LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
+    // Title (top-left of alu deck).  Höjd 44 px: drawTitle tar 26 px för
+    // huvudtiteln + resten till subtiteln — 20 px klippte tidigare bort
+    // hela subtitelraden (brand + version) → tom deck-yta.
+    LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (44),
                      "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v60.6");
 
     // Counter (bottom-centre of deck, just below the VU row)

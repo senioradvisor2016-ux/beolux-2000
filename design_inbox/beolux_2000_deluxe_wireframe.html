@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<title>BEOLUX 2000 DELUXE — Wireframe (full parameter coverage)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f5f3f0;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 32px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .stage { padding: 24px; }
+  svg { display: block; filter: drop-shadow(0 2px 24px rgba(0,0,0,0.06)); }
+  :root {
+    --stroke: #2a2a2a;
+    --stroke-light: #888;
+    --fill-wood: #e8ddd0;
+    --fill-panel: #fff;
+    --fill-dark:  #1c1c1c;
+    --fill-accent: #f0ece6;
+    --label: #555;
+    --red: #c1392b;
+  }
+  .meta { max-width: 920px; margin: 0 auto 16px; color: #555; font-size: 12px; line-height: 1.5; }
+  .meta h1 { font-size: 14px; letter-spacing: 2px; margin-bottom: 4px; color: #2a2a2a; }
+  .meta code { background: #ebe7df; padding: 1px 5px; border-radius: 2px; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div class="meta">
+    <h1>BEOLUX 2000 DELUXE — front panel wireframe</h1>
+    Komplett parameter-mapping mot APVTS. Estetik: B&amp;O Beocord 2400 (1968).
+    7&nbsp;fader · 14&nbsp;rotaries · 5-vägs transport · 3-väg hastighet · 28&nbsp;rockers/toggles.
+  </div>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 780" width="920" height="780">
+    <defs>
+      <style>
+        .wood        { fill: var(--fill-wood); stroke: var(--stroke); stroke-width: 2; }
+        .panel       { fill: var(--fill-panel); stroke: var(--stroke); stroke-width: 1.5; }
+        .panel-dark  { fill: var(--fill-accent); stroke: var(--stroke); stroke-width: 1.5; }
+        .strip-dark  { fill: var(--fill-dark); stroke: var(--stroke); stroke-width: 1; }
+        .outline     { fill: none; stroke: var(--stroke); stroke-width: 1.5; }
+        .outline-thin{ fill: none; stroke: var(--stroke-light); stroke-width: 0.75; }
+        .outline-med { fill: none; stroke: var(--stroke); stroke-width: 1; }
+        .label       { font-family: 'Helvetica Neue', Helvetica, sans-serif; font-size: 11px; fill: var(--label); text-anchor: middle; }
+        .label-sm    { font-family: 'Helvetica Neue', Helvetica, sans-serif; font-size: 8.5px; fill: var(--stroke-light); text-anchor: middle; }
+        .label-xs    { font-family: 'Helvetica Neue', Helvetica, sans-serif; font-size: 7px; fill: var(--stroke-light); text-anchor: middle; }
+        .label-white { font-family: 'Helvetica Neue', Helvetica, sans-serif; font-size: 8px; fill: #ddd; text-anchor: middle; letter-spacing: 0.5px; }
+        .label-title { font-family: 'Helvetica Neue', Helvetica, sans-serif; font-size: 13px; fill: var(--stroke); text-anchor: middle; letter-spacing: 4px; font-weight: 500; }
+        .label-sub   { font-family: 'Helvetica Neue', Helvetica, sans-serif; font-size: 7.5px; fill: var(--stroke-light); text-anchor: middle; letter-spacing: 3px; }
+        .screw       { fill: none; stroke: var(--stroke-light); stroke-width: 0.75; }
+        .tick        { stroke: var(--stroke-light); stroke-width: 0.5; }
+        .slider-track{ fill: none; stroke: var(--stroke-light); stroke-width: 1; }
+        .slider-knob { fill: #fff; stroke: var(--stroke); stroke-width: 1.2; }
+        .btn         { fill: #fff; stroke: var(--stroke); stroke-width: 1; }
+        .btn-dark    { fill: var(--fill-accent); stroke: var(--stroke); stroke-width: 1; }
+        .btn-red     { fill: var(--red); stroke: var(--stroke); stroke-width: 1; }
+        .rotary      { fill: #fff; stroke: var(--stroke); stroke-width: 1.5; }
+        .rotary-sm   { fill: #fff; stroke: var(--stroke); stroke-width: 1; }
+        .rotary-inner{ fill: none; stroke: var(--stroke-light); stroke-width: 0.75; }
+        .hub         { fill: none; stroke: var(--stroke); stroke-width: 1.2; }
+        .reel        { fill: none; stroke: var(--stroke); stroke-width: 1.5; }
+        .reel-spoke  { fill: none; stroke: var(--stroke-light); stroke-width: 1; }
+        .meter       { fill: #fff; stroke: var(--stroke); stroke-width: 1; }
+        .cross       { stroke: var(--stroke-light); stroke-width: 0.5; }
+        .annotation  { font-family: 'Helvetica Neue', Helvetica, sans-serif; font-size: 9px; fill: #999; text-anchor: middle; font-style: italic; }
+        .num-tag     { fill: var(--red); }
+        .num-text    { font-family: 'Helvetica Neue', Helvetica, sans-serif; font-size: 7px; fill: #fff; text-anchor: middle; font-weight: 700; }
+      </style>
+    </defs>
+
+    <!-- ============================ WOODEN CASE ============================ -->
+    <rect x="40" y="30" width="840" height="720" rx="6" class="wood"/>
+
+    <!-- ============================ TOP DECK PANEL (reels) ============================ -->
+    <rect x="60" y="48" width="800" height="310" rx="2" class="panel-dark"/>
+
+    <!-- Tension rollers -->
+    <circle cx="95"  cy="280" r="12" class="outline"/><circle cx="95"  cy="280" r="3" class="outline-thin"/>
+    <circle cx="825" cy="280" r="12" class="outline"/><circle cx="825" cy="280" r="3" class="outline-thin"/>
+
+    <!-- LEFT REEL -->
+    <g transform="translate(280,195)">
+      <circle r="130" class="reel"/>
+      <circle r="115" class="outline-thin"/>
+      <circle r="32"  class="hub"/>
+      <circle r="14"  class="outline-thin"/>
+      <line x1="0" y1="-32" x2="0" y2="-105" class="reel-spoke"/>
+      <line x1="27.7" y1="16" x2="90.9" y2="52.5" class="reel-spoke"/>
+      <line x1="-27.7" y1="16" x2="-90.9" y2="52.5" class="reel-spoke"/>
+      <polygon points="-8,-36 8,-36 18,-105 -18,-105" class="outline-thin"/>
+      <polygon points="30,11 24,22 100,46 94,58"      class="outline-thin"/>
+      <polygon points="-30,11 -24,22 -100,46 -94,58"  class="outline-thin"/>
+    </g>
+
+    <!-- RIGHT REEL -->
+    <g transform="translate(640,195)">
+      <circle r="130" class="reel"/>
+      <circle r="115" class="outline-thin"/>
+      <circle r="32"  class="hub"/>
+      <circle r="14"  class="outline-thin"/>
+      <line x1="0" y1="32" x2="0" y2="105" class="reel-spoke"/>
+      <line x1="-27.7" y1="-16" x2="-90.9" y2="-52.5" class="reel-spoke"/>
+      <line x1="27.7" y1="-16"  x2="90.9"  y2="-52.5" class="reel-spoke"/>
+      <polygon points="-8,36 8,36 18,105 -18,105"      class="outline-thin"/>
+      <polygon points="-30,-11 -24,-22 -100,-46 -94,-58" class="outline-thin"/>
+      <polygon points="30,-11 24,-22 100,-46 94,-58"    class="outline-thin"/>
+    </g>
+
+    <!-- CENTER HEAD AREA — (1) MANÖVERSPAK + (3) TONHUVUDOMKOPPLARE + (5) RÄKNEVERK -->
+    <!-- 1 MANÖVERSPAK (transport lever) -->
+    <line x1="540" y1="200" x2="540" y2="105" stroke="var(--stroke)" stroke-width="2"/>
+    <circle cx="540" cy="102" r="7" class="outline"/>
+    <rect x="525" y="86" width="14" height="9" rx="1" class="num-tag"/><text x="532" y="93" class="num-text">1</text>
+    <text x="540" y="220" class="label-xs">MANÖVERSPAK</text>
+    <text x="540" y="230" class="label-xs">REC · PLAY · &lt;&lt; · &gt;&gt;</text>
+
+    <!-- 3 TONHUVUDOMKOPPLARE — 2/4-spår head selector -->
+    <circle cx="395" cy="270" r="4" class="outline-med"/>
+    <circle cx="430" cy="275" r="4" class="outline-med"/>
+    <circle cx="490" cy="275" r="4" class="outline-med"/>
+    <circle cx="525" cy="270" r="4" class="outline-med"/>
+    <rect x="420" y="250" width="80" height="22" rx="3" class="outline-med"/>
+    <rect x="448" y="234" width="14" height="9" rx="1" class="num-tag"/><text x="455" y="241" class="num-text">3</text>
+    <text x="460" y="246" class="label-xs">2-SPÅR / 4-SPÅR</text>
+    <g transform="translate(460,310)">
+      <circle r="14" class="outline-thin"/>
+      <text y="2" class="label-xs">B&amp;O</text>
+    </g>
+
+    <!-- 5 RÄKNEVERK — 4-digit mechanical counter, top-left of head -->
+    <rect x="350" y="100" width="60" height="22" rx="2" class="meter"/>
+    <line x1="365" y1="100" x2="365" y2="122" class="outline-thin"/>
+    <line x1="380" y1="100" x2="380" y2="122" class="outline-thin"/>
+    <line x1="395" y1="100" x2="395" y2="122" class="outline-thin"/>
+    <text x="357" y="116" class="label-xs">0</text>
+    <text x="372" y="116" class="label-xs">0</text>
+    <text x="387" y="116" class="label-xs">0</text>
+    <text x="402" y="116" class="label-xs">0</text>
+    <rect x="373" y="84" width="14" height="9" rx="1" class="num-tag"/><text x="380" y="91" class="num-text">5</text>
+    <text x="380" y="135" class="label-xs">RÄKNEVERK</text>
+
+    <!-- 28 HASTIGHETSVÄLJARE + STRÖMSTÄLLARE (speed + power, between reels) -->
+    <g transform="translate(460,150)">
+      <circle r="18" class="rotary-sm"/>
+      <line x1="0" y1="0" x2="0" y2="-14" stroke="var(--stroke)" stroke-width="1.2"/>
+      <text x="-26" y="3" class="label-xs">4.75</text>
+      <text x="0"   y="-26" class="label-xs">9.5</text>
+      <text x="26"  y="3" class="label-xs">19</text>
+      <text x="-32" y="3"  class="label-xs">0</text>
+    </g>
+    <rect x="453" y="166" width="14" height="9" rx="1" class="num-tag"/><text x="460" y="173" class="num-text">28</text>
+    <text x="460" y="186" class="label-xs">HASTIGHET · cm/s</text>
+
+    <!-- ============================ TITLE STRIP ============================ -->
+    <rect x="60" y="358" width="800" height="26" rx="0" class="panel"/>
+    <text x="460" y="372" class="label-title">BEOLUX 2000 DELUXE</text>
+    <text x="460" y="381" class="label-sub">SOUNDBOYS · TAPE EMULATION</text>
+
+    <!-- ============================ SERVICE-KNOB STRIP (NEW) ============================ -->
+    <!-- Tape/Saturation/Mod parameters that originally sat behind service hatch -->
+    <rect x="60" y="384" width="800" height="56" class="strip-dark"/>
+    <text x="460" y="396" class="label-white">TAPE MACHINE · ALIGNMENT</text>
+
+    <g font-family="Helvetica Neue,Helvetica" text-anchor="middle">
+      <!-- 8 small rotaries, evenly spaced across 800px @ y≈420 -->
+      <!-- positions: 110, 200, 290, 380, 470, 560, 650, 740 -->
+      <g transform="translate(110,420)">
+        <circle r="12" class="rotary-sm"/><line y2="-10" stroke="var(--stroke)" stroke-width="1"/>
+        <text y="26" class="label-white">BIAS</text>
+      </g>
+      <g transform="translate(200,420)">
+        <circle r="12" class="rotary-sm"/><line y2="-10" stroke="var(--stroke)" stroke-width="1"/>
+        <text y="26" class="label-white">SAT · L</text>
+      </g>
+      <g transform="translate(290,420)">
+        <circle r="12" class="rotary-sm"/><line y2="-10" stroke="var(--stroke)" stroke-width="1"/>
+        <text y="26" class="label-white">SAT · R</text>
+      </g>
+      <g transform="translate(380,420)">
+        <circle r="12" class="rotary-sm"/><line y2="-10" stroke="var(--stroke)" stroke-width="1"/>
+        <text y="26" class="label-white">WOW · FLUTTER</text>
+      </g>
+      <g transform="translate(470,420)">
+        <circle r="12" class="rotary-sm"/><line y2="-10" stroke="var(--stroke)" stroke-width="1"/>
+        <text y="26" class="label-white">PRINT THROUGH</text>
+      </g>
+      <g transform="translate(560,420)">
+        <circle r="12" class="rotary-sm"/><line y2="-10" stroke="var(--stroke)" stroke-width="1"/>
+        <text y="26" class="label-white">STEREO ASYM</text>
+      </g>
+      <g transform="translate(650,420)">
+        <circle r="12" class="rotary-sm"/><line y2="-10" stroke="var(--stroke)" stroke-width="1"/>
+        <text y="26" class="label-white">MULTIPLAY · 1–5</text>
+      </g>
+      <!-- Tape Formula is a 3-pos selector, drawn as flat knob w/ indicator -->
+      <g transform="translate(740,420)">
+        <circle r="12" class="rotary-sm"/><line y2="-10" stroke="var(--stroke)" stroke-width="1"/>
+        <text y="26" class="label-white">TAPE · AGFA/BASF/SCOTCH</text>
+      </g>
+    </g>
+
+    <!-- ============================ MAIN CONTROL PANEL ============================ -->
+    <rect x="60" y="440" width="800" height="298" rx="2" class="panel"/>
+
+    <!-- Corner screws -->
+    <circle cx="76"  cy="456" r="5" class="screw"/><line x1="72.5" y1="456" x2="79.5" y2="456" class="screw"/><line x1="76" y1="452.5" x2="76" y2="459.5" class="screw"/>
+    <circle cx="844" cy="456" r="5" class="screw"/><line x1="840.5" y1="456" x2="847.5" y2="456" class="screw"/><line x1="844" y1="452.5" x2="844" y2="459.5" class="screw"/>
+    <circle cx="76"  cy="722" r="5" class="screw"/><line x1="72.5" y1="722" x2="79.5" y2="722" class="screw"/><line x1="76" y1="718.5" x2="76" y2="725.5" class="screw"/>
+    <circle cx="844" cy="722" r="5" class="screw"/><line x1="840.5" y1="722" x2="847.5" y2="722" class="screw"/><line x1="844" y1="718.5" x2="844" y2="725.5" class="screw"/>
+
+    <!-- ====================== LEFT SECTION — Routing / Monitor / VU ====================== -->
+    <!-- Zone dashed outline -->
+    <rect x="90" y="450" width="210" height="278" rx="4" stroke="#bbb" stroke-width="0.5" stroke-dasharray="4,3" fill="none"/>
+    <text x="195" y="722" class="annotation">INPUT · ROUTING · METER</text>
+
+    <!-- ROW A: 6 rocker buttons — Track / Channel / Sync / Pause -->
+    <text x="195" y="463" class="label-xs">KANALVÄLJARE · SYNKRON · MOMENT</text>
+    <!-- 26 SPÅR 1 -->
+    <rect x="100" y="453" width="14" height="9" rx="1" class="num-tag"/><text x="107" y="460" class="num-text">26</text>
+    <rect x="100" y="468" width="22" height="12" rx="2" class="btn"/><text x="111" y="492" class="label-xs">SPÅR 1</text>
+    <!-- 27 SPÅR 2 -->
+    <rect x="130" y="453" width="14" height="9" rx="1" class="num-tag"/><text x="137" y="460" class="num-text">27</text>
+    <rect x="130" y="468" width="22" height="12" rx="2" class="btn"/><text x="141" y="492" class="label-xs">SPÅR 2</text>
+    <!-- 23 KANALVÄLJARE L -->
+    <rect x="160" y="453" width="14" height="9" rx="1" class="num-tag"/><text x="167" y="460" class="num-text">23</text>
+    <rect x="160" y="468" width="22" height="12" rx="2" class="btn-dark"/><text x="171" y="492" class="label-xs">KV·L</text>
+    <!-- 24 KANALVÄLJARE R -->
+    <rect x="190" y="453" width="14" height="9" rx="1" class="num-tag"/><text x="197" y="460" class="num-text">24</text>
+    <rect x="190" y="468" width="22" height="12" rx="2" class="btn-dark"/><text x="201" y="492" class="label-xs">KV·R</text>
+    <!-- 25 SYNKRON -->
+    <rect x="220" y="453" width="14" height="9" rx="1" class="num-tag"/><text x="227" y="460" class="num-text">25</text>
+    <rect x="220" y="468" width="22" height="12" rx="2" class="btn"/><text x="231" y="492" class="label-xs">SYNK</text>
+    <!-- 2 MOMENT/SNABBSTOPP -->
+    <rect x="250" y="453" width="14" height="9" rx="1" class="num-tag"/><text x="257" y="460" class="num-text">2</text>
+    <rect x="250" y="468" width="22" height="12" rx="2" class="btn"/><text x="261" y="492" class="label-xs">MOMENT</text>
+
+    <!-- ROW B: Routing / Utgångssignal / PA / Förstärkare -->
+    <g transform="translate(100,505)">
+      <text x="90" y="-4" class="label-xs">UTGÅNGSSIGNAL  ·  P.A.  ·  FÖRSTÄRKARE</text>
+      <rect x="0" y="0" width="180" height="50" rx="1" class="outline-thin"/>
+      <line x1="60"  y1="10" x2="60"  y2="40" class="outline-thin"/>
+      <line x1="120" y1="10" x2="120" y2="40" class="outline-thin"/>
+      <line x1="30"  y1="25" x2="150" y2="25" class="outline-thin"/>
+      <text x="30"  y="42" class="label-xs">K1</text>
+      <text x="90"  y="42" class="label-xs">STEREO</text>
+      <text x="150" y="42" class="label-xs">K2</text>
+      <!-- Utgångssignal switch (22) -->
+      <rect x="20" y="20" width="20" height="4" rx="1" class="btn-dark"/>
+      <rect x="80" y="20" width="20" height="4" rx="1" class="btn-dark"/>
+    </g>
+    <!-- 22 UTGÅNGSSIGNAL badge -->
+    <rect x="115" y="500" width="14" height="9" rx="1" class="num-tag"/><text x="122" y="507" class="num-text">22</text>
+    <!-- 19 P.A. -->
+    <rect x="240" y="500" width="14" height="9" rx="1" class="num-tag"/><text x="247" y="507" class="num-text">19</text>
+    <rect x="234" y="513" width="26" height="12" rx="2" class="btn"/><text x="247" y="537" class="label-xs">P.A.</text>
+    <!-- 21 FÖRSTÄRKARE -->
+    <rect x="270" y="500" width="14" height="9" rx="1" class="num-tag"/><text x="277" y="507" class="num-text">21</text>
+    <rect x="264" y="513" width="26" height="12" rx="2" class="btn"/><text x="277" y="537" class="label-xs">FÖRST</text>
+
+    <!-- ROW C: Monitor (18) + Sound on Sound (20) -->
+    <rect x="113" y="572" width="14" height="9" rx="1" class="num-tag"/><text x="120" y="579" class="num-text">18</text>
+    <text x="120" y="592" class="label-sm">MONITOR</text>
+    <rect x="100" y="598" width="22" height="12" rx="2" class="btn"/><text x="111" y="622" class="label-xs">EFTER</text>
+    <rect x="128" y="598" width="22" height="12" rx="2" class="btn"/><text x="139" y="622" class="label-xs">FÖRE</text>
+    <rect x="193" y="572" width="14" height="9" rx="1" class="num-tag"/><text x="200" y="579" class="num-text">20</text>
+    <text x="200" y="592" class="label-sm">SoS / MULTIPLAY</text>
+    <rect x="180" y="598" width="22" height="12" rx="2" class="btn-dark"/><text x="191" y="622" class="label-xs">ON</text>
+    <rect x="208" y="598" width="22" height="12" rx="2" class="btn"/><text x="219" y="622" class="label-xs">REC</text>
+
+    <!-- ROW D: Speaker (6) HÖGTALARPAR + Hörtelefon (8) — kompakt -->
+    <rect x="100" y="635" width="14" height="9" rx="1" class="num-tag"/><text x="107" y="642" class="num-text">6</text>
+    <text x="145" y="642" class="label-sm">HÖGTALARPAR</text>
+    <rect x="100" y="647" width="22" height="11" rx="2" class="btn"/><text x="111" y="655" class="label-xs">I</text>
+    <rect x="126" y="647" width="22" height="11" rx="2" class="btn"/><text x="137" y="655" class="label-xs">II</text>
+    <rect x="152" y="647" width="22" height="11" rx="2" class="btn"/><text x="163" y="655" class="label-xs">MUTE</text>
+    <!-- 8 HÖRTELEFON jack -->
+    <rect x="196" y="635" width="14" height="9" rx="1" class="num-tag"/><text x="203" y="642" class="num-text">8</text>
+    <text x="232" y="642" class="label-sm">HÖRTELEFON</text>
+    <circle cx="220" cy="652" r="6" class="outline"/>
+    <circle cx="220" cy="652" r="2.5" class="outline-thin"/>
+    <circle cx="252" cy="652" r="6" class="outline"/>
+    <circle cx="252" cy="652" r="2.5" class="outline-thin"/>
+
+    <!-- ROW E: VU meters -->
+    <g transform="translate(96,672)">
+      <text x="40" y="-4" class="label-sm">L</text>
+      <rect width="80" height="34" rx="3" class="meter"/>
+      <line x1="8" y1="9"  x2="72" y2="9"  class="tick"/>
+      <line x1="8" y1="9"  x2="8"  y2="14" class="tick"/>
+      <line x1="24" y1="9" x2="24" y2="14" class="tick"/>
+      <line x1="40" y1="9" x2="40" y2="14" class="tick"/>
+      <line x1="56" y1="9" x2="56" y2="14" class="tick"/>
+      <line x1="72" y1="9" x2="72" y2="14" class="tick"/>
+      <line x1="10" y1="26" x2="50" y2="13" stroke="var(--stroke)" stroke-width="0.75"/>
+      <text x="12" y="23" class="label-xs">0</text>
+      <text x="55" y="23" class="label-xs">+3</text>
+    </g>
+    <g transform="translate(192,672)">
+      <text x="40" y="-4" class="label-sm">R</text>
+      <rect width="80" height="34" rx="3" class="meter"/>
+      <line x1="8" y1="9"  x2="72" y2="9"  class="tick"/>
+      <line x1="8" y1="9"  x2="8"  y2="14" class="tick"/>
+      <line x1="24" y1="9" x2="24" y2="14" class="tick"/>
+      <line x1="40" y1="9" x2="40" y2="14" class="tick"/>
+      <line x1="56" y1="9" x2="56" y2="14" class="tick"/>
+      <line x1="72" y1="9" x2="72" y2="14" class="tick"/>
+      <line x1="10" y1="26" x2="45" y2="13" stroke="var(--stroke)" stroke-width="0.75"/>
+      <text x="12" y="23" class="label-xs">0</text>
+      <text x="55" y="23" class="label-xs">+3</text>
+    </g>
+
+    <!-- ====================== CENTER SECTION — 10 INDIVIDUAL FADERS (L+R per source) ====================== -->
+    <rect x="310" y="450" width="262" height="278" rx="4" stroke="#bbb" stroke-width="0.5" stroke-dasharray="4,3" fill="none"/>
+    <text x="441" y="722" class="annotation">10 fader · L+R per källa · 0–10</text>
+
+    <!-- Source-group labels — B&O Beocord 2000 De Luxe manual nomenclature -->
+    <!-- 14 ♀ RADIO · 15 ◇ GRAM · 16 ◇ MIK · 12 EKO/SoS · 11 MASTER -->
+    <rect x="328" y="448" width="14" height="9" rx="1" class="num-tag"/><text x="335" y="455" class="num-text">14</text>
+    <text x="335" y="467" class="label-xs">♀ RADIO</text>
+    <rect x="383" y="448" width="14" height="9" rx="1" class="num-tag"/><text x="390" y="455" class="num-text">15</text>
+    <text x="390" y="467" class="label-xs">◇ GRAM</text>
+    <rect x="438" y="448" width="14" height="9" rx="1" class="num-tag"/><text x="445" y="455" class="num-text">16</text>
+    <text x="445" y="467" class="label-xs">◇ MIK</text>
+    <rect x="493" y="448" width="14" height="9" rx="1" class="num-tag"/><text x="500" y="455" class="num-text">12</text>
+    <text x="500" y="467" class="label-xs">EKO · SoS</text>
+    <rect x="548" y="448" width="14" height="9" rx="1" class="num-tag"/><text x="555" y="455" class="num-text">11</text>
+    <text x="555" y="467" class="label-xs">MASTER</text>
+
+    <!-- L/R per-channel labels above each individual fader -->
+    <text x="328" y="478" class="label-xs">L</text><text x="342" y="478" class="label-xs">R</text>
+    <text x="383" y="478" class="label-xs">L</text><text x="397" y="478" class="label-xs">R</text>
+    <text x="438" y="478" class="label-xs">L</text><text x="452" y="478" class="label-xs">R</text>
+    <text x="493" y="478" class="label-xs">L</text><text x="507" y="478" class="label-xs">R</text>
+    <text x="548" y="478" class="label-xs">L</text><text x="562" y="478" class="label-xs">R</text>
+
+    <!-- Pair separators (subtle dashed verticals between source groups) -->
+    <line x1="362" y1="478" x2="362" y2="668" stroke="#ccc" stroke-width="0.5" stroke-dasharray="2,2"/>
+    <line x1="417" y1="478" x2="417" y2="668" stroke="#ccc" stroke-width="0.5" stroke-dasharray="2,2"/>
+    <line x1="472" y1="478" x2="472" y2="668" stroke="#ccc" stroke-width="0.5" stroke-dasharray="2,2"/>
+    <line x1="527" y1="478" x2="527" y2="668" stroke="#ccc" stroke-width="0.5" stroke-dasharray="2,2"/>
+
+    <g id="faders">
+      <!-- 10 individual faders. Positions (centers): 328, 342 · 383, 397 · 438, 452 · 493, 507 · 548, 562 -->
+      <!-- Fader 1 · RADIO L — scale ticks LEFT side -->
+      <g transform="translate(328,480)">
+        <line x1="0" y1="0" x2="0" y2="180" class="slider-track"/>
+        <text x="-9" y="6"   class="label-xs">10</text><line x1="-3" y1="3"   x2="0" y2="3"   class="tick"/>
+        <text x="-7" y="24"  class="label-xs">9</text> <line x1="-3" y1="21"  x2="0" y2="21"  class="tick"/>
+        <text x="-7" y="42"  class="label-xs">8</text> <line x1="-3" y1="39"  x2="0" y2="39"  class="tick"/>
+        <text x="-7" y="60"  class="label-xs">7</text> <line x1="-3" y1="57"  x2="0" y2="57"  class="tick"/>
+        <text x="-7" y="78"  class="label-xs">6</text> <line x1="-3" y1="75"  x2="0" y2="75"  class="tick"/>
+        <text x="-7" y="96"  class="label-xs">5</text> <line x1="-3" y1="93"  x2="0" y2="93"  class="tick"/>
+        <text x="-7" y="114" class="label-xs">4</text> <line x1="-3" y1="111" x2="0" y2="111" class="tick"/>
+        <text x="-7" y="132" class="label-xs">3</text> <line x1="-3" y1="129" x2="0" y2="129" class="tick"/>
+        <text x="-7" y="150" class="label-xs">2</text> <line x1="-3" y1="147" x2="0" y2="147" class="tick"/>
+        <text x="-7" y="168" class="label-xs">1</text> <line x1="-3" y1="165" x2="0" y2="165" class="tick"/>
+        <text x="-7" y="184" class="label-xs">0</text>
+        <rect x="-6" y="92" width="12" height="10" rx="2" class="slider-knob"/>
+      </g>
+      <!-- Fader 2 · RADIO R -->
+      <g transform="translate(342,480)"><line x1="0" y1="0" x2="0" y2="180" class="slider-track"/><rect x="-6" y="96" width="12" height="10" rx="2" class="slider-knob"/></g>
+
+      <!-- Fader 3 · PHONO L -->
+      <g transform="translate(383,480)"><line x1="0" y1="0" x2="0" y2="180" class="slider-track"/><rect x="-6" y="110" width="12" height="10" rx="2" class="slider-knob"/></g>
+      <!-- Fader 4 · PHONO R -->
+      <g transform="translate(397,480)"><line x1="0" y1="0" x2="0" y2="180" class="slider-track"/><rect x="-6" y="112" width="12" height="10" rx="2" class="slider-knob"/></g>
+
+      <!-- Fader 5 · MIC L -->
+      <g transform="translate(438,480)"><line x1="0" y1="0" x2="0" y2="180" class="slider-track"/><rect x="-6" y="78" width="12" height="10" rx="2" class="slider-knob"/></g>
+      <!-- Fader 6 · MIC R -->
+      <g transform="translate(452,480)"><line x1="0" y1="0" x2="0" y2="180" class="slider-track"/><rect x="-6" y="82" width="12" height="10" rx="2" class="slider-knob"/></g>
+
+      <!-- Fader 7 · S on S L -->
+      <g transform="translate(493,480)"><line x1="0" y1="0" x2="0" y2="180" class="slider-track"/><rect x="-6" y="138" width="12" height="10" rx="2" class="slider-knob"/></g>
+      <!-- Fader 8 · S on S R -->
+      <g transform="translate(507,480)"><line x1="0" y1="0" x2="0" y2="180" class="slider-track"/><rect x="-6" y="140" width="12" height="10" rx="2" class="slider-knob"/></g>
+
+      <!-- Fader 9 · ECHO L -->
+      <g transform="translate(548,480)"><line x1="0" y1="0" x2="0" y2="180" class="slider-track"/><rect x="-6" y="124" width="12" height="10" rx="2" class="slider-knob"/></g>
+      <!-- Fader 10 · ECHO R — scale ticks RIGHT side -->
+      <g transform="translate(562,480)">
+        <line x1="0" y1="0" x2="0" y2="180" class="slider-track"/>
+        <text x="9"  y="6"   class="label-xs">10</text><line x1="0" y1="3"   x2="3" y2="3"   class="tick"/>
+        <text x="7"  y="24"  class="label-xs">9</text> <line x1="0" y1="21"  x2="3" y2="21"  class="tick"/>
+        <text x="7"  y="42"  class="label-xs">8</text> <line x1="0" y1="39"  x2="3" y2="39"  class="tick"/>
+        <text x="7"  y="60"  class="label-xs">7</text> <line x1="0" y1="57"  x2="3" y2="57"  class="tick"/>
+        <text x="7"  y="78"  class="label-xs">6</text> <line x1="0" y1="75"  x2="3" y2="75"  class="tick"/>
+        <text x="7"  y="96"  class="label-xs">5</text> <line x1="0" y1="93"  x2="3" y2="93"  class="tick"/>
+        <text x="7"  y="114" class="label-xs">4</text> <line x1="0" y1="111" x2="3" y2="111" class="tick"/>
+        <text x="7"  y="132" class="label-xs">3</text> <line x1="0" y1="129" x2="3" y2="129" class="tick"/>
+        <text x="7"  y="150" class="label-xs">2</text> <line x1="0" y1="147" x2="3" y2="147" class="tick"/>
+        <text x="7"  y="168" class="label-xs">1</text> <line x1="0" y1="165" x2="3" y2="165" class="tick"/>
+        <text x="7"  y="184" class="label-xs">0</text>
+        <rect x="-6" y="126" width="12" height="10" rx="2" class="slider-knob"/>
+      </g>
+    </g>
+
+    <!-- Source-group mode tabs (one per L+R pair) — B&O input-mode switches per source -->
+    <rect x="327" y="674" width="16" height="10" rx="2" class="btn"/>      <text x="335" y="697" class="label-xs">L/H</text>
+    <rect x="382" y="674" width="16" height="10" rx="2" class="btn"/>      <text x="390" y="697" class="label-xs">L/H</text>
+    <rect x="437" y="674" width="16" height="10" rx="2" class="btn"/>      <text x="445" y="697" class="label-xs">LoZ</text>
+    <rect x="492" y="674" width="16" height="10" rx="2" class="btn-dark"/>
+    <rect x="492" y="660" width="16" height="9"  rx="1" class="num-tag"/><text x="500" y="667" class="num-text">7</text>
+    <text x="500" y="697" class="label-xs">EKO/LIN</text>
+    <rect x="547" y="674" width="16" height="10" rx="2" class="btn"/>      <text x="555" y="697" class="label-xs">BYP</text>
+
+    <!-- ====================== RIGHT SECTION — Transport / EQ / Echo ====================== -->
+    <rect x="625" y="450" width="220" height="278" rx="4" stroke="#bbb" stroke-width="0.5" stroke-dasharray="4,3" fill="none"/>
+    <text x="735" y="722" class="annotation">TRANSPORT · EQ · ECHO</text>
+
+    <!-- DAW transport (plugin-only — komplement till MANÖVERSPAK #1) -->
+    <text x="735" y="463" class="label-xs">DAW TRANSPORT</text>
+    <rect x="638" y="468" width="26" height="14" rx="2" class="btn"/>     <text x="651" y="478" class="label-xs">«</text>
+    <rect x="668" y="468" width="26" height="14" rx="2" class="btn"/>     <text x="681" y="478" class="label-xs">»</text>
+    <rect x="698" y="468" width="26" height="14" rx="2" class="btn"/>     <text x="711" y="478" class="label-xs">▶</text>
+    <rect x="728" y="468" width="26" height="14" rx="2" class="btn"/>     <text x="741" y="478" class="label-xs">■</text>
+    <rect x="758" y="468" width="26" height="14" rx="2" class="btn"/>     <text x="771" y="478" class="label-xs">‖</text>
+    <rect x="800" y="468" width="26" height="14" rx="2" class="btn-red"/> <text x="813" y="478" class="label-xs" fill="#fff">●</text>
+    <text x="813" y="494" class="label-xs">REC</text>
+
+    <!-- 10 BASKONTROLL -->
+    <g transform="translate(660,540)">
+      <circle r="20" class="rotary-sm"/>
+      <line y2="-15" stroke="var(--stroke)" stroke-width="1.2"/>
+      <text y="34" class="label-xs">BAS</text>
+      <text x="-26" y="6" class="label-xs">–12</text>
+      <text x="26"  y="6" class="label-xs">+12</text>
+    </g>
+    <rect x="653" y="510" width="14" height="9" rx="1" class="num-tag"/><text x="660" y="517" class="num-text">10</text>
+
+    <!-- 9 DISKANTKONTROLL -->
+    <g transform="translate(740,540)">
+      <circle r="20" class="rotary-sm"/>
+      <line y2="-15" stroke="var(--stroke)" stroke-width="1.2"/>
+      <text y="34" class="label-xs">DISKANT</text>
+      <text x="-26" y="6" class="label-xs">–12</text>
+      <text x="26"  y="6" class="label-xs">+12</text>
+    </g>
+    <rect x="733" y="510" width="14" height="9" rx="1" class="num-tag"/><text x="740" y="517" class="num-text">9</text>
+
+    <!-- ECHO plugin-extension (utöver original-fader #12) -->
+    <text x="735" y="595" class="label-sm">EKO · plugin-extension</text>
+    <rect x="660" y="600" width="34" height="14" rx="2" class="btn-dark"/><text x="677" y="610" class="label-xs">ON</text>
+    <rect x="700" y="600" width="34" height="14" rx="2" class="btn"/>     <text x="717" y="610" class="label-xs">TAP 1</text>
+    <rect x="740" y="600" width="34" height="14" rx="2" class="btn"/>     <text x="757" y="610" class="label-xs">TAP 2</text>
+
+    <!-- Echo rotaries — TIME + FEEDBACK (plugin extension) -->
+    <g transform="translate(680,670)">
+      <circle r="28" class="outline-thin"/>
+      <text x="-22" y="20" class="label-xs">1</text>
+      <text x="-28" y="6"  class="label-xs">2</text>
+      <text x="-22" y="-12" class="label-xs">3</text>
+      <text x="-4"  y="-22" class="label-xs">4</text>
+      <text x="14"  y="-16" class="label-xs">5</text>
+      <circle r="14" class="rotary"/>
+      <line x1="0" y1="0" x2="-9" y2="-11" stroke="var(--stroke)" stroke-width="1.2"/>
+      <text y="36" class="label-xs">EKO · TIME</text>
+    </g>
+    <g transform="translate(780,670)">
+      <circle r="28" class="outline-thin"/>
+      <text x="-22" y="20" class="label-xs">1</text>
+      <text x="-28" y="6"  class="label-xs">2</text>
+      <text x="-22" y="-12" class="label-xs">3</text>
+      <text x="-4"  y="-22" class="label-xs">4</text>
+      <text x="14"  y="-16" class="label-xs">5</text>
+      <circle r="14" class="rotary"/>
+      <line x1="0" y1="0" x2="7" y2="-12" stroke="var(--stroke)" stroke-width="1.2"/>
+      <text y="36" class="label-xs">EKO · FB</text>
+    </g>
+
+    <!-- ============================ ZONE OUTLINES (top deck) ============================ -->
+    <rect x="130" y="52" width="660" height="290" rx="4" stroke="#bbb" stroke-width="0.5" stroke-dasharray="4,3" fill="none"/>
+    <text x="460" y="345" class="annotation">REEL DECK · MOTORS · HEADS</text>
+
+  </svg>
+</div>
+
+<div class="meta" style="margin-top: 16px;">
+  <h1>Parameter-mapping mot B&amp;O manual (1–28)</h1>
+  <strong>Faders (10) — 5 källor × L+R:</strong><br>
+  &nbsp;&nbsp;<strong>14</strong> ♀ RADIO L+R · <strong>15</strong> ◇ GRAM L+R · <strong>16</strong> ◇ MIKROFON L+R · <strong>12</strong> EKO/SoS/LINJE L+R · <strong>11</strong> AVSPELNING/MASTER L+R<br><br>
+
+  <strong>Top deck (5 kontroller):</strong><br>
+  &nbsp;&nbsp;<strong>1</strong> MANÖVERSPAK · <strong>3</strong> TONHUVUDOMKOPPLARE (2-spår/4-spår) · <strong>5</strong> RÄKNEVERK (4-siff.) · <strong>28</strong> HASTIGHETSVÄLJARE + STRÖMSTÄLLARE (0 / 4.75 / 9.5 / 19 cm·s⁻¹)<br><br>
+
+  <strong>Vänster kontrollpanel:</strong><br>
+  &nbsp;&nbsp;<strong>2</strong> MOMENT/SNABBSTOPP · <strong>22</strong> UTGÅNGSSIGNAL (K1/STEREO/K2) · <strong>23</strong><strong>24</strong> KANALVÄLJARE INSPELNING · <strong>25</strong> SYNKRON · <strong>26</strong><strong>27</strong> SPÅR 1/SPÅR 2<br>
+  &nbsp;&nbsp;<strong>18</strong> MONITOR (EFTER/FÖRE BAND) · <strong>19</strong> P.A. · <strong>20</strong> SOUND ON SOUND/MULTIPLAY · <strong>21</strong> FÖRSTÄRKARE<br>
+  &nbsp;&nbsp;<strong>6</strong> HÖGTALARPAR I/II/MUTE · <strong>8</strong> HÖRTELEFON-uttag<br><br>
+
+  <strong>Höger kontrollpanel:</strong><br>
+  &nbsp;&nbsp;<strong>10</strong> BAS · <strong>9</strong> DISKANT · DAW transport (« » ▶ ■ ‖ ●) · EKO TIME/FB (plugin-extension utanför #1–28)<br><br>
+
+  <strong>Service-strip (plugin-extension — utanför originalmanualen):</strong><br>
+  &nbsp;&nbsp;Bias · Sat L · Sat R · Wow/Flutter · Print Through · Stereo Asym · Multiplay-Gen · Tape Formula (Agfa/BASF/Scotch)<br><br>
+
+  <strong>Per-källa mode-tabs under faders:</strong> Radio L/H · Phono L/H · Mic Lo-Z · <strong>7</strong> EKO/LINJE-väljare · BYPASS TAPE
+</div>
+
+</body>
+</html>

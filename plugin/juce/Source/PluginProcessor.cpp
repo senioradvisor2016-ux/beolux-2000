@@ -4,6 +4,7 @@
 #include "PluginEditor.h"
 #include "WebEditor.h"
 #include "NativeEditor.h"
+#include "WireframeEditor.h"
 #include "presets/Presets.h"
 #include <cstring>
 
@@ -56,6 +57,15 @@ namespace
     // v60.3 — nya hardware-switchar från schema 9224002/9224003
     constexpr auto kP_BiasType         = "bias_type";         // 0=NORMAL Fe₂O₃, 1=HIGH CrO₂
     constexpr auto kP_TrackWidth       = "track_width";       // 0=1/4 track, 1=1/2 track
+    // WireframeEditor (DELUXE-UI) — params som UI:t binder till (porterade från v30.0).
+    constexpr auto kP_EchoTime         = "echo_time";         // 30..350 ms (user override)
+    constexpr auto kP_EchoFeedback     = "echo_feedback";     // 0..1.0 (user override)
+    constexpr auto kP_BiasAmountR      = "bias_amount_r";     // L/R separate bias-trimmers
+    constexpr auto kP_MicMode          = "mic_mode";          // 0=LoZ 50Ω · 1=LoZ 200Ω · 2=HiZ
+    constexpr auto kP_MainsHum         = "mains_hum";         // 0..0.1 — mains-hum intensitet
+    constexpr auto kP_MainsHumFreq     = "mains_hum_freq";    // 0=50Hz · 1=60Hz
+    constexpr auto kP_InputTrim        = "input_trim";        // -24..+24 dB pre-DSP
+    constexpr auto kP_OutputTrim       = "output_trim";       // -24..+24 dB post-DSP makeup
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout
@@ -207,6 +217,37 @@ BC2000DLProcessor::createParameterLayout()
         juce::ParameterID { kP_TrackWidth, 1 }, "Track Width",
         juce::StringArray { "1/4 track stereo", "1/2 track stereo" }, 0));
 
+    // ===== DELUXE-UI-params (WireframeEditor) — porterade från v30.0 =====
+    // Echo time + feedback (plugin-extension utöver auto-speed/curve)
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_EchoTime, 1 }, "Echo Time",
+        juce::NormalisableRange<float> { 30.0f, 350.0f, 1.0f }, 150.0f));
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_EchoFeedback, 1 }, "Echo Feedback",
+        juce::NormalisableRange<float> { 0.0f, 1.0f, 0.01f }, 0.5f));
+    // Bias R-trimmer — separat från bias_amount (behandlas nu som L)
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_BiasAmountR, 1 }, "Bias Amount R",
+        juce::NormalisableRange<float> { 0.5f, 1.5f, 0.01f }, 1.0f));
+    // Mic 3-pos mode (manual p.6 + Studio Sound 1968)
+    layout.add (std::make_unique<PC> (
+        juce::ParameterID { kP_MicMode, 1 }, "Mic Mode",
+        juce::StringArray { "LoZ 50Ohm", "LoZ 200Ohm", "HiZ Crystal" }, 1));
+    // Mains hum — 1968-amparna hade "slight unobtrusive mains hum"
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_MainsHum, 1 }, "Mains Hum",
+        juce::NormalisableRange<float> { 0.0f, 0.1f, 0.001f }, 0.0f));
+    layout.add (std::make_unique<PC> (
+        juce::ParameterID { kP_MainsHumFreq, 1 }, "Mains Hum Frequency",
+        juce::StringArray { "50 Hz", "60 Hz" }, 0));
+    // Plugin-utility I/O-trim (modern gain-staging)
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_InputTrim, 1 }, "Input Trim",
+        juce::NormalisableRange<float> { -24.0f, 24.0f, 0.1f }, 0.0f));
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_OutputTrim, 1 }, "Output Trim",
+        juce::NormalisableRange<float> { -24.0f, 24.0f, 0.1f }, 0.0f));
+
     return layout;
 }
 
@@ -337,10 +378,10 @@ void BC2000DLProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
 juce::AudioProcessorEditor* BC2000DLProcessor::createEditor()
 {
-    // v29.8 — clean-slate native JUCE UI (NativeEditor).
-    // Tidigare BC2000DLEditor (custom L&F + 3D-reels) och BC2000DLWebEditor
-    // finns kvar i build:en för fallback men används inte.
-    return new NativeEditor (*this);
+    // DELUXE-UI — WireframeEditor (matchar design_inbox/beolux_2000_deluxe_wireframe.html
+    // + B&O Beocord 2000 De Luxe-manualen). NativeEditor/BC2000DLEditor/WebEditor
+    // finns kvar i build:en som fallback men används inte.
+    return new bc2000dl::ui::WireframeEditor (*this);
 }
 
 int BC2000DLProcessor::getNumPrograms()  { return bc2000dl::kNumPresets; }
