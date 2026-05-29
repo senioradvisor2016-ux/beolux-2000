@@ -164,7 +164,7 @@ namespace bc2000dl::ui
 
         // ===== Höger zon =====
         juce::ComboBox cbSpeed;            // 28 (top-deck position; combo bound to choice)
-        juce::Slider   knobBass, knobTreble;  // 10, 9
+        juce::Slider   knobBass, knobTreble, knobBalance;  // #9 bas, #8 diskant, #10 balans
         juce::Slider   knobInputTrim, knobOutputTrim;  // plugin-utility I/O trim
         juce::ToggleButton tEchoPluginOn;   // plugin-extension
         juce::Slider   knobEchoTime, knobEchoFb;  // visuella plugin-knobs (ej APVTS-bundna)

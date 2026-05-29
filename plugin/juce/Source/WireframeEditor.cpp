@@ -1123,12 +1123,14 @@ namespace bc2000dl::ui
         setupCombo (cbSpeed, { "4.75", "9.5", "19" }, "speed");
         setupKnob  (knobBass,       "bass_db",     0.0);
         setupKnob  (knobTreble,     "treble_db",   0.0);
+        setupKnob  (knobBalance,    "balance",     0.0);   // #10 — bipolär L/R
         setupKnob  (knobInputTrim,  "input_trim",  0.0);
         setupKnob  (knobOutputTrim, "output_trim", 0.0);
 
         cbSpeed        .setTooltip ("TAPE SPEED\n4.75 cm/s = warmest, narrowest BW\n9.5 cm/s = nominal\n19 cm/s = brightest, widest BW");
         knobBass       .setTooltip ("BASS (#10)\nLow-shelf tone control\nfrom B&O manual.\nRange: -12 to +12 dB");
         knobTreble     .setTooltip ("TREBLE (#9 DISKANT)\nHigh-shelf tone control\nfrom B&O manual.\nRange: -12 to +12 dB");
+        knobBalance    .setTooltip ("BALANCE (#10)\nL/R output balance.\nCenter = lika kanaler.\nVrid mot L/R för att vikta utgangen.");
         knobInputTrim  .setTooltip ("INPUT TRIM\nPre-DSP gain staging.\nLower hot DAW signals before\nthey hit tape saturation.\nRange: -24 to +24 dB");
         knobOutputTrim .setTooltip ("OUTPUT TRIM\nPost-DSP makeup gain.\nCompensate for tape-sat\nlevel reduction.\nRange: -24 to +24 dB");
 
@@ -1432,8 +1434,10 @@ namespace bc2000dl::ui
         knobInputTrim .setBounds (660 - 22, 486 - 22, 44, 44);  // 464-508
         knobOutputTrim.setBounds (740 - 22, 486 - 22, 44, 44);
         // Bass + Treble — y=548 center (range 526-570, ends within panel y=580)
-        knobBass   .setBounds (660 - 22, 548 - 22, 44, 44);
-        knobTreble .setBounds (740 - 22, 548 - 22, 44, 44);
+        // Ton-trio: BASS · BALANCE · TREBLE (3 knobs i bottenraden, inom panelen 594–814)
+        knobBass   .setBounds (648 - 22, 548 - 22, 44, 44);
+        knobBalance.setBounds (704 - 22, 548 - 22, 44, 44);
+        knobTreble .setBounds (760 - 22, 548 - 22, 44, 44);
         // Echo ON toggle — centered between columns (x=700), inside sub-panel
         // (under ECHO header at y=602; knobs below at y=645)
         tEchoPluginOn.setBounds (700 - 16, 616, 32, 14);
@@ -2534,8 +2538,9 @@ namespace bc2000dl::ui
             drawEngraved ("INPUT",  juce::Rectangle<int> (632, 511, 56, 11), silk, labelFont);
             drawEngraved ("OUTPUT", juce::Rectangle<int> (712, 511, 56, 11), silk, labelFont);
             // Row 2 — BASS/TREBLE labels (knob-bottom 570, ECHO-header 602 = 32 px lucka)
-            drawEngraved ("BASS",   juce::Rectangle<int> (632, 573, 56, 11), silk, labelFont);
-            drawEngraved ("TREBLE", juce::Rectangle<int> (712, 573, 56, 11), silk, labelFont);
+            drawEngraved ("BASS",    juce::Rectangle<int> (620, 573, 56, 11), silk, labelFont);
+            drawEngraved ("BALANCE", juce::Rectangle<int> (676, 573, 56, 11), silk, labelFont);
+            drawEngraved ("TREBLE",  juce::Rectangle<int> (732, 573, 56, 11), silk, labelFont);
             // ECHO section header — INSIDE the sub-panel (panel top y=595).
             // Header sits near the panel's inner top edge; toggle button placed
             // below the header (y=620), knobs below the toggle (y=645).

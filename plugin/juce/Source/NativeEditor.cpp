@@ -659,7 +659,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("Beolux 2000 · v61.0")
+                .withTitle ("Beolux 2000 · v61.1")
                 .withMessage ("BEOLUX 2000 — Danish Tape Emulation\n"
                               "by SOUNDBOYS\n\n"
                               "Inspired by the Bang & Olufsen Beocord 2000\n"
@@ -773,7 +773,7 @@ void NativeEditor::paint (juce::Graphics& g)
     // huvudtiteln + resten till subtiteln — 20 px klippte tidigare bort
     // hela subtitelraden (brand + version) → tom deck-yta.
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (44),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v61.0");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v61.1");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -1014,7 +1014,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // v60.5 — S-medaljongen borttagen (Christoffer-feedback: "den kan tas bort
     // om den inte har någon funktion") — den var bara dekorativt brand-mark.
-    // Versionen visas redan alltid via alu-deckens subtitel ("… · v61.0") så
+    // Versionen visas redan alltid via alu-deckens subtitel ("… · v61.1") så
     // ingen separat versionstext behövs här (undviker dubbel-rendering +
     // format-mismatch mot JucePlugin_VersionString).
 

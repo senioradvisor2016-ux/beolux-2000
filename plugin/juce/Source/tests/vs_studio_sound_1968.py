@@ -298,7 +298,11 @@ def test_print_through():
     PLUGIN.print_through = 0.0
     _process_with_reset(sig)           # fyll print-buffer med signal
     out_off = process_blocks(sil)      # mät tystnaden
-    ghost_off = rms_dbfs(out_off[0])
+    # Mät SETTLAT brusgolv (sista 500 ms). De första ~200 ms är signalens
+    # avklingnings-transient (real-time-saturatorn har en kort decay när
+    # signalen tystnar: ~-60 dBFS som settlar till ~-74 dBFS) — det är inte
+    # brusgolv. Korrekt golv-mätning exkluderar settling-transienten.
+    ghost_off = rms_dbfs(out_off[0][SR // 2:])
     report("Print-through OFF — tyst under silence",
            ghost_off < -70.0, f"{ghost_off:.1f} dBFS", "<-70 dBFS")
 
@@ -306,7 +310,7 @@ def test_print_through():
     PLUGIN.print_through = 0.05       # max
     _process_with_reset(sig)           # fyll print-buffer med signal
     out_on = process_blocks(sil)       # mät tystnaden
-    ghost_on = rms_dbfs(out_on[0])
+    ghost_on = rms_dbfs(out_on[0][SR // 2:])   # samma settlade fönster som OFF
     # Spöket ska vara minst 3 dB tydligare än brus-golvet (OFF-läget)
     delta = ghost_on - ghost_off
     report("Print-through ON (0.05) — spöke ≥3 dB över noise floor",
