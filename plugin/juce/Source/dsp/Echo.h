@@ -25,6 +25,13 @@ namespace bc2000dl::dsp
         void setSpeed (TapeSpeed speed);
         void setEnabled (bool e)    { enabled = e; }
         void setAmount (float a)    { amount = a; }
+
+        // DELUXE ECHO TIME/FEEDBACK-knobbar (WireframeEditor) — user-override.
+        // setTimeMs sätter delay-längden direkt (åsidosätter auto-från-speed);
+        // speed styr fortf. wow-djup + HF-loss-karaktär.  setFeedback < 0 = auto
+        // (härled från amount, gammalt beteende); >= 0 = explicit regeneration.
+        void setTimeMs (float ms);
+        void setFeedback (float f)  { feedbackParam = f; }
         bool isEnabled() const      { return enabled; }
         float getAmount() const     { return amount; }
         float getDelayMs() const    { return delayMs; }
@@ -48,6 +55,7 @@ namespace bc2000dl::dsp
         float  amount     { 0.0f };
         float  delayMs    { 75.0f };
         int    delaySamples { 3600 };
+        float  feedbackParam { -1.0f };  // <0 = auto (från amount); >=0 = explicit
 
         // Ring-buffer (max 350 ms)
         std::vector<float> buf;

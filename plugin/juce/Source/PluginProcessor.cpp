@@ -329,6 +329,18 @@ void BC2000DLProcessor::updateChainParameters()
     p.biasType         = static_cast<int> (getF (kP_BiasType));
     p.trackWidth       = static_cast<int> (getF (kP_TrackWidth));
 
+    // ===== DELUXE-UI-params (WireframeEditor) =====
+    p.inputTrimDb      = getF (kP_InputTrim);
+    p.outputTrimDb     = getF (kP_OutputTrim);
+    p.biasAmountR      = getF (kP_BiasAmountR);
+    p.micMode          = static_cast<int> (getF (kP_MicMode));
+    p.mainsHum         = getF (kP_MainsHum);
+    p.mainsHumFreqHz   = getF (kP_MainsHumFreq) > 0.5f ? 60.0f : 50.0f;
+    p.echoTimeMs       = getF (kP_EchoTime);
+    p.echoFeedback     = getF (kP_EchoFeedback);
+    // DELUXE MIC-mode driver micLoZ-DSP:n: läge 0/1 = LoZ, 2 = HiZ Crystal.
+    p.micLoZ           = (p.micMode < 2);
+
     // P.A. mode — duckar phono+radio när mic aktiv (-12 dB)
     if (p.publicAddress && (p.micGain > 0.05f || p.micGainR > 0.05f))
     {

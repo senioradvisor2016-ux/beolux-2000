@@ -106,6 +106,16 @@ namespace bc2000dl::dsp
             // 0 = 1/4 track (quarter-track stereo — BC2000 De Luxe standard)
             // 1 = 1/2 track (half-track stereo — wider head → −3 dB brus, bredare HF)
             int   trackWidth        { 0 };
+
+            // ===== DELUXE-UI-params (WireframeEditor) =====
+            float inputTrimDb     { 0.0f };    // PLUGIN UTILITY in — -24..+24 dB pre-DSP
+            float outputTrimDb    { 0.0f };    // PLUGIN UTILITY out — -24..+24 dB makeup
+            float biasAmountR     { 1.0f };    // BIAS R — separat trimmer (L = biasAmount)
+            int   micMode         { 1 };       // 0=LoZ 50Ω · 1=LoZ 200Ω · 2=HiZ Crystal
+            float mainsHum        { 0.0f };    // MAINS HUM — 0..0.1 intensitet
+            float mainsHumFreqHz  { 50.0f };   // HUM FRQ — 50 eller 60 Hz
+            float echoTimeMs      { 150.0f };  // ECHO TIME — 30..350 ms (override auto-speed)
+            float echoFeedback    { 0.5f };    // ECHO FEEDBACK — 0..1 (override)
         };
 
         void prepare (double sampleRate, int maximumBlockSize);
@@ -141,6 +151,7 @@ namespace bc2000dl::dsp
         double sampleRate { 48000.0 };
         Parameters params;
         TapeSpeed lastSpeed { TapeSpeed::Speed19 };
+        double mainsHumPhase { 0.0 };   // ackumulator för MAINS HUM-injektion
 
         struct ChannelChain
         {

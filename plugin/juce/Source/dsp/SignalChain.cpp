@@ -122,7 +122,7 @@ namespace bc2000dl::dsp
             lastSpeed = p.speed;
         }
 
-        L.tape.setBiasAmount (p.biasAmount);     R.tape.setBiasAmount (p.biasAmount);
+        L.tape.setBiasAmount (p.biasAmount);     R.tape.setBiasAmount (p.biasAmountR);
         // Per-kanal saturation-drive (dubbla skydepotentiometre)
         L.tape.setSaturationDrive (p.saturationDrive);  R.tape.setSaturationDrive (p.saturationDriveR);
         L.wowFlutter.setAmount (p.wowFlutterAmount);    R.wowFlutter.setAmount (p.wowFlutterAmount);
@@ -133,6 +133,11 @@ namespace bc2000dl::dsp
         // Per-kanal echo-amount
         echoL.setEnabled (p.echoEnabled); echoR.setEnabled (p.echoEnabled);
         echoL.setAmount (p.echoAmount);   echoR.setAmount (p.echoAmountR);
+
+        // DELUXE ECHO TIME/FEEDBACK-knobbar — sätts varje block (åsidosätter
+        // auto-från-speed). Måste komma EFTER ev. setSpeed() ovan så override vinner.
+        echoL.setTimeMs   (p.echoTimeMs);   echoR.setTimeMs   (p.echoTimeMs);
+        echoL.setFeedback (p.echoFeedback); echoR.setFeedback (p.echoFeedback);
 
         // v60.5 — SoS+Echo cross-feedback (Christoffer-feedback):
         // Med Sound-on-Sound aktiv ska echo-feedbacken gå L→R och R→L
@@ -402,6 +407,12 @@ namespace bc2000dl::dsp
             inputLevelR_dBFS.store (
                 computeBlockRMSdBFS (buffer.getReadPointer (1), buffer.getNumSamples()));
 
+        // ----- A0. Input trim (PLUGIN UTILITY · pre-DSP gain) -----
+        // Mätaren ovan visar rå input; trimmet appliceras före hela kedjan så
+        // det driver tape/preamp-saturationen (autentisk gain-staging).
+        if (params.inputTrimDb != 0.0f)
+            buffer.applyGain (juce::Decibels::decibelsToGain (params.inputTrimDb));
+
         if (numCh >= 1)
             processChannelChain (L, echoL, buffer, 0);
         if (numCh >= 2)
@@ -473,6 +484,32 @@ namespace bc2000dl::dsp
         }
 
         balanceMaster.processStereo (buffer);
+
+        // ----- Output trim (PLUGIN UTILITY · post-DSP makeup-gain) -----
+        if (params.outputTrimDb != 0.0f)
+            buffer.applyGain (juce::Decibels::decibelsToGain (params.outputTrimDb));
+
+        // ----- MAINS HUM — 1968-amparnas "slight unobtrusive mains hum" -----
+        // Fundamental + 3:e harmonik (nät-trafo-mättnad ger udda övertoner).
+        // Konservativ skalning: mainsHum∈[0,0.1] → max ≈ −34 dBFS, subtilt.
+        if (params.mainsHum > 1.0e-6f && numCh >= 1)
+        {
+            const double inc = juce::MathConstants<double>::twoPi
+                                 * (double) params.mainsHumFreqHz / sampleRate;
+            const float  amp = params.mainsHum * 0.2f;
+            auto* l = buffer.getWritePointer (0);
+            auto* r = numCh >= 2 ? buffer.getWritePointer (1) : nullptr;
+            for (int i = 0; i < n; ++i)
+            {
+                const float hum = amp * (float) (std::sin (mainsHumPhase)
+                                       + 0.3 * std::sin (3.0 * mainsHumPhase));
+                l[i] += hum;
+                if (r != nullptr) r[i] += hum;
+                mainsHumPhase += inc;
+                if (mainsHumPhase >= juce::MathConstants<double>::twoPi)
+                    mainsHumPhase -= juce::MathConstants<double>::twoPi;
+            }
+        }
 
         // Tape transport time accumulation (drives ReelDeck + counter display in UI)
         const double dt = static_cast<double> (buffer.getNumSamples()) / sampleRate;

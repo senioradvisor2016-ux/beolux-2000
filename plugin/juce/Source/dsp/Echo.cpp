@@ -61,6 +61,16 @@ namespace bc2000dl::dsp
             sampleRate, hfLossHz);
     }
 
+    void Echo::setTimeMs (float ms)
+    {
+        // DELUXE ECHO TIME — override auto-från-speed-delayen.  Speed:s
+        // setSpeed() sätter wow-djup + HF-loss (karaktär); denna sätter längden.
+        delayMs = juce::jlimit (30.0f, 350.0f, ms);
+        delaySamples = std::min (
+            static_cast<int> (sampleRate * delayMs / 1000.0f),
+            static_cast<int> (buf.size()) - 1);
+    }
+
     float Echo::processSample (float x)
     {
         if (! enabled || amount < 1e-6f)
@@ -73,7 +83,10 @@ namespace bc2000dl::dsp
         // Tape-loop-recordens self-osc kommer från att fb går just över unity.
         // För DSP-stabilitet kläms den hårda klippen via tanh på återmatningen.
         const float fbCurve = amount * (0.92f + 0.12f * amount);  // mjuk ramp till ~1.04
-        const float feedback = juce::jmin (fbCurve, 1.04f);
+        // DELUXE FEEDBACK-knob: feedbackParam >= 0 åsidosätter auto-kurvan.
+        const float feedback = (feedbackParam >= 0.0f)
+                             ? juce::jmin (feedbackParam, 1.04f)
+                             : juce::jmin (fbCurve, 1.04f);
 
         // Wow-modulated read pointer — tape echo tails pitch-wander at ~1.5 Hz
         echoWowPhase += juce::MathConstants<float>::twoPi * echoWowFreqHz
