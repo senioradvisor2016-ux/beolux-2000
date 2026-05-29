@@ -1010,22 +1010,11 @@ void NativeEditor::paint (juce::Graphics& g)
         }
     }
 
-    // ===== Version-text (alltid synlig) — silver silkscreen efter titeln =====
     // v60.5 — S-medaljongen borttagen (Christoffer-feedback: "den kan tas bort
     // om den inte har någon funktion") — den var bara dekorativt brand-mark.
-    // Versionstexten behålls dock (var tidigare bredvid medaljongen), nu
-    // fristående positionerad direkt efter titeln så versionen alltid syns
-    // även när host:en döljer fönstertiteln.
-    {
-        const float titleTextW = (float) juce::GlyphArrangement::getStringWidthInt (
-                                             lnf.logoFont (22.0f), "BEOLUX 2000");
-        const float vx = (float)(kTeakW + 14) + titleTextW + 20.0f;
-        g.setColour (juce::Colour (0xFFD8D8E0));
-        g.setFont (LnF::monoFont (11.0f));
-        g.drawText ("v" + juce::String (JucePlugin_VersionString),
-            juce::Rectangle<float> (vx, 6.0f, 70.0f, 26.0f).toNearestInt(),
-            juce::Justification::centredLeft, false);
-    }
+    // Versionen visas redan alltid via alu-deckens subtitel ("… · v60.6") så
+    // ingen separat versionstext behövs här (undviker dubbel-rendering +
+    // format-mismatch mot JucePlugin_VersionString).
 
     // ===== Window vignette (last layer — sells "professional product photo") =====
     {
