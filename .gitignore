@@ -16,3 +16,7 @@ output/
 # macOS / IDE
 .vscode/
 .idea/
+
+# Claude Code agent runtime state — never track (gitlinks + transient locks)
+.claude/worktrees/
+.claude/scheduled_tasks.lock
