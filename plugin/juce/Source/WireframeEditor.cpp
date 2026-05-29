@@ -1082,16 +1082,16 @@ namespace bc2000dl::ui
         setupFader (faderMasterR, "master_volume",  0.85);
 
         // Fader tooltips — descriptive hover info (popup display still shows live value)
-        faderRadioL .setTooltip ("RADIO L (#14)\nLeft-channel gain for radio/tuner input.\nFeeds the 8904003 flat preamp (UW0029 + 2N2613).\nLog skew 0.55 — gentle 1968 curve.");
-        faderRadioR .setTooltip ("RADIO R (#14)\nRight-channel gain for radio/tuner input.");
-        faderPhonoL .setTooltip ("PHONO L (#15 ◇)\nLeft-channel gain for phono input.\nFeeds 8904002 with RIAA EQ (H-mode)\nor flat ceramic preamp (L-mode).");
-        faderPhonoR .setTooltip ("PHONO R (#15 ◇)\nRight-channel gain for phono input.");
-        faderMicL   .setTooltip ("MIC L (#16 ◇)\nLeft-channel gain for microphone input.\n50Ω/200Ω LoZ via 8012003 transformer,\nor HiZ direct (per MIC INPUT MODE).");
-        faderMicR   .setTooltip ("MIC R (#16 ◇)\nRight-channel gain for microphone input.");
-        faderEchoL  .setTooltip ("ECHO L (#12)\nLeft-channel send into tape-echo loop.\nDoubles as S-on-S cross-feed amount\nwhen Sound-on-Sound mode is engaged.");
-        faderEchoR  .setTooltip ("ECHO R (#12)\nRight-channel send into tape-echo loop.");
-        faderMasterL.setTooltip ("MASTER L (#11)\nGlobal output level — both faders bound\nto the same APVTS param (mirror-locked).\nManual: never silent (≥0.75 hard-floor).");
-        faderMasterR.setTooltip ("MASTER R (#11)\nGlobal output level — mirror of MASTER L.");
+        faderRadioL .setTooltip ("RADIO L (#13)\nLeft-channel gain for radio/tuner input.\nFeeds the 8904003 flat preamp (UW0029 + 2N2613).\nLog skew 0.55 — gentle 1968 curve.");
+        faderRadioR .setTooltip ("RADIO R (#13)\nRight-channel gain for radio/tuner input.");
+        faderPhonoL .setTooltip ("PHONO L (#14 ◇)\nLeft-channel gain for phono input.\nFeeds 8904002 with RIAA EQ (H-mode)\nor flat ceramic preamp (L-mode).");
+        faderPhonoR .setTooltip ("PHONO R (#14 ◇)\nRight-channel gain for phono input.");
+        faderMicL   .setTooltip ("MIC L (#15 ◇)\nLeft-channel gain for microphone input.\n50Ω/200Ω LoZ via 8012003 transformer,\nor HiZ direct (per MIC INPUT MODE).");
+        faderMicR   .setTooltip ("MIC R (#15 ◇)\nRight-channel gain for microphone input.");
+        faderEchoL  .setTooltip ("ECHO L (#10a)\nLeft-channel send into tape-echo loop.\nDoubles as S-on-S cross-feed amount\nwhen Sound-on-Sound mode is engaged.");
+        faderEchoR  .setTooltip ("ECHO R (#10a)\nRight-channel send into tape-echo loop.");
+        faderMasterL.setTooltip ("MASTER L (#12)\nGlobal output level — both faders bound\nto the same APVTS param (mirror-locked).\nManual: never silent (≥0.75 hard-floor).");
+        faderMasterR.setTooltip ("MASTER R (#12)\nGlobal output level — mirror of MASTER L.");
 
         // ===== 9 service-knobs + 2 selectors (authentic-restoration) =====
         setupKnob (knobBiasL,       "bias_amount",      1.0);
@@ -1128,8 +1128,8 @@ namespace bc2000dl::ui
         setupKnob  (knobOutputTrim, "output_trim", 0.0);
 
         cbSpeed        .setTooltip ("TAPE SPEED\n4.75 cm/s = warmest, narrowest BW\n9.5 cm/s = nominal\n19 cm/s = brightest, widest BW");
-        knobBass       .setTooltip ("BASS (#10)\nLow-shelf tone control\nfrom B&O manual.\nRange: -12 to +12 dB");
-        knobTreble     .setTooltip ("TREBLE (#9 DISKANT)\nHigh-shelf tone control\nfrom B&O manual.\nRange: -12 to +12 dB");
+        knobBass       .setTooltip ("BASS (#9)\nLow-shelf tone control\nfrom B&O manual.\nRange: -12 to +12 dB");
+        knobTreble     .setTooltip ("TREBLE (#8 DISKANT)\nHigh-shelf tone control\nfrom B&O manual.\nRange: -12 to +12 dB");
         knobBalance    .setTooltip ("BALANCE (#10)\nL/R output balance.\nCenter = lika kanaler.\nVrid mot L/R för att vikta utgangen.");
         knobInputTrim  .setTooltip ("INPUT TRIM\nPre-DSP gain staging.\nLower hot DAW signals before\nthey hit tape saturation.\nRange: -24 to +24 dB");
         knobOutputTrim .setTooltip ("OUTPUT TRIM\nPost-DSP makeup gain.\nCompensate for tape-sat\nlevel reduction.\nRange: -24 to +24 dB");
@@ -1139,7 +1139,7 @@ namespace bc2000dl::ui
         setupKnob   (knobEchoTime,  "echo_time",     150.0);
         setupKnob   (knobEchoFb,    "echo_feedback", 0.5);
 
-        tEchoPluginOn.setTooltip ("ECHO ENABLED\nToggle tape-echo loop on/off.\nLED lights when active.");
+        tEchoPluginOn.setTooltip ("ECHO ENABLED (#18)\nToggle tape-echo loop on/off.\nLED lights when active.");
         knobEchoTime .setTooltip ("ECHO TIME\nTape-head-to-head delay time.\nAuto: 75/150/300 ms by speed.\nUser override: 30-350 ms");
         knobEchoFb   .setTooltip ("ECHO FEEDBACK\nLoop recirculation amount.\n>0.85 enters self-oscillation\n(authentic tape behavior).");
 
@@ -1158,17 +1158,17 @@ namespace bc2000dl::ui
         setupToggle (btnSpkMute,     "MUTE",   "speaker_mute");
 
         // ===== Rocker-button tooltips (engineer-grade) =====
-        btnTrack1     .setTooltip ("TRACK 1 (#26)\nMonitor track 1 (left).\nBoth on = stereo · only 1 = L-only.\nManual #19 monitor-routing logic.");
-        btnTrack2     .setTooltip ("TRACK 2 (#27)\nMonitor track 2 (right).\nBoth on = stereo · only 2 = R-only.");
-        btnRecArm1    .setTooltip ("REC ARM L (#23)\nArm left channel for recording.\nLED lights red when armed.\nRequired before tape-write enabled.");
-        btnRecArm2    .setTooltip ("REC ARM R (#24)\nArm right channel for recording.");
-        btnSync       .setTooltip ("SYNCHROPLAY (#25)\nUse record-head for playback monitoring.\nDrier sound — bypasses playback-EQ.\nUsed for overdub sync without latency.");
-        btnMoment     .setTooltip ("PAUSE (#2)\nMomentary stop — reels freeze in place.\nMutes output (master_volume → 0).\nClick again to resume.");
-        btnPA         .setTooltip ("PUBLIC ADDRESS (#19)\nDucks phono/radio when mic is active.\nClassic vintage live-PA function.");
-        btnForstarkare.setTooltip ("BYPASS TAPE (#21 'FÖRSTÄRKARE')\nRoute mixer direct to output, skip\ntape pipeline. Use as line mixer\nwithout tape coloring.");
-        btnSoSOn      .setTooltip ("SOUND ON SOUND (#20)\nAuthentic S-on-S routing.\nPLAY L → REC R cross-feed pre-mix.\nLayer takes without external bouncing.");
-        btnSpkInt     .setTooltip ("SPEAKER I (#6)\nInternal monitor speaker on.\nMutually exclusive with EXT / MUTE.");
-        btnSpkExt     .setTooltip ("SPEAKER II (#6)\nExternal speaker output on.\nFeeds the power-amp stage (8004014).");
+        btnTrack1     .setTooltip ("TRACK 1 (#19)\nMonitor track 1 (left).\nBoth on = stereo · only 1 = L-only.\nManual #19 monitor-routing logic.");
+        btnTrack2     .setTooltip ("TRACK 2 (#20)\nMonitor track 2 (right).\nBoth on = stereo · only 2 = R-only.");
+        btnRecArm1    .setTooltip ("REC ARM L (#24)\nArm left channel for recording.\nLED lights red when armed.\nRequired before tape-write enabled.");
+        btnRecArm2    .setTooltip ("REC ARM R (#25)\nArm right channel for recording.");
+        btnSync       .setTooltip ("SYNCHROPLAY (#26)\nUse record-head for playback monitoring.\nDrier sound — bypasses playback-EQ.\nUsed for overdub sync without latency.");
+        btnMoment     .setTooltip ("PAUSE (#11 MOMENTANSTOP)\nMomentary stop — reels freeze in place.\nMutes output (master_volume → 0).\nClick again to resume.");
+        btnPA         .setTooltip ("PUBLIC ADDRESS (manual s.8)\nDucks phono/radio when mic is active.\nClassic vintage live-PA function.");
+        btnForstarkare.setTooltip ("BYPASS TAPE (#23 'FÖRSTÄRKARE')\nRoute mixer direct to output, skip\ntape pipeline. Use as line mixer\nwithout tape coloring.");
+        btnSoSOn      .setTooltip ("SOUND ON SOUND (S on S)\nAuthentic S-on-S routing.\nPLAY L → REC R cross-feed pre-mix.\nLayer takes without external bouncing.");
+        btnSpkInt     .setTooltip ("SPEAKER I (#5 INT)\nInternal monitor speaker on.\nMutually exclusive with EXT / MUTE.");
+        btnSpkExt     .setTooltip ("SPEAKER II (#4 EXT)\nExternal speaker output on.\nFeeds the power-amp stage (8004014).");
         btnSpkMute    .setTooltip ("SPEAKER MUTE (#6)\nKill all speaker output.\nHeadphones still active.");
         setupCombo  (cbMonitor, { "SOURCE", "TAPE" }, "monitor_mode");
 
@@ -1179,7 +1179,7 @@ namespace bc2000dl::ui
 
         cbRadioMode  .setTooltip ("RADIO INPUT MODE\nL = 3 mV @ 47 kΩ (low)\nH = 100 mV @ 100 kΩ (high)");
         cbPhonoMode  .setTooltip ("PHONO INPUT MODE\nL = 40 mV @ 4 MΩ (ceramic)\nH = 2 mV @ 47 kΩ (magnetic)");
-        cbMonitor    .setTooltip ("MONITOR (#18)\nSOURCE = pre-tape signal\nTAPE = post-tape playback\nFlip during record to verify.");
+        cbMonitor    .setTooltip ("MONITOR (#22)\nSOURCE = pre-tape signal\nTAPE = post-tape playback\nFlip during record to verify.");
         cbMicMode    .setTooltip ("MIC INPUT MODE\n50Ω = LoZ dynamic (+6 dB pad)\n200Ω = LoZ studio mic\nHiZ = Crystal/high-impedance mic");
 
         // ===== Sub-components =====
@@ -1337,12 +1337,14 @@ namespace bc2000dl::ui
         reelDeck.setBounds (60, 48, 800, 310);
         cbSpeed.setBounds  (440, 175, 40, 16);
 
-        // ----- Premium preset browser — centered modal overlay (840×600) -----
-        // Backdrop fills the editor; browser sits centered above it.
+        // ----- Premium preset browser — centered modal overlay -----
+        // Backdrop fyller editorn (dimmar appen); browsern sitter centrerad
+        // ovanpå.  680×520 lämnar ~120 px sidomarginal + ~130 px topp/botten
+        // så appen syns tydligt runtom — täcker inte hela fönstret.
         browserBackdrop.setBounds (getLocalBounds());
         {
-            const int bw = 840;
-            const int bh = 600;
+            const int bw = 680;
+            const int bh = 520;
             presetBrowser.setBounds ((kW - bw) / 2, (kH - bh) / 2, bw, bh);
         }
 
