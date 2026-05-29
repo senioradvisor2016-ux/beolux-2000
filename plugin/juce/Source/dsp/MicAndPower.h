@@ -43,7 +43,12 @@ namespace bc2000dl::dsp
         static constexpr float kSatSoftness  = 1.5f;
     };
 
-    /** Klass-AB power-amp 8004014. */
+    /** Klass-AB power-amp 8004014 + intern-monitor-högtalare-emulering.
+        När enabled (manual #15 "speaker_monitor") routar pluginen genom:
+        - Tighter crossover-coloration (germanium AC127/132 mismatch)
+        - Bandwidth-limit 90 Hz – 6 kHz (intern 4" speaker-driver-respons)
+        - AUTOMATSIKRING soft-clip
+        Resultat: hörbart "monitor-speaker"-färg, inte transparent placebo. */
     class PowerAmp8004014
     {
     public:
@@ -58,13 +63,18 @@ namespace bc2000dl::dsp
         double sampleRate { 48000.0 };
         bool enabled { false };
 
-        juce::dsp::IIR::Filter<float> hpFilter;  // Cap-coupling HP @ 5 Hz
+        // Speaker-emulering: HP @ 90 Hz (cabinet roll-off) + LP @ 6 kHz (cone HF).
+        // Cap-coupling-HP @ 5 Hz inkluderad i hpFilter (90 Hz dominerar).
+        juce::dsp::IIR::Filter<float> hpFilter;  // HP @ 90 Hz
+        juce::dsp::IIR::Filter<float> lpFilter;  // LP @ 6 kHz
+        juce::dsp::IIR::Filter<float> peakFilter; // 1 kHz peak +3 dB (cabinet "honk")
 
-        // Crossover-distorsion-parametrar
-        static constexpr float kCrossoverThreshold = 0.005f;
-        // AUTOMATSIKRING soft-clip-tröskel — knee 2.5 → transparent vid nominell,
-        // mjuk mättning bara vid riktig overdrive. (Var 0.89 = -1 dBFS, för lågt)
-        static constexpr float kAutomatsikring = 2.5f;
+        // Crossover-tröskel höjd från 0.005 → 0.05 så crossover-färgen påverkar
+        // normalt programmaterial (mag < 0.5 berörs, inte bara nära noll-genom).
+        static constexpr float kCrossoverThreshold = 0.05f;
+        // AUTOMATSIKRING tighter knee: 1.0 → soft-clip vid 0 dBFS.  Var 2.5 →
+        // transparent vid normal nivå.  Nu hörs en mjuk kompression över ~-3 dBFS.
+        static constexpr float kAutomatsikring = 1.0f;
 
         float crossoverDistortion (float x) const;
     };

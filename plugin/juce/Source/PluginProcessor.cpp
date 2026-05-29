@@ -53,6 +53,9 @@ namespace
     constexpr auto kP_TapeFormula      = "tape_formula";      // 0=Agfa 1=BASF 2=Scotch
     constexpr auto kP_PrintThrough     = "print_through";     // 0..0.05 (specs §10)
     constexpr auto kP_StereoAsymmetry  = "stereo_asymmetry";  // 0..0.05 (spec §10)
+    // v60.3 — nya hardware-switchar från schema 9224002/9224003
+    constexpr auto kP_BiasType         = "bias_type";         // 0=NORMAL Fe₂O₃, 1=HIGH CrO₂
+    constexpr auto kP_TrackWidth       = "track_width";       // 0=1/4 track, 1=1/2 track
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout
@@ -193,6 +196,17 @@ BC2000DLProcessor::createParameterLayout()
         juce::ParameterID { kP_StereoAsymmetry, 1 }, "Stereo Asymmetry",
         juce::NormalisableRange<float> { 0.0f, 0.05f, 0.001f }, 0.02f));
 
+    // v60.3 — Bias-typ NORMAL/HIGH (schema 9224002 "NORMAL HIGH" switch)
+    // ASCII-only labels — JUCE-default-fonten saknar Unicode-subscripts.
+    layout.add (std::make_unique<PC> (
+        juce::ParameterID { kP_BiasType, 1 }, "Bias Type",
+        juce::StringArray { "NORMAL (Fe2O3)", "HIGH (CrO2)" }, 0));
+
+    // v60.3 — Track-width 1/4 vs 1/2 (schema 9224003 "1/2 1/4" selector)
+    layout.add (std::make_unique<PC> (
+        juce::ParameterID { kP_TrackWidth, 1 }, "Track Width",
+        juce::StringArray { "1/4 track stereo", "1/2 track stereo" }, 0));
+
     return layout;
 }
 
@@ -271,6 +285,8 @@ void BC2000DLProcessor::updateChainParameters()
     p.radioMode        = static_cast<int> (getF (kP_RadioMode));
     p.printThrough     = getF (kP_PrintThrough);
     p.stereoAsymmetry  = getF (kP_StereoAsymmetry);
+    p.biasType         = static_cast<int> (getF (kP_BiasType));
+    p.trackWidth       = static_cast<int> (getF (kP_TrackWidth));
 
     // P.A. mode — duckar phono+radio när mic aktiv (-12 dB)
     if (p.publicAddress && (p.micGain > 0.05f || p.micGainR > 0.05f))

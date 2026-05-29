@@ -155,10 +155,13 @@ namespace bc2000dl::ui
                                  const juce::String& text);
 
         /** Analog VU meter — cream face with curved scale, black needle, glass.
-            @param dbValue   current value in dB (typical -20…+3 range)
-            @param channel   "L" or "R" (or any short label drawn under VU mark)  */
+            @param dbValue    current value in dB (typical -20…+3 range)
+            @param isPeaking  needle past +3 dB (clip warning)
+            @param channel    "L" or "R" (or any short label drawn under VU mark)
+            @param isRecording  true → röd-tonad belysning (manualens "RÖTT SKEN") */
         static void drawAnalogVU (juce::Graphics&, juce::Rectangle<int>,
                                    float dbValue, bool isPeaking,
-                                   const juce::String& channel);
+                                   const juce::String& channel,
+                                   bool isRecording = false);
     };
 }

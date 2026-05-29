@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(BC2000DL VERSION 0.60.1)
+project(BC2000DL VERSION 0.60.6)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -216,6 +216,86 @@ target_compile_definitions(BC2000DL_Tests PRIVATE
 )
 
 target_link_libraries(BC2000DL_Tests PRIVATE
+    juce::juce_dsp
+    juce::juce_audio_basics
+    juce::juce_core
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_warning_flags
+)
+
+# ─────────────────────────────────────────────────────────────────
+# Bug-fix regression tests — Christoffer/Logic-rapporten
+#   Bygg:  cmake --build build --config Release --target BC2000DL_BugFixTests
+#   Kör:   ./build/BC2000DL_BugFixTests_artefacts/Release/BC2000DL_BugFixTests
+# ─────────────────────────────────────────────────────────────────
+juce_add_console_app(BC2000DL_BugFixTests
+    PRODUCT_NAME "BC2000DL BugFixTests"
+)
+
+target_sources(BC2000DL_BugFixTests PRIVATE
+    Source/tests/BugFixTests.cpp
+    Source/dsp/Ge2N2613Stage.cpp
+    Source/dsp/GeLowNoiseStage.cpp
+    Source/dsp/EqDIN1962.cpp
+    Source/dsp/TapeSaturation.cpp
+    Source/dsp/Echo.cpp
+    Source/dsp/ToneAndOutput.cpp
+    Source/dsp/WowFlutter.cpp
+    Source/dsp/MicAndPower.cpp
+    Source/dsp/Multiplay.cpp
+    Source/dsp/PhonoPreamp.cpp
+    Source/dsp/SignalChain.cpp
+)
+
+target_include_directories(BC2000DL_BugFixTests PRIVATE Source)
+
+target_compile_definitions(BC2000DL_BugFixTests PRIVATE
+    JUCE_USE_CURL=0
+    JUCE_WEB_BROWSER=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_STANDALONE_APPLICATION=1
+)
+
+target_link_libraries(BC2000DL_BugFixTests PRIVATE
+    juce::juce_dsp
+    juce::juce_audio_basics
+    juce::juce_core
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_warning_flags
+)
+
+# ─────────────────────────────────────────────────────────────────
+# Audibility Test — verifierar att VARJE parameter påverkar audio.
+# Letar efter "döda kontroller" (placebo-knappar som bias-buggen).
+#   Bygg: cmake --build build --target BC2000DL_AudibilityTest
+# ─────────────────────────────────────────────────────────────────
+juce_add_console_app(BC2000DL_AudibilityTest
+    PRODUCT_NAME "BC2000DL AudibilityTest"
+)
+target_sources(BC2000DL_AudibilityTest PRIVATE
+    Source/tests/AudibilityTest.cpp
+    Source/dsp/Ge2N2613Stage.cpp
+    Source/dsp/GeLowNoiseStage.cpp
+    Source/dsp/EqDIN1962.cpp
+    Source/dsp/TapeSaturation.cpp
+    Source/dsp/Echo.cpp
+    Source/dsp/ToneAndOutput.cpp
+    Source/dsp/WowFlutter.cpp
+    Source/dsp/MicAndPower.cpp
+    Source/dsp/Multiplay.cpp
+    Source/dsp/PhonoPreamp.cpp
+    Source/dsp/SignalChain.cpp
+)
+target_include_directories(BC2000DL_AudibilityTest PRIVATE Source)
+target_compile_definitions(BC2000DL_AudibilityTest PRIVATE
+    JUCE_USE_CURL=0
+    JUCE_WEB_BROWSER=0
+    JUCE_DISPLAY_SPLASH_SCREEN=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_STANDALONE_APPLICATION=1
+)
+target_link_libraries(BC2000DL_AudibilityTest PRIVATE
     juce::juce_dsp
     juce::juce_audio_basics
     juce::juce_core

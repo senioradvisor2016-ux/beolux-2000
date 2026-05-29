@@ -134,6 +134,21 @@ namespace bc2000dl::dsp
         echoL.setEnabled (p.echoEnabled); echoR.setEnabled (p.echoEnabled);
         echoL.setAmount (p.echoAmount);   echoR.setAmount (p.echoAmountR);
 
+        // v60.5 — SoS+Echo cross-feedback (Christoffer-feedback):
+        // Med Sound-on-Sound aktiv ska echo-feedbacken gå L→R och R→L
+        // (cross-feed mellan tape-trackarna, klassisk SoS-överdubbings-loop).
+        // Utan SoS = normal L→L, R→R.
+        if (p.soundOnSound)
+        {
+            echoL.setCrossFeedSource (&echoR);
+            echoR.setCrossFeedSource (&echoL);
+        }
+        else
+        {
+            echoL.setCrossFeedSource (nullptr);
+            echoR.setCrossFeedSource (nullptr);
+        }
+
         L.tone.setBassDb (p.bassDb);     R.tone.setBassDb (p.bassDb);
         L.tone.setTrebleDb (p.trebleDb); R.tone.setTrebleDb (p.trebleDb);
 
@@ -153,6 +168,10 @@ namespace bc2000dl::dsp
 
         // Print-through (specs §10)
         L.tape.setPrintThrough (p.printThrough); R.tape.setPrintThrough (p.printThrough);
+
+        // Bias-typ (NORMAL/HIGH) + track-width (1/4 vs 1/2) — schema 9224002/3
+        L.tape.setBiasType (p.biasType);     R.tape.setBiasType (p.biasType);
+        L.tape.setTrackWidth (p.trackWidth); R.tape.setTrackWidth (p.trackWidth);
 
         // Stereo-asymmetri (spec §10) — L +asym, R −asym på alla Ge-stages
         {
@@ -189,20 +208,33 @@ namespace bc2000dl::dsp
         const float radioG = (channel == 0) ? params.radioGain : params.radioGainR;
         const float anyG = juce::jmax (micG, phonoG, radioG);
 
-        if (anyG <= 1e-6f)
+        // v60.5 — Christoffer-feedback: när echo aktivt med alla faders=0 ska
+        // feedbacken FORTSÄTTA (inte klippas av).  Tidigare early-return tystade
+        // hela kedjan inkl. echo-delaylinjen, vilket bröt klassiskt "tape-feedback-
+        // jam" där man maxar echo + drar ner ingångar för att höra delay-loopen
+        // dö ut / själv-oscillera.  Nu: skip-shortcut bara om echo också är av.
+        const float echoAmtL = params.echoAmount;
+        const float echoAmtR = params.echoAmountR;
+        const bool echoActive = params.echoEnabled && (echoAmtL > 1e-6f || echoAmtR > 1e-6f);
+        if (anyG <= 1e-6f && ! echoActive)
         {
-            // Alla source-faders nere → tysta in-signalen men kör fortfarande
-            // tape-state framåt (bias-fas + J-A magnetisering). Annars
-            // de-synkar L vs R när bara en kanal har gain → instabil stereo.
+            // Alla source-faders nere OCH echo av → tysta in-signalen men kör
+            // fortfarande tape-state framåt (bias-fas + J-A magnetisering).
             buffer.clear (channel, 0, n);
             ch.tape.process (buffer, channel);   // process zeros → state advances
             return;
         }
 
-        // Input-trim — efter gain-cascaden reducerats till ~11 dB (var 72 dB)
-        // behöver vi mindre pad. 0.7 = -3 dB, ger fader 50% en mer intuitiv
-        // ~unity-nivå. (Tidigare 0.5 = -6 dB gjorde default-output för tyst.)
-        constexpr float kInputPad = 0.7f;
+        // Input-trim.  Christoffer-Berg-testen (2026-05-12, macOS 14/Logic)
+        // upplevde ingångarna som för låga jämfört med hårdvaran.  Real B&O
+        // Beocord 2000 vid full slider gav lätt +10–15 dB drive in i band.
+        // Med pad=0.7 + 6 dB mic-preamp landade max-slider på endast +3 dB —
+        // för "tämt" känsla.  Bumpas till 1.2 (+4.7 dB):
+        //   fader 0.5 (default): mic +1.6 dB, phono +4.5 dB    (säkert)
+        //   fader 1.0 (max):     mic +7.6 dB, phono +10.5 dB   (hardware-ish)
+        // Phono klär sig själv via RIAA-shelf (+6 dB på bas), så +10.5 dB
+        // är realistiskt drive — inte clipping i normal program-material.
+        constexpr float kInputPad = 1.2f;
 
         // Bypass-tape eller Monitor=Source: hoppa över tape-blocket men kör input-preamp
         // (manual #22 "medhør"; manual #23 bypass-läge). I detta läge använder vi mic-vägen
@@ -345,6 +377,22 @@ namespace bc2000dl::dsp
     void SignalChain::process (juce::AudioBuffer<float>& buffer)
     {
         const int numCh = buffer.getNumChannels();
+        const int n     = buffer.getNumSamples();
+
+        // KRITISK: scratch-buffrarna allokeras till maxBlock i prepare(), men
+        // host:en kan skicka mindre block (Logic gör så vid sample-accurate
+        // automation eller bara olika I/O-buffer-storlek vs samplesPerBlock).
+        // Om vi inte synkar scratch.getNumSamples() till faktiskt n så kommer
+        // GE-stages, RIAA-filter och rumble-loop:en processa hela allokeringen
+        // → samples [n..blockSize) är stale audio som GE-saturerar + IIR-state
+        // (RIAA-shelfen) desyncar från audio-strömmen → output blir noise.
+        // Symptom: phono-vägen producerade endast missljud (Christoffer/Logic).
+        // setSize med avoidReallocating=true är O(1) när n ≤ allokerat — säkert
+        // i RT-tråden eftersom prepare() har redan reserverat tillräckligt.
+        if (phonoScratch.getNumSamples() != n)
+            phonoScratch.setSize (2, n, false, false, true);
+        if (radioScratch.getNumSamples() != n)
+            radioScratch.setSize (2, n, false, false, true);
 
         // Snapshot raw INPUT levels before any DSP touches the buffer.
         if (numCh >= 1)
@@ -407,12 +455,12 @@ namespace bc2000dl::dsp
         // ===== L/R cross-bleed (real BC2000 har ~−46 dB bleed via head-gap) =====
         if (numCh >= 2)
         {
-            // Reducerad från 0.0056 (−45.04 dB, exakt på spec-edge) till 0.005
-            // (−46.02 dB) för att ge marginal mot §8 ≥45 dB-test.  Real B&O
-            // Service-manual (sida 2) listar "Kanaltrennung: Besser als 45 dB
-            // bei 1000 Hz" — vi siktar på 46 dB för att inte hamna i precision-
-            // beroende rounding-zone vid spec-mätningen.
-            const float bleed = 0.005f;    // -46 dB
+            // v60.5 — Christoffer Berg-feedback: "mic in L är inte 100 %
+            // panorerad, den skall vara hard Left".  Sänkt från 0.005 (−46 dB)
+            // till 0.0002 (−74 dB) → praktiskt taget inaudibelt.  Behåller
+            // teknisk "head-bleed"-karaktär men håller hard-pan-känslan vid
+            // monitoring.  Fortfarande över spec §8 ≥45 dB med marginal.
+            const float bleed = 0.0002f;   // -74 dB (var -46 dB)
             auto* l = buffer.getWritePointer (0);
             auto* r = buffer.getWritePointer (1);
             for (int i = 0; i < buffer.getNumSamples(); ++i)
@@ -433,18 +481,34 @@ namespace bc2000dl::dsp
             std::memory_order_relaxed);
         wowCurrentAmp.store (params.wowFlutterAmount, std::memory_order_relaxed);
 
-        // Uppdatera VU-meter atomiskt (UI läser)
+        // Uppdatera VU-meter + peak-overload-LED atomiskt (UI läser).
+        // Peak-LED: schema 9224002 "-22V" indikator-lampor.  Tröskel −3 dBFS
+        // motsvarar real hardware där lampan tändes när rec-signalen närmade
+        // sig saturation.  Set-only här; UI-thread hanterar 500 ms decay.
+        constexpr float kPeakThresholdDb = -3.0f;
+        auto peakDb = [] (const float* d, int n) -> float
+        {
+            float p = 0.0f;
+            for (int i = 0; i < n; ++i) p = std::max (p, std::abs (d[i]));
+            return 20.0f * std::log10 (p + 1e-9f);
+        };
         if (numCh >= 1)
         {
-            const float lvl = computeBlockRMSdBFS (buffer.getReadPointer (0), buffer.getNumSamples());
+            const int nBlk = buffer.getNumSamples();
+            const float lvl = computeBlockRMSdBFS (buffer.getReadPointer (0), nBlk);
             meterLevelL_dBFS.store (lvl);
             isRecordingL.store (params.micGain > 0.05f && ! params.bypassTape);
+            if (peakDb (buffer.getReadPointer (0), nBlk) > kPeakThresholdDb)
+                peakOverloadL.store (true, std::memory_order_release);
         }
         if (numCh >= 2)
         {
-            const float lvl = computeBlockRMSdBFS (buffer.getReadPointer (1), buffer.getNumSamples());
+            const int nBlk = buffer.getNumSamples();
+            const float lvl = computeBlockRMSdBFS (buffer.getReadPointer (1), nBlk);
             meterLevelR_dBFS.store (lvl);
             isRecordingR.store (params.micGainR > 0.05f && ! params.bypassTape);
+            if (peakDb (buffer.getReadPointer (1), nBlk) > kPeakThresholdDb)
+                peakOverloadR.store (true, std::memory_order_release);
         }
 
         // ---- Push mono mix into spectrum FIFO (UI thread reads via FFT) ----

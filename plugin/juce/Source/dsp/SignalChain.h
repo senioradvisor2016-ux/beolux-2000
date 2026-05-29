@@ -96,6 +96,16 @@ namespace bc2000dl::dsp
             // 0 = L (3 mV ceramic/low-level) → high preamp gain → more character
             // 1 = H (100 mV line/tuner)      → lower preamp gain → cleaner
             int   radioMode         { 0 };
+
+            // Bias-typ (hardware-switch "NORMAL / HIGH", schema 9224002).
+            // 0 = NORMAL (Fe₂O₃ ferric, kAriksbias-amp ~normal)
+            // 1 = HIGH   (CrO₂ chromium, 1.5× bias-amp + tightare hysteres-knä)
+            int   biasType          { 0 };
+
+            // Track-width-selektor (schema 9224003 "1/2 1/4").
+            // 0 = 1/4 track (quarter-track stereo — BC2000 De Luxe standard)
+            // 1 = 1/2 track (half-track stereo — wider head → −3 dB brus, bredare HF)
+            int   trackWidth        { 0 };
         };
 
         void prepare (double sampleRate, int maximumBlockSize);
@@ -110,6 +120,12 @@ namespace bc2000dl::dsp
         std::atomic<float> meterLevelR_dBFS  { -60.0f };
         std::atomic<bool>  isRecordingL { false };
         std::atomic<bool>  isRecordingR { false };
+
+        // Peak-overload LED-state (schema 9224002 "-22V" lampor).
+        // Sätts till TRUE när peak överstiger −3 dBFS i ett block, UI håller
+        // LED:n tänd ~500 ms efter senaste trigger (decay-logik UI-side).
+        std::atomic<bool>  peakOverloadL { false };
+        std::atomic<bool>  peakOverloadR { false };
 
         // ---- Spectrum-analyser FIFO (UI-thread reads, audio-thread writes) ----
         // Lock-free ring buffer of recent post-processing samples (mono mix).

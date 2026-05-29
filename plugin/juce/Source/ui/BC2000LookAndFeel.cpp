@@ -1458,12 +1458,39 @@ namespace bc2000dl::ui
     //=========================================================================
     //  Analog VU meter — proper hardware look with curved scale and needle
     //=========================================================================
+    // v60.5 — slim Kyuritsu-typ vertikal VU (tall + narrow aspect-ratio).
+    // Forward-declare helper, defined nedan main drawAnalogVU.
+    static void drawSlimVerticalVU (juce::Graphics& g, juce::Rectangle<int> r,
+                                     float dbValue, bool isPeaking,
+                                     const juce::String& channel,
+                                     bool isRecording);
+
     void InstructionCardLnF::drawAnalogVU (juce::Graphics& g, juce::Rectangle<int> r,
                                              float dbValue, bool isPeaking,
-                                             const juce::String& channel)
+                                             const juce::String& channel,
+                                             bool isRecording)
     {
+        // v60.5 — Christoffer-feedback: slim+tall Kyuritsu-typ när höjden
+        // är >= 1.4× bredden.  Behåller wide-version som fallback för
+        // bakåtkompatibilitet ifall någon preset/version använder bred VU.
+        if (r.getHeight() > r.getWidth() * 1.4f)
+        {
+            drawSlimVerticalVU (g, r, dbValue, isPeaking, channel, isRecording);
+            return;
+        }
+
         const auto bf = r.toFloat().reduced (1.0f);
         const auto inkCol = juce::Colour (0xFF181408);
+
+        // v60.4 — manualens "VITT SKEN: PÅSLAGEN. RÖTT SKEN: INSPELNING".
+        // När recording aktiv: skifta backlight + lamp-glow från amber/varmt
+        // till röd-tonad.  Subtilt nog att inte störa needle-läsbarheten men
+        // tydligt vid blick:  "ahh, den spelar in nu".
+        const auto faceTop    = isRecording ? juce::Colour (0xFFE89888) : juce::Colour (0xFFE8C078);
+        const auto faceMid    = isRecording ? juce::Colour (0xFFD86858) : juce::Colour (0xFFD8A858);
+        const auto faceBot    = isRecording ? juce::Colour (0xFFB04030) : juce::Colour (0xFFB87830);
+        const auto lampGlow   = isRecording ? juce::Colour (0xFFFF8060) : juce::Colour (0xFFFFE0A0);
+        const auto bloomGlow  = isRecording ? juce::Colour (0xFFFF5040) : juce::Colour (0xFFFFB060);
 
         // ===================================================================
         //  PREMIUM BEZEL — heavy black anodised housing with chrome trim
@@ -1524,18 +1551,18 @@ namespace bc2000dl::ui
         g.setColour (juce::Colours::black.withAlpha (0.7f));
         g.fillRoundedRectangle (face.expanded (1.4f), 3.5f);
 
-        // Deep amber/gold base (the iconic Fairchild backlit warmth)
+        // Deep amber/gold base (the iconic Fairchild backlit warmth, v60.4 r-tint)
         juce::ColourGradient faceGrad (
-            juce::Colour (0xFFE8C078), face.getCentreX(), face.getY(),
-            juce::Colour (0xFFB87830), face.getCentreX(), face.getBottom(), false);
-        faceGrad.addColour (0.45, juce::Colour (0xFFD8A858));
+            faceTop, face.getCentreX(), face.getY(),
+            faceBot, face.getCentreX(), face.getBottom(), false);
+        faceGrad.addColour (0.45, faceMid);
         g.setGradientFill (faceGrad);
         g.fillRoundedRectangle (face, 3.0f);
 
         // Strong radial backlit glow from below — sells the lamp-behind-dial
         {
             juce::ColourGradient lamp (
-                juce::Colour (0xFFFFE0A0).withAlpha (0.85f),
+                lampGlow.withAlpha (0.85f),
                 face.getCentreX(), face.getCentreY() + face.getHeight() * 0.6f,
                 juce::Colours::transparentWhite,
                 face.getCentreX(), face.getY(), true);
@@ -1546,9 +1573,16 @@ namespace bc2000dl::ui
         {
             juce::Path facePath;
             facePath.addRoundedRectangle (face, 3.0f);
-            static thread_local melatonin::DropShadow faceBacklight {
+            // Två separata shadow-objekt (amber vs red) — kan inte ändra
+            // params på static thread_local utan att förlora cache-fördelen.
+            static thread_local melatonin::DropShadow faceBacklightAmber {
                 { juce::Colour (0xFFFFB060).withAlpha (0.30f), 12, { 0, 4 }, 0 }
             };
+            static thread_local melatonin::DropShadow faceBacklightRed {
+                { juce::Colour (0xFFFF5040).withAlpha (0.45f), 12, { 0, 4 }, 0 }
+            };
+            auto& faceBacklight = isRecording ? faceBacklightRed : faceBacklightAmber;
+            (void) bloomGlow;   // explicit-unused (färgen är "bakad" in i shadow-objektet)
             // (Drop-shadow on the face from inside? Use as halo by drawing path
             // smaller and using shadow as the amber bloom.)
             const auto inner = face.reduced (2.0f);
@@ -1789,6 +1823,119 @@ namespace bc2000dl::ui
             g.fillEllipse (px - pR, py - pR, pR * 2, pR * 2);
             g.setColour (juce::Colours::white.withAlpha (0.6f));
             g.fillEllipse (px - pR * 0.4f, py - pR * 0.6f, pR * 0.8f, pR * 0.6f);
+        }
+    }
+
+    // v60.5 — Slim Kyuritsu-typ vertikal VU.  Tall+narrow aspect ratio.
+    // Bargraph av segmenterade LED-like blocks som tänds från botten.
+    // Peak-hold-strip överst som dröjer kvar, klassisk Japanese hi-fi-look.
+    static void drawSlimVerticalVU (juce::Graphics& g, juce::Rectangle<int> r,
+                                     float dbValue, bool isPeaking,
+                                     const juce::String& channel,
+                                     bool isRecording)
+    {
+        const auto bf = r.toFloat().reduced (1.0f);
+
+        // ===== Bezel — slim chrome-trimmed dark housing =====
+        {
+            juce::Path bezelPath;
+            bezelPath.addRoundedRectangle (bf, 3.0f);
+            static thread_local melatonin::DropShadow bezelShadow {
+                { juce::Colours::black.withAlpha (0.65f), 8, { 0, 3 }, 1 }
+            };
+            bezelShadow.render (g, bezelPath);
+        }
+        juce::ColourGradient bezelGrad (
+            juce::Colour (0xFF35353A), bf.getCentreX(), bf.getY(),
+            juce::Colour (0xFF080808), bf.getCentreX(), bf.getBottom(), false);
+        bezelGrad.addColour (0.45, juce::Colour (0xFF1A1A1E));
+        g.setGradientFill (bezelGrad);
+        g.fillRoundedRectangle (bf, 3.0f);
+        g.setColour (juce::Colour (0xFF9090A0).withAlpha (0.5f));
+        g.drawRoundedRectangle (bf.reduced (0.4f), 3.0f, 0.7f);
+
+        // ===== Inner face — recessed black with subtle backlight =====
+        const auto face = bf.reduced (4.0f, 6.0f);
+        g.setColour (juce::Colours::black.withAlpha (0.7f));
+        g.fillRoundedRectangle (face.expanded (0.8f), 2.0f);
+
+        const auto faceBg = isRecording ? juce::Colour (0xFF1A0808) : juce::Colour (0xFF080605);
+        g.setColour (faceBg);
+        g.fillRoundedRectangle (face, 2.0f);
+
+        // ===== Bargraph segments =====
+        // 18 segment-LEDs från botten, mapping -20 dB..+3 dB.
+        // Färg-zoner: 0-11 grön, 12-14 amber, 15-17 röd (peak-zone).
+        // Recording = alla segment skiftar mot röd-tonat.
+        const float vuNorm = juce::jlimit (0.0f, 1.0f, (dbValue + 20.0f) / 23.0f);
+        const int numSegs = 18;
+        const int litSegs = (int) std::round (vuNorm * numSegs);
+
+        const float segMargin = face.getHeight() * 0.04f;
+        const float segArea   = face.getHeight() - segMargin * 2.0f;
+        const float segH      = segArea / numSegs;
+        const float segGap    = segH * 0.18f;
+        const float segDrawH  = segH - segGap;
+        const float segW      = face.getWidth() - 8.0f;
+        const float segX      = face.getX() + 4.0f;
+
+        for (int i = 0; i < numSegs; ++i)
+        {
+            const float segY = face.getBottom() - segMargin - (i + 1) * segH + segGap * 0.5f;
+            const bool  lit  = (i < litSegs);
+
+            juce::Colour segCol;
+            if (i < 11)       segCol = juce::Colour (0xFF40C870);     // green
+            else if (i < 14)  segCol = juce::Colour (0xFFFFB040);     // amber
+            else              segCol = juce::Colour (0xFFFF4030);     // red
+
+            if (isRecording)
+                segCol = segCol.interpolatedWith (juce::Colour (0xFFFF3030), 0.5f);
+
+            if (lit)
+            {
+                // Glow halo
+                g.setColour (segCol.withAlpha (0.35f));
+                g.fillRect (segX - 1.5f, segY - 0.5f, segW + 3.0f, segDrawH + 1.0f);
+                // Main
+                g.setColour (segCol);
+                g.fillRoundedRectangle (segX, segY, segW, segDrawH, 0.8f);
+                // Inner highlight
+                g.setColour (juce::Colours::white.withAlpha (0.25f));
+                g.fillRoundedRectangle (segX + 0.5f, segY + 0.4f, segW - 1.0f, segDrawH * 0.35f, 0.8f);
+            }
+            else
+            {
+                // Dim/off segment — barely visible outline
+                g.setColour (segCol.withAlpha (0.10f));
+                g.fillRoundedRectangle (segX, segY, segW, segDrawH, 0.8f);
+            }
+        }
+
+        // ===== Peak warning glow (when isPeaking) =====
+        if (isPeaking)
+        {
+            g.setColour (juce::Colour (0xFFFF3020).withAlpha (0.35f));
+            g.fillRoundedRectangle (face.expanded (1.0f), 2.5f);
+        }
+
+        // ===== Channel label at bottom =====
+        if (channel.isNotEmpty())
+        {
+            const auto lblRect = juce::Rectangle<int> (
+                r.getX() + 1, r.getBottom() - 12, r.getWidth() - 2, 11);
+            g.setColour (juce::Colour (0xFFB0B0B6).withAlpha (0.75f));
+            g.setFont (InstructionCardLnF::sectionFont (7.5f));
+            g.drawText (channel, lblRect, juce::Justification::centred, false);
+        }
+
+        // ===== Subtle glass overlay =====
+        {
+            juce::ColourGradient glass (
+                juce::Colours::white.withAlpha (0.06f), face.getX(), face.getY(),
+                juce::Colours::transparentBlack, face.getX(), face.getBottom(), false);
+            g.setGradientFill (glass);
+            g.fillRoundedRectangle (face, 2.0f);
         }
     }
 

@@ -21,7 +21,9 @@ namespace bc2000dl::dsp
 
     void Multiplay::setGeneration (int gen)
     {
-        generation = juce::jlimit (1, 5, gen);
+        const int newGen = juce::jlimit (1, 5, gen);
+        if (newGen == generation) return;   // ingen ändring → ingen state-reset
+        generation = newGen;
         updateForGeneration();
     }
 
@@ -33,6 +35,10 @@ namespace bc2000dl::dsp
         const int idx = juce::jlimit (0, 4, generation - 1);
         hfFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeFirstOrderLowPass (
             sampleRate, corners[idx]);
+        // Reset bara här — anropas från prepare() och från setGeneration() vid ÄKTA
+        // generationsbyte.  Resetar vi varje block (det gamla buggade beteendet) får
+        // hfFilter.state alltid värdet 0 vid blockstart, vilket producerar en klick-
+        // transient @ blockgränsen → audibelt som missljud / kornighet.
         hfFilter.reset();
 
         // Brus per generation: +1 dB/gen, bas -60 dBFS

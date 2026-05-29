@@ -38,6 +38,13 @@ namespace bc2000dl::dsp
         void setSaturationDrive (float drive);     // 0.5–2.0
         void setPrintThrough (float amount);       // 0.0–0.05
         void setFormula (TapeFormula f);
+        // NORMAL=0 (Fe₂O₃), HIGH=1 (CrO₂) — schema 9224002 "NORMAL HIGH" switch.
+        // CrO₂ kräver ~50 % mer bias för optimal magnetisering + har högre coercivity
+        // (tightare hysteres-knä → mindre 3rd harm, bättre HF-respons).
+        void setBiasType (int t);
+        // 0 = 1/4 track stereo (BC2000 standard), 1 = 1/2 track (full-width).
+        // 1/2 track: bredare gap → lägre brus + bredare head-bump-Q.
+        void setTrackWidth (int t);
 
         void process (juce::AudioBuffer<float>& buffer, int channel);
 
@@ -48,12 +55,19 @@ namespace bc2000dl::dsp
         float biasAmount      { 1.0f };
         float saturationDrive { 1.0f };
         float printThrough    { 0.0f };
+        int   biasType        { 0 };   // 0=NORMAL, 1=HIGH (CrO₂)
+        int   trackWidth      { 0 };   // 0=1/4 track, 1=1/2 track
 
         // HF-roll-off per hastighet
         juce::dsp::IIR::Filter<float> hfFilter;
 
         // Head-bump (peaking EQ)
         juce::dsp::IIR::Filter<float> bumpFilter;
+
+        // v60.3 — Bias-typ presence-shelf (HIGH = CrO₂ är ljusare ovanför 4 kHz).
+        // Behövs eftersom hfCorner ofta clamps över Nyquist → ingen audibel
+        // HF-skillnad mellan NORMAL/HIGH utan separat shelf-filter.
+        juce::dsp::IIR::Filter<float> biasShelfFilter;
 
         // ----- Oversampled J-A hysteres-block -----
         // 8× oversampling kring J-A + bias-injection (100 kHz sinus).

@@ -86,13 +86,22 @@ namespace bc2000dl::dsp
         const int   delayInt   = static_cast<int> (std::floor (fracDelay));
         const float delayFrac  = fracDelay - static_cast<float> (delayInt);
 
-        const int bufLen = static_cast<int> (buf.size());
-        int r0 = writeIdx - delayInt;
-        int r1 = writeIdx - delayInt - 1;
+        // v60.5 — Cross-feedback (SoS): läs delay-sample från partner-Echo:s
+        // buffer istället för egen.  Resultatet: L:s echo-output har R:s
+        // delayed-signal med feedback, R:s output har L:s.  Ping-pong/X-feed.
+        const std::vector<float>& readBuf = (feedbackSource != nullptr)
+                                          ? feedbackSource->getDelayBuffer()
+                                          : buf;
+        const int writeIdxForRead         = (feedbackSource != nullptr)
+                                          ? feedbackSource->getWriteIdx()
+                                          : writeIdx;
+        const int bufLen = static_cast<int> (readBuf.size());
+        int r0 = writeIdxForRead - delayInt;
+        int r1 = writeIdxForRead - delayInt - 1;
         if (r0 < 0) r0 += bufLen;  if (r0 >= bufLen) r0 -= bufLen;
         if (r1 < 0) r1 += bufLen;  if (r1 >= bufLen) r1 -= bufLen;
-        const float delayed = buf[static_cast<size_t> (r0)] * (1.0f - delayFrac)
-                            + buf[static_cast<size_t> (r1)] * delayFrac;
+        const float delayed = readBuf[static_cast<size_t> (r0)] * (1.0f - delayFrac)
+                            + readBuf[static_cast<size_t> (r1)] * delayFrac;
 
         // Output = input + feedback × delayed (våt + torr)
         // Soft-clip BOTH the output AND the feedback signal so neither the

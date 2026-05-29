@@ -108,13 +108,25 @@ namespace bc2000dl
         void paint (juce::Graphics&) override;
         float getCurrentDb()  const { return current; }
         float getPeakHoldDb() const { return peakHoldDb; }
+        // v60.3: överload-LED från SignalChain.peakOverloadL/R.
+        // Triggas DSP-side när peak > −3 dBFS, decay 500 ms i UI.
+        void triggerPeakLed() { peakLedFrames = 15; repaint(); }
+        void tickPeakLed()
+        {
+            if (peakLedFrames > 0) { --peakLedFrames; if (peakLedFrames == 0) repaint(); }
+        }
+        bool isPeakLedOn() const { return peakLedFrames > 0; }
+        // v60.4: manualens "VITT SKEN: PÅSLAGEN. RÖTT SKEN: INSPELNING".
+        void setRecording (bool r) { if (r != recording) { recording = r; repaint(); } }
     private:
         float current     { -20.0f };
         float velocity    { 0.0f };
         float peakHoldDb  { -20.0f };
         int   peakHoldFrames { 0 };
+        int   peakLedFrames  { 0 };   // ~500 ms decay @ 30 Hz timer
         juce::uint32 bootStart { 0 };
         bool  peaking  { false };
+        bool  recording { false };   // v60.4 — röd backlight när rec aktiv
         juce::String channel;
     };
 }
@@ -154,11 +166,14 @@ private:
     melatonin::Inspector inspector { *this };
 #endif
 
-    // ---- Top deck zone: reels + 3 analog VU meters + spectrum strip ----
+    // ---- Top deck zone: 4 slim Kyuritsu VU + reels (v60.5 layout) ----
+    // Christoffer-feedback: smala+höga VU-mätare av Kyuritsu-typ, ordning från
+    // vänster: L-in, R-in, REELS, L-out, R-out.
     bc2000dl::ReelDeck reelDeck;
-    bc2000dl::AnalogVU vuInL { "VU" };
-    bc2000dl::AnalogVU vuInR { "VU" };
-    bc2000dl::AnalogVU vuOut { "VU" };
+    bc2000dl::AnalogVU vuInL  { "L IN" };
+    bc2000dl::AnalogVU vuInR  { "R IN" };
+    bc2000dl::AnalogVU vuOutL { "L OUT" };
+    bc2000dl::AnalogVU vuOutR { "R OUT" };
     bc2000dl::SpectrumAnalyser spectrum;
     juce::String       counterText { "0000" };
     bool               recLedOn { false };       // record-LED state
@@ -180,7 +195,9 @@ private:
 
     // ---- 5 selectors ----
     juce::ComboBox cb_speed, cb_monitor, cb_phono, cb_radio, cb_formula;
+    juce::ComboBox cb_biasType, cb_trackWidth;     // v60.3 — schema 9224002/3
     juce::Label    lbl_speed, lbl_monitor, lbl_phono, lbl_radio, lbl_formula;
+    juce::Label    lbl_biasType, lbl_trackWidth;
 
     // ---- Toggle buttons ----
     juce::ToggleButton t_echo, t_bypass, t_speaker, t_sync;

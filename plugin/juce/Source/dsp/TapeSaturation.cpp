@@ -50,6 +50,7 @@ namespace bc2000dl::dsp
     {
         hfFilter.reset();
         bumpFilter.reset();
+        biasShelfFilter.reset();
         biasReject.reset();
         hysteresis.reset();   // clears J-A magnetisation history
         biasCosState = 1.0;
@@ -70,6 +71,7 @@ namespace bc2000dl::dsp
         // numerical drift on the first few samples.
         hfFilter.reset();
         bumpFilter.reset();
+        biasShelfFilter.reset();
         biasReject.reset();
         hysteresis.reset();
         if (oversampler) oversampler->reset();
@@ -78,6 +80,22 @@ namespace bc2000dl::dsp
     void TapeSaturation::setBiasAmount (float a)        { biasAmount      = a; }
     void TapeSaturation::setSaturationDrive (float d)   { saturationDrive = d; }
     void TapeSaturation::setPrintThrough (float p)      { printThrough    = p; }
+
+    void TapeSaturation::setBiasType (int t)
+    {
+        const int newType = juce::jlimit (0, 1, t);
+        if (newType == biasType) return;
+        biasType = newType;
+        updateFilters();   // HF/bump/noise beror på bias-typ
+    }
+
+    void TapeSaturation::setTrackWidth (int t)
+    {
+        const int newW = juce::jlimit (0, 1, t);
+        if (newW == trackWidth) return;
+        trackWidth = newW;
+        updateFilters();   // brus + head-bump-Q beror på track-width
+    }
     void TapeSaturation::setFormula (TapeFormula f)
     {
         if (f != formula)
@@ -156,6 +174,29 @@ namespace bc2000dl::dsp
                 break;
         }
 
+        // Bias-typ-justering (schema 9224002 NORMAL/HIGH switch).
+        // HIGH = CrO₂ chromium tape: högre coercivity (550 Oe vs 350 Oe) →
+        // markant bättre HF-extension + lägre brus (−4 dB).  hfCorner är
+        // ofta över Nyquist (Speed19 → 30 kHz → clamps), så vi använder
+        // ett DEDIKERAT presence-shelf på bumpFilter istället för att förlita
+        // oss på hfCorner-skillnaden ensam.
+        if (biasType == 1)
+        {
+            hfCorner *= 1.35;
+            noiseDb -= 4.0;
+            headBumpGainDb -= 1.0;   // chrome har mindre LF-bump (mindre print-through)
+        }
+
+        // Track-width-justering (schema 9224003 "1/2 1/4").
+        // 1/2 track (half-track): dubbel gap-area → markant lägre brus (−6 dB)
+        // + förstärkt LF head-bump (större head-area) + lite mörkare HF.
+        if (trackWidth == 1)
+        {
+            noiseDb -= 6.0;
+            hfCorner *= 0.88;        // gap-loss vid bred gap
+            headBumpGainDb += 2.5;   // markant mer LF från större head
+        }
+
         // Hård Nyquist-clamp på hfCorner.  För Speed19 + BASF blev hfCorner
         // 30000 × 1.40 = 42000 Hz > Nyquist (24 kHz @ 48 kHz SR), vilket gav
         // instabila bilinear-koefficienter (tan(π·fc/Fs) → ∞ när fc → Fs/2)
@@ -191,6 +232,16 @@ namespace bc2000dl::dsp
                 sampleRate, static_cast<float> (headBumpFreq), 1.5f,
                 juce::Decibels::decibelsToGain (static_cast<float> (headBumpGainDb)));
         }
+
+        // v60.3 — Bias-typ presence-shelf @ 4 kHz.  NORMAL = pass-through (Fe₂O₃),
+        // HIGH = +3 dB shelf (CrO₂ brighter character).  Hörbar HF-skillnad utan
+        // att förlita sig på hfCorner som ofta clamps över Nyquist.
+        if (biasType == 1)
+            biasShelfFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (
+                sampleRate, 4000.0f, 0.707f, juce::Decibels::decibelsToGain (3.0f));
+        else
+            biasShelfFilter.coefficients = new juce::dsp::IIR::Coefficients<float> (
+                1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);  // pass-through
 
         noiseAmpLin = std::pow (10.0f, static_cast<float> (noiseDb) / 20.0f);
     }
@@ -244,7 +295,10 @@ namespace bc2000dl::dsp
 
         const int nUp = (int) upBlock.getNumSamples();
         auto* up = upBlock.getChannelPointer (0);
-        const float biasAmplitude = 0.03f * biasAmount;
+        // HIGH-bias (CrO₂): +50 % bias-amplitud — chrome-tape behöver mer
+        // optimal-bias än ferric pga högre coercivity (schema 9224002).
+        const float biasTypeMul   = (biasType == 1) ? 1.5f : 1.0f;
+        const float biasAmplitude = 0.03f * biasAmount * biasTypeMul;
         // Renormalisera oscillator-state mot drift (1 sqrt per block, försumbart).
         // Numerisk avrundning i 4-mul-rotationen ackumuleras till |state|≠1 över tid;
         // 1/sqrt(c²+s²) trimmar tillbaka utan att påverka frekvensen.
@@ -260,7 +314,30 @@ namespace bc2000dl::dsp
         // THD från J-A själv blir < 0.5 %.  Återstoden från asymmetric-sat
         // (≈ 0.5-1 %) + GE cascade (≈ 0.5-1 %) summerar till <3 % spec.
         constexpr float kDriveScaling = 0.1f;
-        const float satDrive = saturationDrive * kDriveScaling;
+
+        // Bias-koppling.  Tidigare hade biasAmount-knappen ingen audibel
+        // effekt:  den 100 kHz bias-sinus som adderas till H filtreras bort
+        // av LP @ 40 kHz, och vid den linjära region som J-A opererar i
+        // (H ≪ a) ger bias-ditheringen inga intermodulationsprodukter i
+        // baseband.  Fysikaliskt fungerar real tape så att under-bias ger
+        // mer 3:e-harmonik och under-magnetisering (i praktiken: hörbart
+        // mer distortion), över-bias ger HF-roll-off + mjukare ton.
+        //
+        // Vi modellerar detta genom att (a) skala drive in i J-A, (b) skala
+        // den asymmetriska post-J-A-mättnadens koefficient och (c) shifta
+        // HF-rolloff vid över-bias.  J-A själv opererar i sin linjära region
+        // vid typiska signal-nivåer (H ≪ a=0.3), så drive-mul ensam räcker
+        // inte — den asymmetriska stage är där baseband-THD genereras.
+        const float biasUnder      = juce::jmax (0.0f, 1.0f - biasAmount);  // 0..0.5
+        const float biasOver       = juce::jmax (0.0f, biasAmount - 1.0f);  // 0..0.5
+        const float biasDriveMul   = 1.0f + biasUnder * 2.0f - biasOver * 0.3f;
+        const float satDrive       = saturationDrive * kDriveScaling * biasDriveMul;
+        // Asymmetri-multiplikator: under-bias → upp till 9× h2-distortion,
+        // over-bias → 0.7× (mjukare).  Detta är det DOMINERANDE bidraget
+        // till THD-skillnaden mellan låg och hög bias.  Behövs aggressiv
+        // skalning eftersom basala koefficienterna (0.02 totalt h2) är
+        // små i förhållande till post-J-A flux-amplituden (~0.16).
+        const float biasAsymMul    = 1.0f + biasUnder * 16.0f - biasOver * 0.6f;
 
         // Lokal kopia av oscillator-state — låter compilern hålla i register.
         double oscC = biasCosState;
@@ -346,15 +423,18 @@ namespace bc2000dl::dsp
 
             // Asymmetric saturation: pos/neg flux har olika expansion-curva.
             // Matchar real tape's 2nd-harmonic content men i spec-skala.
+            // biasAsymMul ger Bias-knappen audibel effekt här: under-bias
+            // multiplicerar tape-asymmetrin upp till 4× → hörbart mer h2.
             const float yClamped = juce::jlimit (-1.0f, 1.0f, y);
-            y = y * (1.0f + (baseAsym + perFormulaAsym) * yClamped);
+            y = y * (1.0f + (baseAsym + perFormulaAsym) * biasAsymMul * yClamped);
 
             // Subtilt 2nd-harmonic bias (pos > neg compression).
-            // Halverat från 0.015/0.005 → 0.005/0.002 (v62.0).
+            // Halverat från 0.015/0.005 → 0.005/0.002 (v62.0).  Skalas också
+            // med biasAsymMul så hela compression-banan följer bias-knappen.
             if (y > 0.0f)
-                y = y * (1.0f - 0.005f * y);    // mer kompression på pos
+                y = y * (1.0f - 0.005f * biasAsymMul * y);    // mer kompression på pos
             else
-                y = y * (1.0f + 0.002f * y);    // mindre på neg
+                y = y * (1.0f + 0.002f * biasAsymMul * y);    // mindre på neg
 
             // 2. Print-through (om aktiv)
             if (printThrough > 1e-6f)
@@ -370,6 +450,9 @@ namespace bc2000dl::dsp
 
             // 4. Head-bump
             y = bumpFilter.processSample (y);
+
+            // 4b. v60.3 — Bias-typ presence-shelf (HIGH/CrO₂ = +3 dB @ 4 kHz)
+            y = biasShelfFilter.processSample (y);
 
             // 5. Tape-egenbrus (LCG Gaussian — RT-safe, 30× snabbare än mt19937)
             y += detail::fastGaussNoise (lcgState) * noiseAmpLin;

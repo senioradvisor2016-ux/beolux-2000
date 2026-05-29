@@ -48,13 +48,22 @@ namespace bc2000dl::dsp
     void PowerAmp8004014::prepare (double sr)
     {
         sampleRate = sr;
-        hpFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeFirstOrderHighPass (sr, 5.0f);
+        // Intern-speaker-emulering: bandpass ≈ 90 Hz – 6 kHz med cabinet-peak vid 1 kHz.
+        // Hörbar färg som "monitor genom liten högtalare" — inte placebo.
+        hpFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeFirstOrderHighPass (sr, 90.0f);
+        lpFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeFirstOrderLowPass  (sr, 6000.0f);
+        peakFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter (
+            sr, 1000.0f, 1.2f, juce::Decibels::decibelsToGain (3.0f));
         hpFilter.reset();
+        lpFilter.reset();
+        peakFilter.reset();
     }
 
     void PowerAmp8004014::reset()
     {
         hpFilter.reset();
+        lpFilter.reset();
+        peakFilter.reset();
     }
 
     float PowerAmp8004014::crossoverDistortion (float x) const
@@ -79,11 +88,14 @@ namespace bc2000dl::dsp
         if (! enabled) return x;
         // 1. Smooth crossover (germanium AC127/132 class-AB-mismatch)
         float y = crossoverDistortion (x);
-        // 2. AUTOMATSIKRING soft-clip — knee 2.5 → transparent vid nominell,
-        //    mjuk mättning bara vid riktig overdrive (>0 dBFS).
+        // 2. Cabinet-peak +3 dB @ 1 kHz (intern-speaker "honk")
+        y = peakFilter.processSample (y);
+        // 3. AUTOMATSIKRING soft-clip — knee 1.0 → mjuk kompression vid 0 dBFS.
         y = kAutomatsikring * std::tanh (y / kAutomatsikring);
-        // 3. Cap-coupling HP @ 5 Hz
+        // 4. Speaker HP @ 90 Hz (cabinet-roll-off, ingen sub-bas)
         y = hpFilter.processSample (y);
+        // 5. Speaker LP @ 6 kHz (cone HF-cutoff)
+        y = lpFilter.processSample (y);
         return y;
     }
 

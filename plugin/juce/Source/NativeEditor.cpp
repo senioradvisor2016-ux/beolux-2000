@@ -46,6 +46,8 @@ namespace
         if (id == "phono_mode")       return "L = ceramic · H = magnetic (RIAA)";
         if (id == "radio_mode")       return "L = 3 mV · H = 100 mV line";
         if (id == "tape_formula")     return "Agfa / BASF / Scotch tape-emulering";
+        if (id == "bias_type")        return "NORMAL = Fe2O3 ferric · HIGH = CrO2 chrome (1.5x bias)";
+        if (id == "track_width")      return "1/4 stereo = BC2000 std · 1/2 stereo = lägre brus, bredare bas";
         if (id == "saturation_drive") return "Tape-saturation drive";
         if (id == "echo_amount")      return "Echo-mängd (high = self-oscillation)";
         if (id == "bias_amount")      return "Bias-ström (under nominal = mer 3rd harm)";
@@ -201,9 +203,15 @@ namespace bc2000dl
 
     void AnalogVU::paint (juce::Graphics& g)
     {
-        ui::InstructionCardLnF::drawAnalogVU (g, getLocalBounds(), current, peaking, channel);
+        ui::InstructionCardLnF::drawAnalogVU (g, getLocalBounds(), current, peaking, channel, recording);
+
+        // v60.5 — detektera slim Kyuritsu-mode (höjd > 1.4× bredd).
+        // Slim-mode renderar bargraph, så curve-overlays nedan skippas.
+        const auto lb = getLocalBounds();
+        const bool slimMode = lb.getHeight() > lb.getWidth() * 1.4f;
 
         // Melatonin InnerShadow — depth ring that makes the face look recessed
+        if (! slimMode)
         {
             juce::Path facePath;
             facePath.addRoundedRectangle (getLocalBounds().toFloat().reduced (1.0f), 3.0f);
@@ -213,8 +221,8 @@ namespace bc2000dl
             vuInner.render (g, facePath);
         }
 
-        // Overlay: amber peak-hold needle
-        if (peakHoldDb > -19.0f && std::abs (peakHoldDb - current) > 0.5f)
+        // Overlay: amber peak-hold needle (curved-VU only)
+        if (! slimMode && peakHoldDb > -19.0f && std::abs (peakHoldDb - current) > 0.5f)
         {
             const auto bf = getLocalBounds().toFloat().reduced (1.0f);
             const float screwBuffer = juce::jmax (1.8f, juce::jmin (bf.getWidth(), bf.getHeight()) * 0.018f) * 2.0f + 6.0f;
@@ -231,6 +239,25 @@ namespace bc2000dl
             g.setColour (juce::Colour (0xFFC2A050).withAlpha (0.85f));
             g.drawLine (pivotX + r1 * std::sin (a), pivotY - r1 * std::cos (a),
                         pivotX + r2 * std::sin (a), pivotY - r2 * std::cos (a), 1.4f);
+        }
+
+        // v60.3 — Peak-overload LED (schema 9224002 "-22V" lampa).
+        // Liten röd LED uppe i högra hörnet, glow-effekt när tänd.
+        if (peakLedFrames > 0)
+        {
+            const auto bf = getLocalBounds().toFloat();
+            const float dia = juce::jmin (bf.getWidth(), bf.getHeight()) * 0.10f;
+            const float x = bf.getRight() - dia - 4.0f;
+            const float y = bf.getY() + 4.0f;
+            // Glow halo (decay-beroende alpha)
+            const float alpha = juce::jlimit (0.3f, 1.0f, peakLedFrames / 15.0f);
+            g.setColour (juce::Colour (0xFFFF3030).withAlpha (alpha * 0.4f));
+            g.fillEllipse (x - 1.5f, y - 1.5f, dia + 3.0f, dia + 3.0f);
+            g.setColour (juce::Colour (0xFFFF4040).withAlpha (alpha));
+            g.fillEllipse (x, y, dia, dia);
+            // Inner highlight för "lit LED"-känsla
+            g.setColour (juce::Colour (0xFFFFB0B0).withAlpha (alpha * 0.6f));
+            g.fillEllipse (x + dia * 0.25f, y + dia * 0.15f, dia * 0.35f, dia * 0.30f);
         }
     }
 
@@ -380,13 +407,15 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
 
     vuInL.setComponentEffect (&vuShadow);
     vuInR.setComponentEffect (&vuShadow);
-    vuOut.setComponentEffect (&vuShadow);
+    vuOutL.setComponentEffect (&vuShadow);
+    vuOutR.setComponentEffect (&vuShadow);
     reelDeck.setComponentEffect (&reelShadow);
 
     addAndMakeVisible (reelDeck);
     addAndMakeVisible (vuInL);
     addAndMakeVisible (vuInR);
-    addAndMakeVisible (vuOut);
+    addAndMakeVisible (vuOutL);
+    addAndMakeVisible (vuOutR);
 
     // ---- Spectrum analyser (live FFT strip on deck) ----
     spectrum.setSource (audioProc.getChain().spectrumBuffer,
@@ -531,6 +560,9 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
     setupCombo (cb_phono,   lbl_phono,   "phono_mode",   "PHONO IN",    { "L (ceramic)", "H (magnetic)" });
     setupCombo (cb_radio,   lbl_radio,   "radio_mode",   "RADIO IN",    { "L (3 mV)", "H (100 mV)" });
     setupCombo (cb_formula, lbl_formula, "tape_formula", "TAPE FORMULA",{ "Agfa", "BASF", "Scotch" });
+    // v60.3 — Schema 9224002 NORMAL/HIGH bias-switch + 9224003 track-width
+    setupCombo (cb_biasType,   lbl_biasType,   "bias_type",   "BIAS",   { "NORMAL", "HIGH" });
+    setupCombo (cb_trackWidth, lbl_trackWidth, "track_width", "TRACK",  { "1/4 stereo", "1/2 stereo" });
 
     // ---- Toggle buttons ----
     auto setupToggle = [&] (juce::ToggleButton& b, const juce::String& cap, const juce::String& id)
@@ -627,7 +659,7 @@ NativeEditor::NativeEditor (BC2000DLProcessor& p)
         juce::AlertWindow::showAsync (
             juce::MessageBoxOptions()
                 .withIconType (juce::MessageBoxIconType::InfoIcon)
-                .withTitle ("Beolux 2000 · v60.1")
+                .withTitle ("Beolux 2000 · v60.6")
                 .withMessage ("BEOLUX 2000 — Danish Tape Emulation\n"
                               "by SOUNDBOYS\n\n"
                               "Inspired by the Bang & Olufsen Beocord 2000\n"
@@ -739,7 +771,7 @@ void NativeEditor::paint (juce::Graphics& g)
 
     // Title (top-left of alu deck)
     LnF::drawTitle (g, aluZone.reduced (14, 3).removeFromTop (20),
-                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v60.1");
+                     "BEOLUX 2000", "SOUNDBOYS · DANISH TAPE EMULATION · v60.6");
 
     // Counter (bottom-centre of deck, just below the VU row)
     {
@@ -800,18 +832,21 @@ void NativeEditor::paint (juce::Graphics& g)
     }
 
     // VU-meter engraved headers (silver on black metal, above each meter)
+    // v60.5: 4 slim Kyuritsu-VUs i ordningen L-in | R-in | reels | L-out | R-out
     {
         struct Hdr { juce::Rectangle<int> r; const char* text; };
-        const auto& vuLb = vuInL.getBounds();
-        const auto& vuRb = vuInR.getBounds();
-        const auto& vuOb = vuOut.getBounds();
-        const int hY = juce::jmax (aluZone.getY(), vuLb.getY() - 18);
+        const auto& vuLib = vuInL.getBounds();
+        const auto& vuRib = vuInR.getBounds();
+        const auto& vuLob = vuOutL.getBounds();
+        const auto& vuRob = vuOutR.getBounds();
+        const int hY = juce::jmax (aluZone.getY(), vuLib.getY() - 18);
         const int hH = 14;
 
         Hdr hs[] = {
-            { { vuLb.getX(), hY, vuLb.getWidth(), hH }, "LEFT"   },
-            { { vuRb.getX(), hY, vuRb.getWidth(), hH }, "RIGHT"  },
-            { { vuOb.getX(), hY, vuOb.getWidth(), hH }, "OUTPUT" }
+            { { vuLib.getX(), hY, vuLib.getWidth(), hH }, "L IN"  },
+            { { vuRib.getX(), hY, vuRib.getWidth(), hH }, "R IN"  },
+            { { vuLob.getX(), hY, vuLob.getWidth(), hH }, "L OUT" },
+            { { vuRob.getX(), hY, vuRob.getWidth(), hH }, "R OUT" }
         };
         for (auto& h : hs)
         {
@@ -975,62 +1010,20 @@ void NativeEditor::paint (juce::Graphics& g)
         }
     }
 
-    // ===== Soundboys brand medallion (engraved on the black metal deck) =====
-    // Small chrome-rimmed circular badge, just under the title text on the left.
+    // ===== Version-text (alltid synlig) — silver silkscreen efter titeln =====
+    // v60.5 — S-medaljongen borttagen (Christoffer-feedback: "den kan tas bort
+    // om den inte har någon funktion") — den var bara dekorativt brand-mark.
+    // Versionstexten behålls dock (var tidigare bredvid medaljongen), nu
+    // fristående positionerad direkt efter titeln så versionen alltid syns
+    // även när host:en döljer fönstertiteln.
     {
-        // Positioned dynamically: measure the actual title font width so the
-        // badge always lands 20 px clear of the last glyph, regardless of
-        // platform font metrics.
-        const float br = 13.0f;
         const float titleTextW = (float) juce::GlyphArrangement::getStringWidthInt (
                                              lnf.logoFont (22.0f), "BEOLUX 2000");
-        const float bx = (float)(kTeakW + 14) + titleTextW + 20.0f + br;
-        const float by = 6.0f;
-
-        // Recess shadow
-        g.setColour (juce::Colours::black.withAlpha (0.7f));
-        g.fillEllipse (bx - br - 1.0f, by - 1.0f, (br + 1.0f) * 2, (br + 1.0f) * 2);
-
-        // Chrome bezel ring
-        juce::ColourGradient bezel (
-            juce::Colour (0xFFE8E8EC), bx, by - br * 0.5f,
-            juce::Colour (0xFF50505A), bx, by + br * 0.7f, false);
-        bezel.addColour (0.5, juce::Colour (0xFFA8A8AC));
-        g.setGradientFill (bezel);
-        g.fillEllipse (bx - br, by, br * 2, br * 2);
-
-        // Inner deep medallion face
-        const float ir = br - 2.5f;
-        juce::ColourGradient face (
-            juce::Colour (0xFF202024), bx, by + br - ir,
-            juce::Colour (0xFF050507), bx, by + br + ir, false);
-        g.setGradientFill (face);
-        g.fillEllipse (bx - ir, by + br - ir + (br - ir) * 0.0f, ir * 2, ir * 2);
-
-        // Engraved "S" mark + "SBYS" microtext
-        g.setColour (juce::Colour (0xFF8A8A92));
-        g.setFont (LnF::logoFont (12.0f));
-        g.drawText ("S",
-            juce::Rectangle<float> (bx - ir, by + br - ir - 1.0f, ir * 2, ir * 2)
-                .toNearestInt(),
-            juce::Justification::centred, false);
-        // small ring text
-        g.setColour (juce::Colour (0xFFB0B0B6).withAlpha (0.55f));
-        g.setFont (LnF::sectionFont (5.5f));
-        g.drawText ("SOUNDBOYS",
-            juce::Rectangle<float> (bx - br + 1.0f, by + br + br * 0.3f, (br - 1) * 2, 7.0f)
-                .toNearestInt(),
-            juce::Justification::centred, false);
-        // tiny highlight glint on bezel
-        g.setColour (juce::Colours::white.withAlpha (0.55f));
-        g.fillEllipse (bx - br * 0.4f, by + br * 0.05f, br * 0.4f, br * 0.18f);
-
-        // Version-text till höger om medaljongen — silver silkscreen, alltid synlig
+        const float vx = (float)(kTeakW + 14) + titleTextW + 20.0f;
         g.setColour (juce::Colour (0xFFD8D8E0));
         g.setFont (LnF::monoFont (11.0f));
         g.drawText ("v" + juce::String (JucePlugin_VersionString),
-            juce::Rectangle<float> (bx + br + 8.0f, by, 70.0f, br * 2)
-                .toNearestInt(),
+            juce::Rectangle<float> (vx, 6.0f, 70.0f, 26.0f).toNearestInt(),
             juce::Justification::centredLeft, false);
     }
 
@@ -1064,9 +1057,10 @@ void NativeEditor::resized()
     const auto bounds = getLocalBounds();
     auto inner = bounds.withTrimmedLeft (kTeakW).withTrimmedRight (kTeakW);
 
-    // ===== Top deck zone: reel deck + analog VU pair + spectrum strip =====
+    // ===== Top deck zone (v60.5 — Christoffer-feedback layout) =====
+    // Från vänster: L-in VU | R-in VU | REELS (mitten) | L-out VU | R-out VU
+    // Smala Kyuritsu-typ VU-mätare (60×120 px) — höga, smala, illuminerade.
     auto deckZone = inner.withHeight (kAluH).withTrimmedTop (20).reduced (4, 1);
-    reelDeck.setBounds (deckZone);
 
     // Spectrum strip — thin glowing band at the bottom of the deck zone,
     // spans full inner width, just above the chrome divider line.
@@ -1075,23 +1069,33 @@ void NativeEditor::resized()
         spectrum.setBounds (kTeakW + 4, kAluH - strH - 1, kInnerW - 8, strH);
     }
 
-    // 3 analog VU meters in a single horizontal row, with engraved headers
-    // above (LEFT / RIGHT / OUTPUT) and counter below.
+    // 4 slim Kyuritsu VUs + reels i mitten.
     {
-        const int reelDiam = juce::jmin (deckZone.getHeight() - 6,
-                                          (int) (deckZone.getWidth() * 0.36f));
-        const int gapL = deckZone.getX() + reelDiam + 8;
-        const int gapR = deckZone.getRight() - reelDiam - 8;
-        const int gapW = juce::jmax (300, gapR - gapL);
-
-        const int meterW = (gapW - 24) / 3;
-        // Reserve 12 px above for engraved header and 14 px below for counter.
-        const int meterH = juce::jmin (deckZone.getHeight() - 28, 96);
+        const int meterW = 60;
+        const int meterH = juce::jmin (deckZone.getHeight() - 28, 120);
         const int meterY = deckZone.getY() + 13;
+        const int gap    = 12;
+        const int reelW  = 320;
+        const int reelGap = 20;
 
-        vuInL.setBounds (gapL,                       meterY, meterW, meterH);
-        vuInR.setBounds (gapL +  meterW + 12,        meterY, meterW, meterH);
-        vuOut.setBounds (gapL + (meterW + 12) * 2,   meterY, meterW, meterH);
+        const int centreX = deckZone.getCentreX();
+        const int reelsX  = centreX - reelW / 2;
+        const int reelsRight = reelsX + reelW;
+
+        // Inputs vänster om reels (R-in närmast, L-in ytterst vänster)
+        const int rInX = reelsX - reelGap - meterW;
+        const int lInX = rInX - gap - meterW;
+        // Outputs höger om reels (L-out närmast, R-out ytterst höger)
+        const int lOutX = reelsRight + reelGap;
+        const int rOutX = lOutX + meterW + gap;
+
+        vuInL.setBounds  (lInX,  meterY, meterW, meterH);
+        vuInR.setBounds  (rInX,  meterY, meterW, meterH);
+        vuOutL.setBounds (lOutX, meterY, meterW, meterH);
+        vuOutR.setBounds (rOutX, meterY, meterW, meterH);
+
+        // Reels i centrum (mellan input- och output-VU)
+        reelDeck.setBounds (reelsX, deckZone.getY(), reelW, deckZone.getHeight());
     }
 
     // ===== Black panel zone =====
@@ -1148,18 +1152,37 @@ void NativeEditor::resized()
         auto togRow1 = leftCol.removeFromBottom (tRowH);
         leftCol.removeFromBottom (6);
 
-        // ---- 5 combo boxes at top, expanded to fill remaining space ----
+        // ---- 6 combo-rader (varav sista delas BIAS|TRACK), fyller leftCol-top.
+        // v60.5.1 — Christoffer-feedback: vi gick från 5 → 7 combos i v60.3
+        // (lade till BIAS + TRACK) men leftCol-höjden räcker bara för 5–6.
+        // Lösning: stacka BIAS|TRACK på samma rad (delat horisontellt).
+        // Båda är 2-val NORMAL/HIGH och 1/4/(1/2) — korta nog.
+        // Per-combo total = 8+16+1 = 25 px.  6 rader = 150 px — ryms i ~159 px.
         auto layoutCombo = [&] (juce::ComboBox& c, juce::Label& l)
         {
-            l.setBounds (leftCol.removeFromTop (10));
-            c.setBounds (leftCol.removeFromTop (20).reduced (0, 1));
-            leftCol.removeFromTop (2);
+            l.setBounds (leftCol.removeFromTop (8));
+            c.setBounds (leftCol.removeFromTop (16).reduced (0, 1));
+            leftCol.removeFromTop (1);
         };
-        layoutCombo (cb_speed,   lbl_speed);
-        layoutCombo (cb_monitor, lbl_monitor);
-        layoutCombo (cb_phono,   lbl_phono);
-        layoutCombo (cb_radio,   lbl_radio);
-        layoutCombo (cb_formula, lbl_formula);
+        auto layoutComboPair = [&] (juce::ComboBox& cA, juce::Label& lA,
+                                     juce::ComboBox& cB, juce::Label& lB)
+        {
+            auto labelRow = leftCol.removeFromTop (8);
+            auto comboRow = leftCol.removeFromTop (16).reduced (0, 1);
+            leftCol.removeFromTop (1);
+            const int halfL = labelRow.getWidth() / 2;
+            const int halfC = comboRow.getWidth() / 2;
+            lA.setBounds (labelRow.removeFromLeft (halfL));
+            lB.setBounds (labelRow);
+            cA.setBounds (comboRow.removeFromLeft (halfC).reduced (1, 0));
+            cB.setBounds (comboRow.reduced (1, 0));
+        };
+        layoutCombo (cb_speed,      lbl_speed);
+        layoutCombo (cb_monitor,    lbl_monitor);
+        layoutCombo (cb_phono,      lbl_phono);
+        layoutCombo (cb_radio,      lbl_radio);
+        layoutCombo (cb_formula,    lbl_formula);
+        layoutComboPair (cb_biasType, lbl_biasType, cb_trackWidth, lbl_trackWidth);  // v60.3
 
         // ---- Lay out toggle rows ----
         const int tW = togRow1.getWidth() / 4;
@@ -1250,9 +1273,25 @@ void NativeEditor::timerCallback()
     auto& chain = audioProc.getChain();
     vuInL.setLevel (chain.inputLevelL_dBFS.load());
     vuInR.setLevel (chain.inputLevelR_dBFS.load());
-    // OUT meter: max of L/R post-processing (most useful for clip-detection)
-    vuOut.setLevel (juce::jmax (chain.meterLevelL_dBFS.load(),
-                                 chain.meterLevelR_dBFS.load()));
+    // v60.5 — separate L/R output VUs (var en kombinerad vuOut)
+    vuOutL.setLevel (chain.meterLevelL_dBFS.load());
+    vuOutR.setLevel (chain.meterLevelR_dBFS.load());
+
+    // v60.4 — manualens "VITT SKEN: PÅSLAGEN. RÖTT SKEN: INSPELNING".
+    // VU-backlight skiftar amber → röd när chain.isRecordingL/R är true.
+    const bool recL = chain.isRecordingL.load();
+    const bool recR = chain.isRecordingR.load();
+    vuInL.setRecording (recL);
+    vuInR.setRecording (recR);
+    vuOutL.setRecording (recL);
+    vuOutR.setRecording (recR);
+
+    // v60.3 — Peak-overload-LED från SignalChain.peakOverloadL/R.
+    // DSP-side sätter flaggan när peak > −3 dBFS i ett block.  Här konsumerar
+    // vi (load + atomically clear) och triggar LED-state med 500 ms decay.
+    if (chain.peakOverloadL.exchange (false, std::memory_order_acq_rel)) vuInL.triggerPeakLed();
+    if (chain.peakOverloadR.exchange (false, std::memory_order_acq_rel)) vuInR.triggerPeakLed();
+    vuInL.tickPeakLed();  vuInR.tickPeakLed();
 
     // Reel spin when any input gain > threshold OR active output signal
     const float inputAny = audioProc.apvts.getRawParameterValue ("mic_gain")->load()

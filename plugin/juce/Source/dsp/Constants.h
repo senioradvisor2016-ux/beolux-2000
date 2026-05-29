@@ -34,7 +34,13 @@ namespace bc2000dl::dsp
     // Knappt audibelt mismatch men tillräckligt för stereo-asymmetri-character.
     constexpr double kAsymmetryPNP = +0.005;
     constexpr double kAsymmetryNPN = -0.005;
-    constexpr double kAsymmetryGain = 1.0;
+    // kAsymmetryGain höjd från 1.0 → 3.0 (v60.2):  user-kontrollerad
+    // stereoAsymmetry (range 0..0.05) hade tidigare ΔRMS < 0.002 vid max →
+    // upplevdes som "död kontroll".  Med gain 3.0 ger max-settingen tydlig
+    // L/R 2nd-harmonic-mismatch (autentisk 1968-hardware-tolerance), medan
+    // baseline (0.005 × 3 = 0.015) håller h2-cascade < 1.5 % — fortfarande
+    // inom §4 THD-spec.
+    constexpr double kAsymmetryGain = 3.0;
 
     // ---------- Tape-hastigheter ----------
     enum class TapeSpeed
