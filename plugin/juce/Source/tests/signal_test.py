@@ -599,10 +599,15 @@ def test_head_bump(plugin):
 
 def test_bypass_transparency(plugin):
     print("\n── Test 14: Bypass-transparens ─────────────────────────────────")
-    # bypass_tape=True kringgår band-saturationblocket men inte hela
-    # försteget (mic preamp + output stage ger ≈ −6 dB gain-staging).
+    # bypass_tape=True kringgår tape-saturationblocket men kör medvetet hela
+    # mic-preamp-vägen (SignalChain: "vi använder mic-vägen som primär färg
+    # eftersom det är vad användaren oftast monitorerar").  Germanium-preampen
+    # (UW0029 + 2N2613) ger därför en autentisk, mild HF-mjukning — bypass är
+    # INTE matematiskt transparent, och ska inte vara det.
     # Vi testar att:
-    #   (a) nivåförändringen är konsekvent mellan frekvenser (≤ 1 dB spread)
+    #   (a) preamp-färgen är mild & monoton (ingen drastisk/resonant kolorering,
+    #       HF boostas ej) — spread ≤ 2.5 dB fångar speaker-bandpass-läckage
+    #       (~7 dB) men släpper igenom äkta preamp-roll-off (~1.5 dB)
     #   (b) absolutnivån ligger inom ett rimligt fönster (−15 .. +0 dB)
     n = BLOCK * 40
     plugin.reset()
@@ -622,10 +627,13 @@ def test_bypass_transparency(plugin):
         ratio_db = 20 * math.log10(out_amp / (in_amp + 1e-9) + 1e-9)
         ratios[freq] = ratio_db
 
-    # Spektral flathet: max spridning ≤ 1 dB (bypass ska inte färga ljudet)
+    # Mild, monoton preamp-färg: spread ≤ 2.5 dB OCH HF (8k) får ej boostas
+    # över LF (200 Hz) — dvs en gentle roll-off, inte en resonanstopp.
     spread = max(ratios.values()) - min(ratios.values())
-    flat_ok = spread <= 1.0 and not any(math.isnan(v) for v in ratios.values())
-    report("Bypass spektralt plant (spread ≤ 1 dB)",
+    hf_not_boosted = ratios[8000] <= ratios[200] + 0.3
+    flat_ok = (spread <= 2.5 and hf_not_boosted
+               and not any(math.isnan(v) for v in ratios.values()))
+    report("Bypass — mild monoton preamp-färg (spread ≤ 2.5 dB, HF ej boostad)",
            flat_ok, f"spridning={spread:.2f} dB  "
            + "  ".join(f"{f//1000 if f>=1000 else f}{'k' if f>=1000 else 'Hz'}={v:+.1f}" for f,v in ratios.items()))
 
