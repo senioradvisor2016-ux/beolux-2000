@@ -239,7 +239,11 @@ namespace bc2000dl::dsp
         //   fader 1.0 (max):     mic +7.6 dB, phono +10.5 dB   (hardware-ish)
         // Phono klär sig själv via RIAA-shelf (+6 dB på bas), så +10.5 dB
         // är realistiskt drive — inte clipping i normal program-material.
-        constexpr float kInputPad = 1.2f;
+        // v61.1 — sänkt 1.2 → 0.85 (−3 dB).  v60.x-omkalibreringen drev tape-
+        // steget för hett: THD @ −3 dBFS spräckte 3 %-spec:en (≈4.5 %) och
+        // utgången gick över 0 dBFS vid het input.  −3 dB drar referensnivå-THD
+        // under spec + ger utgångstak utan att tappa tape-karaktär vid 0 dBFS.
+        constexpr float kInputPad = 0.85f;
 
         // Bypass-tape eller Monitor=Source: hoppa över tape-blocket men kör input-preamp
         // (manual #22 "medhør"; manual #23 bypass-läge). I detta läge använder vi mic-vägen
