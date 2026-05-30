@@ -27,18 +27,25 @@ namespace bc2000dl::dsp
                                 asymOffset, baseSeed + 170);
         ch.radioN2613.prepare (sr, 2.0, asymOffset, baseSeed + 171);
 
-        // Per-källa-tonsignatur — gör Mic/Phono/Radio audibelt olika.
-        // (Mic lämnas NEUTRAL — spec mäts via mic-vägen.)
-        // Phono: bas-lyft + dämpad diskant → varm/fyllig vinyl-karaktär.
+        // Per-källa-tonsignatur — gör Mic/Phono/Radio TYDLIGT audibelt olika.
+        // (Mic lämnas NEUTRAL — full-range referens; spec mäts via mic-vägen.)
+        // Skillnaderna måste överleva tape-steget + ev. inblandad mic, så de är
+        // medvetet kraftiga (≈±6 dB) → phono och radio hamnar ~20 dB isär i
+        // ton-tilt och blir omisskännligt olika.
+        //
+        // Phono: rejält bas-lyft + tydligt dämpad diskant → varm/mörk vinyl.
         ch.phonoToneLf.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (
-            sr, 180.0f, 0.70f, juce::Decibels::decibelsToGain (+3.0f));
+            sr, 220.0f, 0.70f, juce::Decibels::decibelsToGain (+5.0f));
         ch.phonoToneHf.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (
-            sr, 3500.0f, 0.70f, juce::Decibels::decibelsToGain (-3.5f));
-        // Radio: HF-boost + tunnare bas → ljus, ren line-nivå.
-        ch.radioToneHf.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (
-            sr, 4000.0f, 0.70f, juce::Decibels::decibelsToGain (+4.0f));
-        ch.radioToneLf.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (
-            sr, 200.0f, 0.70f, juce::Decibels::decibelsToGain (-3.0f));
+            sr, 3000.0f, 0.70f, juce::Decibels::decibelsToGain (-6.0f));
+        // Radio: BANDBEGRÄNSAD "FM-tuner" — högpass + lågpass skär bort djupbas
+        // och luft → mittenfokuserad, "boxig" radiokaraktär. Bandbegränsning är
+        // irreversibel (tape kan inte lägga tillbaka borttaget innehåll), så
+        // skillnaden överlever tape-steget OCH när radion mixas med mic.
+        ch.radioToneLf.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass (
+            sr, 170.0f, 0.707f);                       // skär djupbas
+        ch.radioToneHf.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowPass (
+            sr, 6500.0f, 0.707f);                      // skär luft/diskant
         ch.phonoToneHf.reset(); ch.phonoToneLf.reset();
         ch.radioToneHf.reset(); ch.radioToneLf.reset();
 
@@ -457,17 +464,27 @@ namespace bc2000dl::dsp
         if (numCh >= 2)
             processChannelChain (R, echoR, buffer, 1);
 
-        // ----- B. Sound-on-Sound (manualens S-on-S): PLAY L → REC R -----
-        // Korsmix EFTER per-kanal-pipeline: höger output får tillagt en del av
-        // vänster. SMOOTHAD on/off (15 ms) — annars hoppar nivån/panoreringen
-        // direkt när knappen trycks in → klick + plötslig högerförskjutning.
+        // ----- B. Sound-on-Sound (manualens S-on-S: bouncing/lagring) -----
+        // Tidigare la vi BARA in vänster i höger (r += l*a). Det gjorde signalen
+        // lopsided: höger blev högre + bildens tyngdpunkt drogs åt höger, och en
+        // mono-källa fick +3 dB bara i R → lät trasigt ("knas"). S-on-S ska låta
+        // som tätare/lagrat material, inte panorerat fel.
+        // Nu: SYMMETRISK korsmix (båda kanalerna får en del av den andra) som
+        // mjukt fäller ihop mot mono — med makeup-gain så NIVÅN inte hoppar.
+        // SMOOTHAD on/off (15 ms) → inga klick. Balanserad bild, tätare ljud.
         if (numCh >= 2 && (params.soundOnSound || sosSmooth.isSmoothing()))
         {
             const int n = buffer.getNumSamples();
             auto* l = buffer.getWritePointer (0);
             auto* r = buffer.getWritePointer (1);
             for (int i = 0; i < n; ++i)
-                r[i] += l[i] * sosSmooth.getNextValue();
+            {
+                const float a  = sosSmooth.getNextValue();      // 0..0.4
+                const float mk = 1.0f / (1.0f + a);             // makeup → konstant nivå
+                const float l0 = l[i], r0 = r[i];
+                l[i] = (l0 + a * r0) * mk;
+                r[i] = (r0 + a * l0) * mk;
+            }
         }
         else
         {

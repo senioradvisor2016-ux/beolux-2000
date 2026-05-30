@@ -791,6 +791,86 @@ def test_headroom(plugin):
 
 
 # ══════════════════════════════════════════════════════════════════
+# TEST: Källval Mic / Phono / Radio ska låta TYDLIGT olika
+#   (regression — Christoffer hörde ingen skillnad; differentieringen
+#    drunknade i tape-steget. Isolerat ska källorna ha klart skild
+#    tonbalans: Phono varm/basig, Radio bandbegränsad, Mic neutral.)
+# ══════════════════════════════════════════════════════════════════
+
+def _band_db(sig, lo, hi, sr=SR_DEFAULT):
+    m = sig.mean(axis=1) if sig.ndim > 1 else sig
+    f = np.abs(np.fft.rfft(m * np.hanning(len(m))))
+    fr = np.fft.rfftfreq(len(m), 1 / sr)
+    sel = (fr >= lo) & (fr < hi)
+    return 20 * np.log10(np.sqrt(np.mean(f[sel] ** 2)) + 1e-12)
+
+
+def test_source_differentiation(plugin):
+    rng = np.random.default_rng(7)
+    noise = (rng.standard_normal((SR_DEFAULT, 2)) * 0.15).astype(np.float32)
+
+    def render(src):
+        default_params(plugin)
+        for g in ("mic_gain", "mic_gain_r", "phono_gain", "phono_gain_r",
+                  "radio_gain", "radio_gain_r"):
+            setattr(plugin, g, 0.0)
+        setattr(plugin, src + "_gain", 1.0)
+        setattr(plugin, src + "_gain_r", 1.0)
+        out = plugin(noise, sample_rate=SR_DEFAULT, buffer_size=BLOCK, reset=True)
+        return _band_db(out, 20, 300), _band_db(out, 300, 3000), _band_db(out, 3000, 18000)
+
+    mic   = render("mic")
+    phono = render("phono")
+    radio = render("radio")
+    # Ton-tilt (hög − låg) är NIVÅ-oberoende. Tape-steget tippar allt nedåt, så
+    # vi jämför källornas tilt RELATIVT varandra (ej mot absolut "neutral").
+    mic_tilt   = mic[2]   - mic[0]
+    phono_tilt = phono[2] - phono[0]
+    radio_tilt = radio[2] - radio[0]
+
+    # Phono mycket basigare än Radio (varm vinyl vs bandbegränsad tuner)
+    bass_gap = phono[0] - radio[0]
+    report("Phono basigare än Radio (>4 dB)", bass_gap > 4.0, f"{bass_gap:+.1f} dB")
+    # Radio TYDLIGT ljusare tilt än Phono (>3 dB) → omisskännligt olika
+    report("Radio ljusare än Phono (tilt >3 dB)", (radio_tilt - phono_tilt) > 3.0,
+           f"{radio_tilt - phono_tilt:+.1f} dB")
+    # Radio bandbegränsad: både bas OCH diskant under Mic
+    report("Radio bandbegränsad vs Mic",
+           radio[0] < mic[0] - 2.0 and radio[2] < mic[2] - 1.0,
+           f"låg {radio[0]-mic[0]:+.1f}  hög {radio[2]-mic[2]:+.1f}")
+    # Mic ligger MITTEMELLAN (neutral referens mellan mörk phono och ljus radio)
+    report("Mic-tilt mellan Phono och Radio",
+           phono_tilt < mic_tilt < radio_tilt,
+           f"phono {phono_tilt:+.1f} < mic {mic_tilt:+.1f} < radio {radio_tilt:+.1f}")
+
+
+# ══════════════════════════════════════════════════════════════════
+# TEST: Sound-on-Sound balanserad (ej lopsided/blowup)
+# ══════════════════════════════════════════════════════════════════
+
+def test_sound_on_sound(plugin):
+    rng = np.random.default_rng(3)
+    # asymmetrisk stereo (L >> R) → avslöjar lopsided beteende
+    x = np.stack([rng.standard_normal(SR_DEFAULT) * 0.2,
+                  rng.standard_normal(SR_DEFAULT) * 0.05], axis=1).astype(np.float32)
+
+    def run(sos):
+        default_params(plugin)
+        plugin.sound_on_sound = bool(sos)
+        o = plugin(x, sample_rate=SR_DEFAULT, buffer_size=BLOCK, reset=True)
+        l = np.sqrt(np.mean(o[:, 0] ** 2)); r = np.sqrt(np.mean(o[:, 1] ** 2))
+        return 20 * np.log10(l / (r + 1e-12)), float(np.max(np.abs(o)))
+
+    bal_off, _      = run(0)
+    bal_on, peak_on = run(1)
+    # SoS ska BALANSERA bilden (mot mono), inte förvärra obalansen
+    report("SoS balanserar L/R (mer mot mono)", bal_on < bal_off - 1.0,
+           f"{bal_off:+.1f} → {bal_on:+.1f} dB")
+    # ingen peak-blowup
+    report("SoS ingen peak-blowup (< 2.0)", peak_on < 2.0, f"peak {peak_on:.3f}")
+
+
+# ══════════════════════════════════════════════════════════════════
 # HUVUD
 # ══════════════════════════════════════════════════════════════════
 
@@ -818,6 +898,8 @@ if __name__ == "__main__":
     test_preset_transitions(plugin)
     test_stereo_isolation(plugin)
     test_headroom(plugin)
+    test_source_differentiation(plugin)
+    test_sound_on_sound(plugin)
 
     print("\n" + "═" * 66)
     print(f"  RESULTAT:  {gPass} godkända   {gFail} underkända")
