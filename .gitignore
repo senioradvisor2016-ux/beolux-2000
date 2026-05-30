@@ -1,7 +1,7 @@
 .DS_Store
 
 # Build artefacts (JUCE/CMake output trees)
-plugin/juce/build/
+plugin/juce/build*/
 plugin/juce/build_old_*/
 plugin/juce/build-universal/
 

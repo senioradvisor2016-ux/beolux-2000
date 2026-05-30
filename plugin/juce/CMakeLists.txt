@@ -406,3 +406,20 @@ if(EXISTS "/Applications/pluginval.app/Contents/MacOS/pluginval")
              COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/validate.sh --strict 10)
     set_tests_properties(Pluginval_strict10 PROPERTIES LABELS "integration")
 endif()
+
+# ─────────────────────────────────────────────────────────────────
+#  AddressSanitizer + UBSan för DSP-testmålen (separat build)
+#    cmake -S plugin/juce -B build-asan -DBC2000DL_SANITIZE=ON \
+#          -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_BUILD_TYPE=Debug
+#    cmake --build build-asan --target BC2000DL_Catch2 BC2000DL_GTest
+#    ./build-asan/.../BC2000DL_Catch2   # ASan rapporterar minnesfel/UB
+# ─────────────────────────────────────────────────────────────────
+option(BC2000DL_SANITIZE "Bygg DSP-testmålen med ASan + UBSan" OFF)
+if(BC2000DL_SANITIZE)
+    set(BC2000DL_SAN -fsanitize=address,undefined -fno-omit-frame-pointer)
+    foreach(t BC2000DL_Catch2 BC2000DL_GTest BC2000DL_Tests BC2000DL_BugFixTests BC2000DL_AudibilityTest)
+        target_compile_options(${t} PRIVATE ${BC2000DL_SAN})
+        target_link_options   (${t} PRIVATE ${BC2000DL_SAN})
+    endforeach()
+    message(STATUS "BC2000DL: sanitizers PÅ (ASan+UBSan) för DSP-testmålen")
+endif()
