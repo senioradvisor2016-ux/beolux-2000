@@ -65,6 +65,8 @@ namespace bc2000dl::dsp
         echoL.prepare (sr);
         echoR.prepare (sr);
         balanceMaster.prepare (sr, blockSize);
+        sosSmooth.reset (sr, 0.015);   // 15 ms on/off-ramp för Sound-on-Sound
+        sosSmooth.setCurrentAndTargetValue (0.0f);
 
         // Initial speed-config
         L.recEq.setSpeed (params.speed);  R.recEq.setSpeed (params.speed);
@@ -153,6 +155,8 @@ namespace bc2000dl::dsp
             echoL.setCrossFeedSource (nullptr);
             echoR.setCrossFeedSource (nullptr);
         }
+        // S-on-S korsmix-nivå (smoothad i process() → ingen klick vid toggle)
+        sosSmooth.setTargetValue (p.soundOnSound ? 0.4f : 0.0f);
 
         L.tone.setBassDb (p.bassDb);     R.tone.setBassDb (p.bassDb);
         L.tone.setTrebleDb (p.trebleDb); R.tone.setTrebleDb (p.trebleDb);
@@ -424,17 +428,20 @@ namespace bc2000dl::dsp
             processChannelChain (R, echoR, buffer, 1);
 
         // ----- B. Sound-on-Sound (manualens S-on-S): PLAY L → REC R -----
-        // Implementeras som korsmix EFTER per-kanal-pipeline: höger output får
-        // tillagt en del av vänster output. Pluginen approximerar detta som
-        // post-mix-routing (riktig hårdvara gör det innan tape-record).
-        if (params.soundOnSound && numCh >= 2)
+        // Korsmix EFTER per-kanal-pipeline: höger output får tillagt en del av
+        // vänster. SMOOTHAD on/off (15 ms) — annars hoppar nivån/panoreringen
+        // direkt när knappen trycks in → klick + plötslig högerförskjutning.
+        if (numCh >= 2 && (params.soundOnSound || sosSmooth.isSmoothing()))
         {
             const int n = buffer.getNumSamples();
             auto* l = buffer.getWritePointer (0);
             auto* r = buffer.getWritePointer (1);
-            constexpr float sosAmount = 0.4f;
             for (int i = 0; i < n; ++i)
-                r[i] += l[i] * sosAmount;
+                r[i] += l[i] * sosSmooth.getNextValue();
+        }
+        else
+        {
+            sosSmooth.skip (buffer.getNumSamples());
         }
 
         // ----- C. Monitor track-routing (manual knap 19/20) -----

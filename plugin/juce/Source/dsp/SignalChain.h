@@ -153,6 +153,7 @@ namespace bc2000dl::dsp
         Parameters params;
         TapeSpeed lastSpeed { TapeSpeed::Speed19 };
         double mainsHumPhase { 0.0 };   // ackumulator för MAINS HUM-injektion
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> sosSmooth;  // S-on-S on/off-ramp
 
         struct ChannelChain
         {
