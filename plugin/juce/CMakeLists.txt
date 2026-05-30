@@ -404,6 +404,21 @@ target_link_libraries(BC2000DL_UIRenderTest PRIVATE
     melatonin_blur melatonin_inspector
     juce::juce_recommended_config_flags)
 
+# --- Headless host-render (laddar den BYGGDA .vst3 via JUCE:s VST3-värd) ---
+#   Loggiskt en "riktig DAW"-test: scannar + instansierar binären på format-nivå
+#   (samma host-lager som pluginval) och renderar en ton genom pluggen.
+juce_add_console_app(BC2000DL_HostRenderTest PRODUCT_NAME "BC2000DL_HostRenderTest")
+target_sources(BC2000DL_HostRenderTest PRIVATE Source/tests/HostRenderTest.cpp)
+target_include_directories(BC2000DL_HostRenderTest PRIVATE Source)
+target_compile_definitions(BC2000DL_HostRenderTest PRIVATE
+    JUCE_PLUGINHOST_VST3=1 JUCE_PLUGINHOST_AU=0
+    JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_DISPLAY_SPLASH_SCREEN=0)
+target_link_libraries(BC2000DL_HostRenderTest PRIVATE
+    juce::juce_audio_utils juce::juce_audio_processors
+    juce::juce_audio_basics juce::juce_dsp juce::juce_gui_basics
+    juce::juce_events juce::juce_core
+    juce::juce_recommended_config_flags)
+
 # ─────────────────────────────────────────────────────────────────
 #  ctest — ett mål som samlar ALLA testsviter (CI-redo)
 #    Allt:          ctest --test-dir build --output-on-failure
@@ -445,6 +460,10 @@ if(EXISTS "/Applications/pluginval.app/Contents/MacOS/pluginval")
              COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/validate.sh --strict 10)
     set_tests_properties(Pluginval_strict10 PROPERTIES LABELS "integration")
 endif()
+
+# Headless host-render via JUCE:s VST3-värd (kräver installerad VST3)
+add_test(NAME HostRender COMMAND BC2000DL_HostRenderTest)
+set_tests_properties(HostRender PROPERTIES LABELS "integration")
 
 # ─────────────────────────────────────────────────────────────────
 #  AddressSanitizer + UBSan för DSP-testmålen (separat build)
