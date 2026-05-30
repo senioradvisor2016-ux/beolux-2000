@@ -236,9 +236,12 @@ namespace bc2000dl::ui
         melatonin::DropShadow  manoverspakShadow  { juce::Colours::black.withAlpha (0.55f),  4, { 0,  2 } };
         melatonin::DropShadow  bAndOPlaqueShadow  { juce::Colours::black.withAlpha (0.50f),  5, { 0,  2 } };
 
-        // ===== melatonin_inspector — Cmd+Shift+I togglar Chrome DevTools-style overlay =====
-        // Inte gated på JUCE_DEBUG → fungerar i Release-build också under UX-iterering.
+        // ===== melatonin_inspector — Chrome DevTools-style overlay =====
+        // ENDAST debug-build. Gated på JUCE_DEBUG → kompileras INTE in i release,
+        // så den följer aldrig med pluginen till slutanvändare.
+       #if JUCE_DEBUG
         melatonin::Inspector inspector { *this };
+       #endif
 
         // ===== APVTS attachments =====
         using SAtt = juce::AudioProcessorValueTreeState::SliderAttachment;

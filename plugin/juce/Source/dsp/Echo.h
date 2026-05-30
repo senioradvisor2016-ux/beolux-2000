@@ -55,6 +55,7 @@ namespace bc2000dl::dsp
         float  amount     { 0.0f };
         float  delayMs    { 75.0f };
         int    delaySamples { 3600 };
+        float  delaySmoothed { 3600.0f };  // glider mot delaySamples (anti-knaster + pitch-glide)
         float  feedbackParam { -1.0f };  // <0 = auto (från amount); >=0 = explicit
 
         // Ring-buffer (max 350 ms)

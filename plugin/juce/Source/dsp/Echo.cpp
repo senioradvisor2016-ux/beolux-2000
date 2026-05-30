@@ -25,6 +25,7 @@ namespace bc2000dl::dsp
         writeIdx = 0;
         hfLossFilter.reset();
         echoWowPhase = 0.0f;
+        delaySmoothed = static_cast<float> (delaySamples);  // ingen glide vid reset
     }
 
     void Echo::setSpeed (TapeSpeed speed)
@@ -94,8 +95,13 @@ namespace bc2000dl::dsp
         if (echoWowPhase >= juce::MathConstants<float>::twoPi)
             echoWowPhase -= juce::MathConstants<float>::twoPi;
 
+        // Glid delay-längden mjukt mot målet — annars hoppar läspekaren när
+        // TIME-knoben vrids → knaster/klick. Mjuk ramp (~30 ms) ger istället en
+        // autentisk tape-pitch-glide. ~0.0007 ≈ 1-pol @ 48 kHz.
+        delaySmoothed += (static_cast<float> (delaySamples) - delaySmoothed) * 0.0007f;
+
         const float wowOffset  = echoWowDepth * std::sin (echoWowPhase);
-        const float fracDelay  = static_cast<float> (delaySamples) + wowOffset;
+        const float fracDelay  = delaySmoothed + wowOffset;
         const int   delayInt   = static_cast<int> (std::floor (fracDelay));
         const float delayFrac  = fracDelay - static_cast<float> (delayInt);
 
