@@ -48,16 +48,19 @@ namespace bc2000dl::dsp
         void reset();
 
         void setBalance (float bal);  // -1=L, 0=mid, +1=R
-        void setMaster  (float m);    // 0..1 linear amplitude
+        void setMaster  (float m);    // 0..1 linear amplitude (vänster master)
+        void setMasterR (float m);    // 0..1 linear amplitude (höger — oberoende L/R)
 
         void processStereo (juce::AudioBuffer<float>& buffer);
 
     private:
         float balance { 0.0f };
-        float master  { 0.75f };
+        float master  { 0.75f };   // vänster
+        float masterR { 0.75f };   // höger (oberoende skydepotentiometer)
 
         // 10 ms smoothing — removes clicks from automation at typical block sizes
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> masterSmooth;
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> masterRSmooth;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> balanceSmooth;
     };
 

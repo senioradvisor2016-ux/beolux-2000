@@ -26,6 +26,7 @@ namespace
     constexpr auto kP_TrebleDb      = "treble_db";
     constexpr auto kP_Balance       = "balance";
     constexpr auto kP_Master        = "master_volume";
+    constexpr auto kP_MasterR       = "master_volume_r";   // oberoende höger master
     constexpr auto kP_BiasAmount    = "bias_amount";
     constexpr auto kP_SatDrive      = "saturation_drive";
     constexpr auto kP_WowFlutter    = "wow_flutter";
@@ -118,7 +119,10 @@ BC2000DLProcessor::createParameterLayout()
         juce::ParameterID { kP_Balance, 1 }, "Balance",
         juce::NormalisableRange<float> { -1.0f, 1.0f, 0.01f }, 0.0f));
     layout.add (std::make_unique<P> (
-        juce::ParameterID { kP_Master, 1 }, "Master Volume",
+        juce::ParameterID { kP_Master, 1 }, "Master Volume L",
+        juce::NormalisableRange<float> { 0.0f, 1.0f }, 0.85f));
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_MasterR, 1 }, "Master Volume R",
         juce::NormalisableRange<float> { 0.0f, 1.0f }, 0.85f));
 
     // Tape parameters
@@ -304,6 +308,7 @@ void BC2000DLProcessor::updateChainParameters()
     p.trebleDb         = getF (kP_TrebleDb);
     p.balance          = getF (kP_Balance);
     p.masterVolume     = getF (kP_Master);
+    p.masterVolumeR    = getF (kP_MasterR);
     p.biasAmount       = getF (kP_BiasAmount);
     p.saturationDrive  = getF (kP_SatDrive);
     p.saturationDriveR = getF (kP_SatDriveR);
@@ -357,8 +362,9 @@ void BC2000DLProcessor::updateChainParameters()
         || (getF (kP_SpeakerExt) < 0.5f && getF (kP_SpeakerInt) < 0.5f
             && getF (kP_SpeakerMute) < 0.5f && p.speakerMonitor))
     {
-        // Pause/mute → master_volume * 0
-        p.masterVolume = 0.0f;
+        // Pause/mute → master_volume * 0 (båda kanaler)
+        p.masterVolume  = 0.0f;
+        p.masterVolumeR = 0.0f;
     }
 
     chain.setParameters (p);

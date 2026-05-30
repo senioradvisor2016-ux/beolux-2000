@@ -71,14 +71,17 @@ namespace bc2000dl::dsp
     {
         constexpr double kSmoothSecs = 0.010;   // 10 ms — removes zipper noise at all block sizes
         masterSmooth.reset  (sr, kSmoothSecs);
+        masterRSmooth.reset (sr, kSmoothSecs);
         balanceSmooth.reset (sr, kSmoothSecs);
         masterSmooth.setCurrentAndTargetValue  (master);
+        masterRSmooth.setCurrentAndTargetValue (masterR);
         balanceSmooth.setCurrentAndTargetValue (balance);
     }
 
     void BalanceMaster::reset()
     {
         masterSmooth.setCurrentAndTargetValue  (master);
+        masterRSmooth.setCurrentAndTargetValue (masterR);
         balanceSmooth.setCurrentAndTargetValue (balance);
     }
 
@@ -94,36 +97,44 @@ namespace bc2000dl::dsp
         masterSmooth.setTargetValue (master);
     }
 
+    void BalanceMaster::setMasterR (float m)
+    {
+        masterR = juce::jlimit (0.0f, 1.0f, m);
+        masterRSmooth.setTargetValue (masterR);
+    }
+
     void BalanceMaster::processStereo (juce::AudioBuffer<float>& buffer)
     {
         if (buffer.getNumChannels() < 2) return;
 
         const int n = buffer.getNumSamples();
 
-        if (masterSmooth.isSmoothing() || balanceSmooth.isSmoothing())
+        if (masterSmooth.isSmoothing() || masterRSmooth.isSmoothing() || balanceSmooth.isSmoothing())
         {
-            // Per-sample path: interpolate both controls during automation transitions.
+            // Per-sample path: interpolate all controls during automation transitions.
             // This prevents zipper noise on fades and balance sweeps.
             auto* l = buffer.getWritePointer (0);
             auto* r = buffer.getWritePointer (1);
             for (int i = 0; i < n; ++i)
             {
-                const float m = masterSmooth.getNextValue();
+                const float mL = masterSmooth.getNextValue();
+                const float mR = masterRSmooth.getNextValue();
                 const float ang = (balanceSmooth.getNextValue() + 1.0f)
                                   * juce::MathConstants<float>::pi * 0.25f;
-                l[i] *= std::cos (ang) * m;
-                r[i] *= std::sin (ang) * m;
+                l[i] *= std::cos (ang) * mL;
+                r[i] *= std::sin (ang) * mR;
             }
         }
         else
         {
             // Fast vectorised path: steady state (no automation change in flight).
             masterSmooth.skip  (n);
+            masterRSmooth.skip (n);
             balanceSmooth.skip (n);
 
             const float angle   = (balance + 1.0f) * juce::MathConstants<float>::pi * 0.25f;
             buffer.applyGain (0, 0, n, std::cos (angle) * master);
-            buffer.applyGain (1, 0, n, std::sin (angle) * master);
+            buffer.applyGain (1, 0, n, std::sin (angle) * masterR);
         }
     }
 }

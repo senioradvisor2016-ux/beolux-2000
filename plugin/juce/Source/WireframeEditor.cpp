@@ -1078,8 +1078,8 @@ namespace bc2000dl::ui
         setupFader (faderEchoL,   "echo_amount",    0.0);
         setupFader (faderEchoR,   "echo_amount_r",  0.0);
         // Master L+R båda till master_volume (synkroniseras via APVTS-broadcast)
-        setupFader (faderMasterL, "master_volume",  0.85);
-        setupFader (faderMasterR, "master_volume",  0.85);
+        setupFader (faderMasterL, "master_volume",   0.85);
+        setupFader (faderMasterR, "master_volume_r", 0.85);
 
         // Fader tooltips — descriptive hover info (popup display still shows live value)
         faderRadioL .setTooltip ("RADIO L (#13)\nLeft-channel gain for radio/tuner input.\nFeeds the 8904003 flat preamp (UW0029 + 2N2613).\nLog skew 0.55 — gentle 1968 curve.");
@@ -1090,8 +1090,8 @@ namespace bc2000dl::ui
         faderMicR   .setTooltip ("MIC R (#15 ◇)\nRight-channel gain for microphone input.");
         faderEchoL  .setTooltip ("ECHO L (#10a)\nLeft-channel send into tape-echo loop.\nDoubles as S-on-S cross-feed amount\nwhen Sound-on-Sound mode is engaged.");
         faderEchoR  .setTooltip ("ECHO R (#10a)\nRight-channel send into tape-echo loop.");
-        faderMasterL.setTooltip ("MASTER L (#12)\nGlobal output level — both faders bound\nto the same APVTS param (mirror-locked).\nManual: never silent (≥0.75 hard-floor).");
-        faderMasterR.setTooltip ("MASTER R (#12)\nGlobal output level — mirror of MASTER L.");
+        faderMasterL.setTooltip ("MASTER L (#12)\nOutput level — vänster kanal.\nOberoende av MASTER R (egen skydepotentiometer).\nBALANCE-knoben viktar därutöver L/R.");
+        faderMasterR.setTooltip ("MASTER R (#12)\nOutput level — höger kanal.\nOberoende av MASTER L.");
 
         // ===== 9 service-knobs + 2 selectors (authentic-restoration) =====
         setupKnob (knobBiasL,       "bias_amount",      1.0);

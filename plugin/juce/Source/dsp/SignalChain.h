@@ -49,7 +49,8 @@ namespace bc2000dl::dsp
             float bassDb            { 0.0f };
             float trebleDb          { 0.0f };
             float balance           { 0.0f };
-            float masterVolume      { 0.75f };
+            float masterVolume      { 0.75f };  // L
+            float masterVolumeR     { 0.75f };  // R (oberoende skydepotentiometer)
             float biasAmount        { 1.0f };
             float saturationDrive   { 1.0f };  // L
             float saturationDriveR  { 1.0f };

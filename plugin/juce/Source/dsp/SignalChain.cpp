@@ -196,7 +196,8 @@ namespace bc2000dl::dsp
         // Per-kanal-gain hanteras i processChannelChain.
         mixer.setGains (p.micGain, p.phonoGain, p.radioGain);
         balanceMaster.setBalance (p.balance);
-        balanceMaster.setMaster (p.masterVolume);
+        balanceMaster.setMaster  (p.masterVolume);
+        balanceMaster.setMasterR (p.masterVolumeR);
     }
 
     void SignalChain::processChannelChain (ChannelChain& ch, Echo& echo,
