@@ -469,15 +469,17 @@ void BC2000DLProcessor::setStateInformation (const void* data, int sizeInBytes)
 
             // JUCE 8: replaceState() updates the ValueTree synchronously but the
             // AudioParameter getValue() can remain stale (atomic not yet propagated).
-            // Read directly from the restored ValueTree children — that data is always
-            // current — and push to setValueNotifyingHost so DAWs/validators see the
-            // correct restored values immediately, including AudioParameterBool.
+            // Read direkt från ValueTree-barnen och push till setValueNotifyingHost.
+            // KRITISKT: child["value"] är det FAKTISKA (denormaliserade) värdet, men
+            // setValueNotifyingHost förväntar NORMALISERAT 0..1 → konvertera först.
+            // Utan convertTo0to1 korrumperades alla params med icke-0..1-range
+            // (bias, trims, mains_hum, echo_time, ton-dB …) vid varje session-laddning.
             for (auto child : apvts.state)
             {
                 if (child.hasType ("PARAM"))
                 {
                     if (auto* prm = apvts.getParameter (child["id"].toString()))
-                        prm->setValueNotifyingHost ((float) child["value"]);
+                        prm->setValueNotifyingHost (prm->convertTo0to1 ((float) child["value"]));
                 }
             }
         }

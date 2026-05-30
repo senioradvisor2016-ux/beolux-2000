@@ -356,6 +356,18 @@ target_link_libraries(BC2000DL_GTest PRIVATE
     juce::juce_dsp juce::juce_audio_basics juce::juce_core
     juce::juce_recommended_config_flags)
 
+# --- State round-trip (länkar mot plugin-SharedCode för riktiga processorn) ---
+juce_add_console_app(BC2000DL_StateTest PRODUCT_NAME "BC2000DL_StateTest")
+target_sources(BC2000DL_StateTest PRIVATE Source/tests/StateRoundTripTest.cpp)
+target_include_directories(BC2000DL_StateTest PRIVATE Source)
+target_link_libraries(BC2000DL_StateTest PRIVATE
+    BC2000DL                       # plugin-SharedCode: processor + editors (symboler)
+    BC2000DL_Assets
+    juce::juce_audio_utils juce::juce_audio_processors juce::juce_dsp
+    juce::juce_gui_basics juce::juce_gui_extra
+    melatonin_blur melatonin_inspector
+    juce::juce_recommended_config_flags)
+
 # ─────────────────────────────────────────────────────────────────
 #  ctest — ett mål som samlar ALLA testsviter (CI-redo)
 #    Allt:          ctest --test-dir build --output-on-failure
@@ -372,7 +384,8 @@ add_test(NAME GTest          COMMAND BC2000DL_GTest)
 add_test(NAME DspSmoke       COMMAND BC2000DL_Tests)
 add_test(NAME BugFixTests    COMMAND BC2000DL_BugFixTests)
 add_test(NAME AudibilityTest COMMAND BC2000DL_AudibilityTest)
-set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest
+add_test(NAME StateRoundTrip COMMAND BC2000DL_StateTest)
+set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest StateRoundTrip
                      PROPERTIES LABELS "unit")
 
 # Integrations-tester (kräver installerad VST3 + pedalboard / pluginval)
