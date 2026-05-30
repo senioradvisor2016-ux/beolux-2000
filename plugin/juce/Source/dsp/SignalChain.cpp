@@ -27,6 +27,21 @@ namespace bc2000dl::dsp
                                 asymOffset, baseSeed + 170);
         ch.radioN2613.prepare (sr, 2.0, asymOffset, baseSeed + 171);
 
+        // Per-källa-tonsignatur — gör Mic/Phono/Radio audibelt olika.
+        // (Mic lämnas NEUTRAL — spec mäts via mic-vägen.)
+        // Phono: bas-lyft + dämpad diskant → varm/fyllig vinyl-karaktär.
+        ch.phonoToneLf.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (
+            sr, 180.0f, 0.70f, juce::Decibels::decibelsToGain (+3.0f));
+        ch.phonoToneHf.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (
+            sr, 3500.0f, 0.70f, juce::Decibels::decibelsToGain (-3.5f));
+        // Radio: HF-boost + tunnare bas → ljus, ren line-nivå.
+        ch.radioToneHf.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (
+            sr, 4000.0f, 0.70f, juce::Decibels::decibelsToGain (+4.0f));
+        ch.radioToneLf.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowShelf (
+            sr, 200.0f, 0.70f, juce::Decibels::decibelsToGain (-3.0f));
+        ch.phonoToneHf.reset(); ch.phonoToneLf.reset();
+        ch.radioToneHf.reset(); ch.radioToneLf.reset();
+
         ch.recEq.prepare (sr);
         ch.ac126_1.prepare (sr, GeStageType::AC126, 0.0,
                              asymOffset, baseSeed + 200);
@@ -96,6 +111,8 @@ namespace bc2000dl::dsp
             ch->tone.reset();
             ch->powerAmp.reset();
             ch->dcBlock.reset();
+            ch->phonoToneHf.reset(); ch->phonoToneLf.reset();
+            ch->radioToneHf.reset(); ch->radioToneLf.reset();
         }
         echoL.reset(); echoR.reset();
         balanceMaster.reset();
@@ -283,6 +300,7 @@ namespace bc2000dl::dsp
 
             ch.micUw0029.process (buffer, channel);
             ch.micN2613.process (buffer, channel);
+            // Mic lämnas tonneutral — referens (spec mäts via mic-vägen).
         }
         else
         {
@@ -295,6 +313,13 @@ namespace bc2000dl::dsp
         {
             phonoScratch.applyGain (channel, 0, n, phonoG * kInputPad);
             ch.phono.process (phonoScratch, channel);
+
+            // Phono-tonsignatur (varm/fyllig vinyl) — utöver RIAA
+            {
+                auto* pd = phonoScratch.getWritePointer (channel);
+                for (int i = 0; i < n; ++i)
+                    pd[i] = ch.phonoToneHf.processSample (ch.phonoToneLf.processSample (pd[i]));
+            }
 
             // Phono subsonic rumble — LP-filtered noise from platter bearing (<5 Hz)
             {
@@ -336,6 +361,11 @@ namespace bc2000dl::dsp
 
             ch.radioUw0029.process (radioScratch, channel);
             ch.radioN2613.process (radioScratch, channel);
+
+            // Radio-tonsignatur (ljus/ren)
+            auto* rd = radioScratch.getWritePointer (channel);
+            for (int i = 0; i < n; ++i)
+                rd[i] = ch.radioToneLf.processSample (ch.radioToneHf.processSample (rd[i]));
 
             buffer.addFrom (channel, 0, radioScratch, channel, 0, n);
         }

@@ -170,6 +170,13 @@ namespace bc2000dl::dsp
             GeLowNoiseStage       radioUw0029;
             Ge2N2613Stage         radioN2613;
 
+            // ----- Per-källa-tonsignatur (gör Mic/Phono/Radio audibelt olika) -----
+            // Mic = NEUTRAL referens (spec mäts via mic-vägen → får ej färgas).
+            // Phono = varm/fyllig (RIAA + extra bas, dämpad diskant) som vinyl.
+            // Radio = ljus/ren (HF-boost + tunnare bas) som line-nivå.
+            juce::dsp::IIR::Filter<float> phonoToneHf, phonoToneLf;
+            juce::dsp::IIR::Filter<float> radioToneHf, radioToneLf;
+
             // ----- Record-amp efter input-mixern -----
             PreEmphasisDIN1962  recEq;
             GeLowNoiseStage     ac126_1;
