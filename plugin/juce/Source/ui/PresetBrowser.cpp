@@ -11,28 +11,31 @@ namespace bc2000dl::ui
     using namespace bc2000dl::ui::colours;
 
     // ------------------------------------------------------------------
-    //  Palette (local to this file — BC2000 dark amber theme)
+    //  Palette — matchar WireframeEditor (DELUXE): anodiserad charcoal-panel,
+    //  silkscreen-vit text, teak-accent (samma som trä-ramen). Tidigare ett
+    //  fristående "dark amber theme" som inte hörde ihop med appen.
     // ------------------------------------------------------------------
     namespace pal
     {
-        const Colour bg         { 0xff0f0d09 };  // panel background
-        const Colour bgCat      { 0xff0b0906 };  // category column
-        const Colour bgRow      { 0xff121008 };  // normal row
-        const Colour bgHover    { 0xff1e1a12 };  // hovered row
-        const Colour bgSelected { 0xff321e08 };  // selected row
-        const Colour bgInfo     { 0xff090704 };  // info panel
-        const Colour bgSearch   { 0xff181410 };  // search bar
-        const Colour divider    { 0xff2e2618 };  // separating lines
-        const Colour catSel     { 0xff2e1e06 };  // selected category bg
-        const Colour catHover   { 0xff181410 };
+        const Colour bg         { 0xff141414 };  // panel background (anodiserad charcoal)
+        const Colour bgCat      { 0xff0e0e0e };  // category column
+        const Colour bgRow      { 0xff161616 };  // normal row (= LnF::kPanelBlk)
+        const Colour bgHover    { 0xff232323 };  // hovered row
+        const Colour bgSelected { 0xff2c2c2c };  // selected row
+        const Colour bgInfo     { 0xff0c0c0c };  // info panel
+        const Colour bgSearch   { 0xff1b1b1b };  // search bar
+        const Colour divider    { 0xff3a3a3a };  // separating lines (neutral)
+        const Colour catSel     { 0xff2a2a2a };  // selected category bg
+        const Colour catHover   { 0xff1f1f1f };
 
-        const Colour amber      { 0xffffb14a };
-        const Colour amberGlow  { 0xffffd58a };
-        const Colour amberDim   { 0xff5a4824 };
-        const Colour cream      { 0xffefe6cf };
-        const Colour creamDim   { 0xffd0c09a };
-        const Colour gray       { 0xff8a7a5e };
-        const Colour grayDim    { 0xff5a4e3a };
+        // Accent = teak (matchar DELUXE-trä-ramen) istället för clashande amber.
+        const Colour amber      { 0xffc8753e };  // teak-top
+        const Colour amberGlow  { 0xffe2a070 };  // ljusare teak (highlight)
+        const Colour amberDim   { 0xff4a3420 };  // dim teak
+        const Colour cream      { 0xffedeae0 };  // silkscreen-vit (= LnF::kSilk)
+        const Colour creamDim   { 0xffc8c5bc };  // dim silk
+        const Colour gray       { 0xff8e8b82 };  // = LnF::kSilkDim
+        const Colour grayDim    { 0xff555555 };  // = LnF::kStrokeLite
 
         // bar colours per parameter
         const Colour barDrive   { 0xffd4861e };  // warm amber
