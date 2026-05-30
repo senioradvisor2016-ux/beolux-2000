@@ -465,7 +465,21 @@ void BC2000DLProcessor::setStateInformation (const void* data, int sizeInBytes)
     {
         if (xml->hasTagName (apvts.state.getType()))
         {
-            apvts.replaceState (juce::ValueTree::fromXml (*xml));
+            // HÄRDNING (steg 1): tvinga varje PARAM:s "value" till en ÄNDLIG double
+            // INNAN replaceState. APVTS läser värdet internt (choice/int castar
+            // NaN→int = UB i JUCE:s String-konvertering, och "nan"/"inf"-strängar
+            // från en korrupt fil överlever annars). Genom att skriva tillbaka en
+            // ren double ser APVTS aldrig ett icke-ändligt värde.
+            auto tree = juce::ValueTree::fromXml (*xml);
+            for (auto child : tree)
+                if (child.hasType ("PARAM"))
+                {
+                    double v = (double) child["value"];
+                    if (! std::isfinite (v)) v = 0.0;
+                    child.setProperty ("value", v, nullptr);
+                }
+
+            apvts.replaceState (tree);
 
             // JUCE 8: replaceState() updates the ValueTree synchronously but the
             // AudioParameter getValue() can remain stale (atomic not yet propagated).
@@ -479,7 +493,17 @@ void BC2000DLProcessor::setStateInformation (const void* data, int sizeInBytes)
                 if (child.hasType ("PARAM"))
                 {
                     if (auto* prm = apvts.getParameter (child["id"].toString()))
-                        prm->setValueNotifyingHost (prm->convertTo0to1 ((float) child["value"]));
+                    {
+                        // HÄRDNING: en korrupt projektfil / illvillig preset kan mata
+                        // in NaN/inf (överlever t.o.m. xml-round-trip via strtod) eller
+                        // absurda värden. Sanera → default vid icke-ändligt, klamp till
+                        // [0,1] efter normalisering så DSP:n aldrig får ett NaN-param.
+                        const float raw  = (float) child["value"];
+                        const float norm = std::isfinite (raw)
+                                             ? prm->convertTo0to1 (raw)
+                                             : prm->getDefaultValue();
+                        prm->setValueNotifyingHost (juce::jlimit (0.0f, 1.0f, norm));
+                    }
                 }
             }
         }

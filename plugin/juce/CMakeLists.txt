@@ -368,6 +368,18 @@ target_link_libraries(BC2000DL_StateTest PRIVATE
     melatonin_blur melatonin_inspector
     juce::juce_recommended_config_flags)
 
+# --- State-fuzzing (robusthet mot trasig/manipulerad setStateInformation) ---
+juce_add_console_app(BC2000DL_StateFuzzTest PRODUCT_NAME "BC2000DL_StateFuzzTest")
+target_sources(BC2000DL_StateFuzzTest PRIVATE Source/tests/StateFuzzTest.cpp)
+target_include_directories(BC2000DL_StateFuzzTest PRIVATE Source)
+target_link_libraries(BC2000DL_StateFuzzTest PRIVATE
+    BC2000DL                       # plugin-SharedCode: riktiga processorn
+    BC2000DL_Assets
+    juce::juce_audio_utils juce::juce_audio_processors juce::juce_dsp
+    juce::juce_gui_basics juce::juce_gui_extra
+    melatonin_blur melatonin_inspector
+    juce::juce_recommended_config_flags)
+
 # --- VU-rendering (renderar WireframeVU offscreen, detekterar nålens läge) ---
 juce_add_console_app(BC2000DL_VURenderTest PRODUCT_NAME "BC2000DL_VURenderTest")
 target_sources(BC2000DL_VURenderTest PRIVATE Source/tests/VURenderTest.cpp)
@@ -397,8 +409,9 @@ add_test(NAME DspSmoke       COMMAND BC2000DL_Tests)
 add_test(NAME BugFixTests    COMMAND BC2000DL_BugFixTests)
 add_test(NAME AudibilityTest COMMAND BC2000DL_AudibilityTest)
 add_test(NAME StateRoundTrip COMMAND BC2000DL_StateTest)
+add_test(NAME StateFuzz      COMMAND BC2000DL_StateFuzzTest)
 add_test(NAME VURender       COMMAND BC2000DL_VURenderTest)
-set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest StateRoundTrip VURender
+set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest StateRoundTrip StateFuzz VURender
                      PROPERTIES LABELS "unit")
 
 # Integrations-tester (kräver installerad VST3 + pedalboard / pluginval)
@@ -430,7 +443,7 @@ endif()
 option(BC2000DL_SANITIZE "Bygg DSP-testmålen med ASan + UBSan" OFF)
 if(BC2000DL_SANITIZE)
     set(BC2000DL_SAN -fsanitize=address,undefined -fno-omit-frame-pointer)
-    foreach(t BC2000DL_Catch2 BC2000DL_GTest BC2000DL_Tests BC2000DL_BugFixTests BC2000DL_AudibilityTest)
+    foreach(t BC2000DL_Catch2 BC2000DL_GTest BC2000DL_Tests BC2000DL_BugFixTests BC2000DL_AudibilityTest BC2000DL_StateFuzzTest)
         target_compile_options(${t} PRIVATE ${BC2000DL_SAN})
         target_link_options   (${t} PRIVATE ${BC2000DL_SAN})
     endforeach()
