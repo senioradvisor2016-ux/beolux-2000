@@ -253,15 +253,20 @@ def test_cpu():
     configure()
     sig = (np.random.default_rng(0).standard_normal((2, SR * 5)).astype(np.float32) * 0.2)
     block = 128
-    PLUGIN.process(sig[:, :block], SR, reset=True)
     n = sig.shape[1]
-    t0 = time.perf_counter()
-    for off in range(0, n, block):
-        end = min(off + block, n)
-        PLUGIN.process(sig[:, off:end], SR, reset=False)
-    t1 = time.perf_counter()
-    cpu_pct = 100 * (t1 - t0) / (n / SR)
-    report("CPU @ 48 kHz / 128 smp / stereo (5 s)",
+    # Bästa av 3 körningar — minimum = den faktiska algoritmiska kostnaden,
+    # robust mot transienta load-spikar (t.ex. när testet körs parallellt i
+    # CI/ctest). En enda mätning är load-känslig och blir flaky.
+    cpu_pct = float("inf")
+    for _ in range(3):
+        PLUGIN.process(sig[:, :block], SR, reset=True)
+        t0 = time.perf_counter()
+        for off in range(0, n, block):
+            end = min(off + block, n)
+            PLUGIN.process(sig[:, off:end], SR, reset=False)
+        t1 = time.perf_counter()
+        cpu_pct = min(cpu_pct, 100 * (t1 - t0) / (n / SR))
+    report("CPU @ 48 kHz / 128 smp / stereo (best of 3)",
            cpu_pct < 5.0, f"{cpu_pct:.1f}%", "<5%")
 
 

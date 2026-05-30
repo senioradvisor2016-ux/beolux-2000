@@ -355,3 +355,41 @@ target_link_libraries(BC2000DL_GTest PRIVATE
     GTest::gtest_main
     juce::juce_dsp juce::juce_audio_basics juce::juce_core
     juce::juce_recommended_config_flags)
+
+# ─────────────────────────────────────────────────────────────────
+#  ctest — ett mål som samlar ALLA testsviter (CI-redo)
+#    Allt:          ctest --test-dir build --output-on-failure
+#    Bara snabba:   ctest --test-dir build -L unit
+#    Bara integr.:  ctest --test-dir build -L integration
+#  (integrations-tester kräver att pluginen byggts + installerats först,
+#   samt python3+pedalboard / pluginval på maskinen.)
+# ─────────────────────────────────────────────────────────────────
+enable_testing()
+
+# C++-enhetstester (snabba, inga externa beroenden)
+add_test(NAME Catch2         COMMAND BC2000DL_Catch2)
+add_test(NAME GTest          COMMAND BC2000DL_GTest)
+add_test(NAME DspSmoke       COMMAND BC2000DL_Tests)
+add_test(NAME BugFixTests    COMMAND BC2000DL_BugFixTests)
+add_test(NAME AudibilityTest COMMAND BC2000DL_AudibilityTest)
+set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest
+                     PROPERTIES LABELS "unit")
+
+# Integrations-tester (kräver installerad VST3 + pedalboard / pluginval)
+find_program(PYTHON3_EXE NAMES python3)
+if(PYTHON3_EXE)
+    add_test(NAME SignalTest_pedalboard
+             COMMAND ${PYTHON3_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/Source/tests/signal_test.py)
+    add_test(NAME StudioSound1968
+             COMMAND ${PYTHON3_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/Source/tests/vs_studio_sound_1968.py)
+    set_tests_properties(SignalTest_pedalboard PROPERTIES
+        LABELS "integration" PASS_REGULAR_EXPRESSION "0 underkända")
+    set_tests_properties(StudioSound1968 PROPERTIES
+        LABELS "integration" PASS_REGULAR_EXPRESSION "29/29")
+endif()
+
+if(EXISTS "/Applications/pluginval.app/Contents/MacOS/pluginval")
+    add_test(NAME Pluginval_strict10
+             COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/validate.sh --strict 10)
+    set_tests_properties(Pluginval_strict10 PROPERTIES LABELS "integration")
+endif()
