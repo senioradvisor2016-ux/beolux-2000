@@ -462,3 +462,23 @@ if(BC2000DL_SANITIZE)
     endforeach()
     message(STATUS "BC2000DL: sanitizers PÅ (ASan+UBSan) för DSP-testmålen")
 endif()
+
+# ─────────────────────────────────────────────────────────────────
+#  Source-based code coverage (clang/llvm) för DSP-testmålen
+#    cmake -S plugin/juce -B build-cov -DBC2000DL_COVERAGE=ON \
+#          -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_BUILD_TYPE=Debug
+#    cmake --build build-cov --target <DSP-testmål>
+#    LLVM_PROFILE_FILE=t.profraw ./.../BC2000DL_Catch2
+#    llvm-profdata merge -o m.profdata *.profraw
+#    llvm-cov report <bin> -instr-profile=m.profdata Source/dsp
+#  (Körs av scripts/coverage.sh.)
+# ─────────────────────────────────────────────────────────────────
+option(BC2000DL_COVERAGE "Bygg DSP-testmålen med llvm source-based coverage" OFF)
+if(BC2000DL_COVERAGE)
+    set(BC2000DL_COV -fprofile-instr-generate -fcoverage-mapping)
+    foreach(t BC2000DL_Catch2 BC2000DL_GTest BC2000DL_Tests BC2000DL_BugFixTests BC2000DL_AudibilityTest)
+        target_compile_options(${t} PRIVATE ${BC2000DL_COV})
+        target_link_options   (${t} PRIVATE ${BC2000DL_COV})
+    endforeach()
+    message(STATUS "BC2000DL: coverage PÅ (llvm source-based) för DSP-testmålen")
+endif()
