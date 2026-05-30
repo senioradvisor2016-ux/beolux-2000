@@ -72,6 +72,75 @@ namespace
         p.monitorMode = 1;  // Tape
         return p;
     }
+
+    SignalChain::Parameters randomParams (juce::Random& r)
+    {
+        SignalChain::Parameters p;
+        p.speed = (TapeSpeed) r.nextInt (3);
+        p.micGain = r.nextFloat();   p.micGainR = r.nextFloat();
+        p.phonoGain = r.nextFloat(); p.phonoGainR = r.nextFloat();
+        p.radioGain = r.nextFloat(); p.radioGainR = r.nextFloat();
+        p.bassDb = r.nextFloat()*24-12; p.trebleDb = r.nextFloat()*24-12;
+        p.balance = r.nextFloat()*2-1;
+        p.masterVolume = r.nextFloat(); p.masterVolumeR = r.nextFloat();
+        p.biasAmount = 0.5f+r.nextFloat(); p.biasAmountR = 0.5f+r.nextFloat();
+        p.saturationDrive = 0.5f+r.nextFloat()*1.5f; p.saturationDriveR = 0.5f+r.nextFloat()*1.5f;
+        p.wowFlutterAmount = r.nextFloat()*2;
+        p.echoEnabled = r.nextBool(); p.echoAmount = r.nextFloat(); p.echoAmountR = r.nextFloat();
+        p.echoTimeMs = 30+r.nextFloat()*320; p.echoFeedback = r.nextFloat();
+        p.bypassTape = r.nextBool(); p.speakerMonitor = r.nextBool();
+        p.synchroplay = r.nextBool(); p.multiplayGen = 1+r.nextInt (5);
+        p.soundOnSound = r.nextBool(); p.publicAddress = r.nextBool();
+        p.tapeFormula = r.nextInt (3); p.biasType = r.nextInt (2); p.trackWidth = r.nextInt (2);
+        p.printThrough = r.nextFloat()*0.05f; p.stereoAsymmetry = r.nextFloat()*0.05f;
+        p.monitorMode = r.nextInt (2); p.phonoMode = r.nextInt (2); p.radioMode = r.nextInt (2);
+        p.micMode = r.nextInt (3); p.mainsHum = r.nextFloat()*0.1f;
+        p.inputTrimDb = r.nextFloat()*24-12; p.outputTrimDb = r.nextFloat()*24-12;  // ±12 (sane)
+        p.monitorTrack1 = r.nextBool(); p.monitorTrack2 = r.nextBool();
+        return p;
+    }
+
+    juce::AudioBuffer<float> randomAudio (juce::Random& r, int n)
+    {
+        juce::AudioBuffer<float> b (2, n);
+        const int kind = r.nextInt (5);
+        for (int ch = 0; ch < 2; ++ch)
+            for (int i = 0; i < n; ++i)
+            {
+                float v = 0.0f;
+                const double ph = 2.0 * juce::MathConstants<double>::pi * (200 + ch*300) * i / kSR;
+                switch (kind)
+                {
+                    case 0: v = 0.0f; break;                                // tystnad
+                    case 1: v = (r.nextFloat()*2-1) * 0.9f; break;          // hett brus
+                    case 2: v = 0.5f; break;                                // DC
+                    case 3: v = 1.5f * (float) std::sin (ph); break;        // över 0 dBFS
+                    default: v = 0.1f * (float) std::sin (ph); break;       // mild ton
+                }
+                b.setSample (ch, i, v);
+            }
+        return b;
+    }
+}
+
+TEST_CASE ("Fuzz: slumpade params + edge-audio → finit & bounded", "[fuzz]")
+{
+    juce::Random r (1234);
+    for (int it = 0; it < 300; ++it)
+    {
+        auto out = render (randomParams (r), randomAudio (r, 4096));
+        REQUIRE (allFinite (out));
+        REQUIRE (out.getMagnitude (0, 0, out.getNumSamples()) < 8.0f);
+    }
+}
+
+TEST_CASE ("Output- och input-meter speglar signalnivån", "[meters]")
+{
+    SignalChain c; c.prepare (kSR, kBlk); c.setParameters (micParams());
+    for (int k = 0; k < 40; ++k) { auto b = makeSine (1000.0f, kBlk, 0.6f); c.process (b); }
+    REQUIRE (std::isfinite (c.meterLevelL_dBFS.load()));
+    REQUIRE (c.inputLevelL_dBFS.load()  > -40.0f);   // input-VU känner signalen
+    REQUIRE (c.meterLevelL_dBFS.load()  > -40.0f);   // output-VU känner signalen
 }
 
 TEST_CASE ("Output is finite for a normal signal", "[stability]")

@@ -553,6 +553,18 @@ namespace bc2000dl::dsp
             }
         }
 
+        // ----- Output safety-clamp -----
+        // Hård gräns ±4.0 (≈ +12 dBFS) — transparent under den nivån (påverkar
+        // inte normal drift, spec eller signaltester) men förhindrar absurda
+        // utgångsnivåer vid extrema param-kombinationer (t.ex. bas+diskant+
+        // output-trim maxade) som annars kan nå +30 dBFS. Skyddar högtalare/öron.
+        for (int ch = 0; ch < numCh; ++ch)
+        {
+            auto* d = buffer.getWritePointer (ch);
+            for (int i = 0; i < n; ++i)
+                d[i] = juce::jlimit (-4.0f, 4.0f, d[i]);
+        }
+
         // Tape transport time accumulation (drives ReelDeck + counter display in UI)
         const double dt = static_cast<double> (buffer.getNumSamples()) / sampleRate;
         tapePositionSeconds.store (

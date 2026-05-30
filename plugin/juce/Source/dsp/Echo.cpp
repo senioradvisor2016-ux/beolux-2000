@@ -122,17 +122,16 @@ namespace bc2000dl::dsp
         const float delayed = readBuf[static_cast<size_t> (r0)] * (1.0f - delayFrac)
                             + readBuf[static_cast<size_t> (r1)] * delayFrac;
 
-        // Output = input + feedback × delayed (våt + torr)
-        // Soft-clip BOTH the output AND the feedback signal so neither the
-        // downstream record chain nor the delay buffer ever sees values > ~±1.5.
-        // Without output clipping, self-oscillating echo (fb > 0.96) could push
-        // ±2–3 into the tape/rec-eq stages, compounding into DAW-level blowup.
+        // Separat AMOUNT (wet-nivå man hör) och FEEDBACK (regeneration/tail):
+        //   output       = torr + amount   × delayed   (hur mycket echo man hör)
+        //   recirkulation = torr + feedback × delayed   (hur länge svansen lever)
+        // Soft-clip båda så varken record-kedjan eller delay-buffern ser > ~±1.5.
+        // Self-osc (feedback > ~0.96) hålls bounded av tanh-clippet.
         constexpr float kClipKnee = 1.5f;
-        const float yRaw = x + delayed * feedback;
-        const float y    = kClipKnee * std::tanh (yRaw / kClipKnee);  // output clipped
+        const float y = kClipKnee * std::tanh ((x + delayed * amount) / kClipKnee);  // wet ut
 
-        // Feedback signal: HF-loss per pass then another soft-clip for the buffer
-        float fbSignal = hfLossFilter.processSample (y);
+        // Recirkulation: HF-loss per pass (band-eko tappar diskant) + soft-clip.
+        float fbSignal = hfLossFilter.processSample (x + delayed * feedback);
         fbSignal = kClipKnee * std::tanh (fbSignal / kClipKnee);
 
         buf[static_cast<size_t> (writeIdx)] = fbSignal;
