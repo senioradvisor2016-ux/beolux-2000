@@ -368,6 +368,18 @@ target_link_libraries(BC2000DL_StateTest PRIVATE
     melatonin_blur melatonin_inspector
     juce::juce_recommended_config_flags)
 
+# --- VU-rendering (renderar WireframeVU offscreen, detekterar nålens läge) ---
+juce_add_console_app(BC2000DL_VURenderTest PRODUCT_NAME "BC2000DL_VURenderTest")
+target_sources(BC2000DL_VURenderTest PRIVATE Source/tests/VURenderTest.cpp)
+target_include_directories(BC2000DL_VURenderTest PRIVATE Source)
+target_link_libraries(BC2000DL_VURenderTest PRIVATE
+    BC2000DL                       # plugin-SharedCode: WireframeVU-symboler
+    BC2000DL_Assets
+    juce::juce_audio_utils juce::juce_audio_processors juce::juce_dsp
+    juce::juce_gui_basics juce::juce_gui_extra
+    melatonin_blur melatonin_inspector
+    juce::juce_recommended_config_flags)
+
 # ─────────────────────────────────────────────────────────────────
 #  ctest — ett mål som samlar ALLA testsviter (CI-redo)
 #    Allt:          ctest --test-dir build --output-on-failure
@@ -385,7 +397,8 @@ add_test(NAME DspSmoke       COMMAND BC2000DL_Tests)
 add_test(NAME BugFixTests    COMMAND BC2000DL_BugFixTests)
 add_test(NAME AudibilityTest COMMAND BC2000DL_AudibilityTest)
 add_test(NAME StateRoundTrip COMMAND BC2000DL_StateTest)
-set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest StateRoundTrip
+add_test(NAME VURender       COMMAND BC2000DL_VURenderTest)
+set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest StateRoundTrip VURender
                      PROPERTIES LABELS "unit")
 
 # Integrations-tester (kräver installerad VST3 + pedalboard / pluginval)

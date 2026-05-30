@@ -909,7 +909,7 @@ namespace bc2000dl::ui
 
         // ===== (13a) Peak-hold marker — thin amber tick above face =====
         // Authentic vintage broadcast meter behaviour: instant rise, slow decay.
-        const float peakNorm = juce::jmap (juce::jlimit (peakHold, -40.0f, 0.0f),
+        const float peakNorm = juce::jmap (juce::jlimit (-40.0f, 0.0f, peakHold),
                                               -40.0f, 0.0f, 0.0f, 1.0f);
         const float peakX = face.getX() + face.getWidth() * juce::jlimit (0.0f, 1.0f, peakNorm);
         const bool peakInRed = peakNorm > 0.80f;
@@ -926,7 +926,7 @@ namespace bc2000dl::ui
         }
 
         // ===== (13) Needle — tapered with shadow and brighter tip =====
-        const float norm  = juce::jmap (juce::jlimit (current, -40.0f, 0.0f),
+        const float norm  = juce::jmap (juce::jlimit (-40.0f, 0.0f, current),
                                           -40.0f, 0.0f, 0.0f, 1.0f);
         const float needleX = face.getX() + face.getWidth() * juce::jlimit (0.0f, 1.0f, norm);
         const bool inRedZone = norm > 0.80f;
