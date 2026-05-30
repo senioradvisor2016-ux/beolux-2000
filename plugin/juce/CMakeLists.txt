@@ -306,3 +306,52 @@ target_link_libraries(BC2000DL_AudibilityTest PRIVATE
     juce::juce_recommended_config_flags
     juce::juce_recommended_warning_flags
 )
+
+# ─────────────────────────────────────────────────────────────────
+#  Framework-baserade DSP-enhetstester — Catch2 + GoogleTest
+#  (FetchContent vid första bygget — kräver internet)
+#    Bygg:  cmake --build build --target BC2000DL_Catch2 BC2000DL_GTest
+#    Kör:   ./build/BC2000DL_Catch2_artefacts/Release/BC2000DL_Catch2
+#           ./build/BC2000DL_GTest_artefacts/Release/BC2000DL_GTest
+# ─────────────────────────────────────────────────────────────────
+include(FetchContent)
+FetchContent_Declare(Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.5.4
+    GIT_SHALLOW    TRUE)
+FetchContent_Declare(googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        v1.14.0
+    GIT_SHALLOW    TRUE)
+FetchContent_MakeAvailable(Catch2 googletest)
+
+# Delad DSP-källista för båda testmålen
+set(BC2000DL_DSP_TEST_SOURCES
+    Source/dsp/Ge2N2613Stage.cpp  Source/dsp/GeLowNoiseStage.cpp
+    Source/dsp/EqDIN1962.cpp      Source/dsp/TapeSaturation.cpp
+    Source/dsp/Echo.cpp           Source/dsp/ToneAndOutput.cpp
+    Source/dsp/WowFlutter.cpp     Source/dsp/MicAndPower.cpp
+    Source/dsp/Multiplay.cpp      Source/dsp/PhonoPreamp.cpp
+    Source/dsp/SignalChain.cpp)
+
+# --- Catch2 ---
+juce_add_console_app(BC2000DL_Catch2 PRODUCT_NAME "BC2000DL_Catch2")
+target_sources(BC2000DL_Catch2 PRIVATE Source/tests/Catch2Tests.cpp ${BC2000DL_DSP_TEST_SOURCES})
+target_include_directories(BC2000DL_Catch2 PRIVATE Source)
+target_compile_definitions(BC2000DL_Catch2 PRIVATE
+    JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_DISPLAY_SPLASH_SCREEN=0 JUCE_STANDALONE_APPLICATION=1)
+target_link_libraries(BC2000DL_Catch2 PRIVATE
+    Catch2::Catch2WithMain
+    juce::juce_dsp juce::juce_audio_basics juce::juce_core
+    juce::juce_recommended_config_flags)
+
+# --- GoogleTest ---
+juce_add_console_app(BC2000DL_GTest PRODUCT_NAME "BC2000DL_GTest")
+target_sources(BC2000DL_GTest PRIVATE Source/tests/GTests.cpp ${BC2000DL_DSP_TEST_SOURCES})
+target_include_directories(BC2000DL_GTest PRIVATE Source)
+target_compile_definitions(BC2000DL_GTest PRIVATE
+    JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_DISPLAY_SPLASH_SCREEN=0 JUCE_STANDALONE_APPLICATION=1)
+target_link_libraries(BC2000DL_GTest PRIVATE
+    GTest::gtest_main
+    juce::juce_dsp juce::juce_audio_basics juce::juce_core
+    juce::juce_recommended_config_flags)
