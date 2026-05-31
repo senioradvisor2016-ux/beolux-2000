@@ -276,10 +276,18 @@ void BC2000DLProcessor::releaseResources()
 
 bool BC2000DLProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-    // Stöd för stereo in/ut
-    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+    // Stöd BÅDE mono och stereo (in måste matcha ut — ingen upp/ned-mix).
+    // KRITISKT för Ableton Live: en plugin som BARA accepterade stereo nekades
+    // på MONOSPÅR → Live kunde inte ge en giltig buss → spåret blev TYST.
+    // Mono-vägen processar kanal 0 genom hela kedjan (DSP:n är kanal-säker:
+    // SoS/monitor/cross-bleed är numCh>=2-gardade, och BalanceMaster applicerar
+    // master-volym på kanal 0 i mono).
+    const auto mainOut = layouts.getMainOutputChannelSet();
+    const auto mainIn  = layouts.getMainInputChannelSet();
+    if (mainOut != juce::AudioChannelSet::mono()
+        && mainOut != juce::AudioChannelSet::stereo())
         return false;
-    if (layouts.getMainInputChannelSet()  != juce::AudioChannelSet::stereo())
+    if (mainIn != mainOut)
         return false;
     return true;
 }

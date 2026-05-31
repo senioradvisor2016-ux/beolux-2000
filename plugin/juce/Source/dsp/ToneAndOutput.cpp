@@ -105,9 +105,28 @@ namespace bc2000dl::dsp
 
     void BalanceMaster::processStereo (juce::AudioBuffer<float>& buffer)
     {
-        if (buffer.getNumChannels() < 2) return;
-
         const int n = buffer.getNumSamples();
+
+        // MONO: ingen balans/pan — applicera bara master-volym (L) på kanal 0.
+        // Utan detta ignorerades master-fadern OCH speaker-mute (master=0) i mono.
+        if (buffer.getNumChannels() < 2)
+        {
+            if (buffer.getNumChannels() == 1)
+            {
+                if (masterSmooth.isSmoothing())
+                {
+                    auto* d = buffer.getWritePointer (0);
+                    for (int i = 0; i < n; ++i) d[i] *= masterSmooth.getNextValue();
+                }
+                else
+                {
+                    masterSmooth.skip (n);
+                    buffer.applyGain (0, 0, n, master);
+                }
+                masterRSmooth.skip (n); balanceSmooth.skip (n);
+            }
+            return;
+        }
 
         if (masterSmooth.isSmoothing() || masterRSmooth.isSmoothing() || balanceSmooth.isSmoothing())
         {

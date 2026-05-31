@@ -871,6 +871,37 @@ def test_sound_on_sound(plugin):
 
 
 # ══════════════════════════════════════════════════════════════════
+# TEST: MONO-spår (Ableton) — pluggen får inte vara tyst/krascha i mono
+#   (regression: isBusesLayoutSupported accepterade förut BARA stereo →
+#    monospår i Live blev tysta.)
+# ══════════════════════════════════════════════════════════════════
+
+def test_mono_track(plugin):
+    print("\n── Test: MONO-spår (1 kanal) ───────────────────────────────────")
+    plugin.reset(); default_params(plugin)
+    rng = np.random.default_rng(5)
+    mono = (rng.standard_normal(SR_DEFAULT) * 0.2).astype(np.float32)   # (N,) mono
+    try:
+        out = plugin(mono, sample_rate=SR_DEFAULT, buffer_size=BLOCK, reset=True)
+    except Exception as e:
+        report("Mono: processar utan krasch", False, str(e)[:60]); return
+    report("Mono: processar utan krasch", True, f"shape {out.shape}")
+    report("Mono: ändlig output (ej NaN/Inf)", bool(np.all(np.isfinite(out))), "")
+    report("Mono: icke-tyst (rms > 1e-4)", rms(out) > 1e-4, f"rms {rms(out):.4f}")
+    report("Mono: bounded (peak < 4)", peak(out) < 4.0, f"peak {peak(out):.3f}")
+    # master-volym ska fungera i mono (mute → tystnad). Mono drivs av L-master.
+    plugin.reset(); default_params(plugin)
+    try:
+        plugin.master_volume_l = 0.0
+        plugin.master_volume_r = 0.0
+    except Exception:
+        pass
+    out0 = plugin(mono, sample_rate=SR_DEFAULT, buffer_size=BLOCK, reset=True)
+    report("Mono: master-volym 0 → ~tyst", rms(out0) < rms(out) * 0.2,
+           f"rms {rms(out0):.5f}")
+
+
+# ══════════════════════════════════════════════════════════════════
 # HUVUD
 # ══════════════════════════════════════════════════════════════════
 
@@ -900,6 +931,7 @@ if __name__ == "__main__":
     test_headroom(plugin)
     test_source_differentiation(plugin)
     test_sound_on_sound(plugin)
+    test_mono_track(plugin)
 
     print("\n" + "═" * 66)
     print(f"  RESULTAT:  {gPass} godkända   {gFail} underkända")
