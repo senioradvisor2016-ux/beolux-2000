@@ -570,16 +570,46 @@ namespace bc2000dl::dsp
             }
         }
 
-        // ----- Output safety-clamp -----
-        // Hård gräns ±4.0 (≈ +12 dBFS) — transparent under den nivån (påverkar
-        // inte normal drift, spec eller signaltester) men förhindrar absurda
-        // utgångsnivåer vid extrema param-kombinationer (t.ex. bas+diskant+
-        // output-trim maxade) som annars kan nå +30 dBFS. Skyddar högtalare/öron.
+        // ----- Output safety: NaN/Inf-vakt (SJÄLVLÄKANDE) + hård clamp -----
+        // KRITISKT: jlimit() fångar INTE NaN (NaN<lo och NaN>hi är båda false →
+        // NaN passerar). Utan detta kunde en enda NaN — t.ex. om Jiles-Atherton-
+        // tape-state divergerar under ihållande drive, eller echo-feedback rusar —
+        // latcha i de rekursiva tillstånden (IIR-filter, echo-delay, tape) och
+        // tysta pluggen PERMANENT (host:en mutar). Symptom: "Ableton tystar appen
+        // efter en tids användning". Nu: upptäck icke-ändligt → RESET hela kedjan
+        // + mut några block medan allt flushas → pluggen läker automatiskt.
+        bool nonFinite = false;
+        for (int ch = 0; ch < numCh && ! nonFinite; ++ch)
+        {
+            const auto* d = buffer.getReadPointer (ch);
+            for (int i = 0; i < n; ++i)
+                if (! std::isfinite (d[i])) { nonFinite = true; break; }
+        }
+        if (nonFinite)
+        {
+            reset();                  // nollar echo-buffert, IIR-states, tape-state …
+            safetyMuteBlocks = 4;     // ~4 block tystnad medan kedjan settlar
+        }
+
+        // Hård gräns ±4.0 (≈ +12 dBFS) + per-sample-sanering: ALDRIG NaN/Inf ut,
+        // och inga absurda nivåer (skyddar högtalare/öron). Transparent under ±4.
         for (int ch = 0; ch < numCh; ++ch)
         {
             auto* d = buffer.getWritePointer (ch);
             for (int i = 0; i < n; ++i)
-                d[i] = juce::jlimit (-4.0f, 4.0f, d[i]);
+            {
+                const float v = d[i];
+                d[i] = std::isfinite (v) ? juce::jlimit (-4.0f, 4.0f, v) : 0.0f;
+            }
+        }
+
+        // Sticky safety-mute: håll tyst N block efter en NaN-händelse så att
+        // FIR-oversampler / IIR-states / delay-lines hinner flushas rent.
+        if (safetyMuteBlocks > 0)
+        {
+            for (int ch = 0; ch < numCh; ++ch)
+                buffer.clear (ch, 0, n);
+            --safetyMuteBlocks;
         }
 
         // Tape transport time accumulation (drives ReelDeck + counter display in UI)

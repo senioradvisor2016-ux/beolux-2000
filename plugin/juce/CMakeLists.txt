@@ -356,6 +356,16 @@ target_link_libraries(BC2000DL_GTest PRIVATE
     juce::juce_dsp juce::juce_audio_basics juce::juce_core
     juce::juce_recommended_config_flags)
 
+# --- NaN-recovery (hostlös: kör SignalChain direkt, bevarar state exakt) ---
+juce_add_console_app(BC2000DL_NanTest PRODUCT_NAME "BC2000DL_NanTest")
+target_sources(BC2000DL_NanTest PRIVATE Source/tests/NanRecoveryTest.cpp ${BC2000DL_DSP_TEST_SOURCES})
+target_include_directories(BC2000DL_NanTest PRIVATE Source)
+target_compile_definitions(BC2000DL_NanTest PRIVATE
+    JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_DISPLAY_SPLASH_SCREEN=0 JUCE_STANDALONE_APPLICATION=1)
+target_link_libraries(BC2000DL_NanTest PRIVATE
+    juce::juce_dsp juce::juce_audio_basics juce::juce_core
+    juce::juce_recommended_config_flags)
+
 # --- State round-trip (länkar mot plugin-SharedCode för riktiga processorn) ---
 juce_add_console_app(BC2000DL_StateTest PRODUCT_NAME "BC2000DL_StateTest")
 target_sources(BC2000DL_StateTest PRIVATE Source/tests/StateRoundTripTest.cpp)
@@ -439,7 +449,8 @@ add_test(NAME StateRoundTrip COMMAND BC2000DL_StateTest)
 add_test(NAME StateFuzz      COMMAND BC2000DL_StateFuzzTest)
 add_test(NAME VURender       COMMAND BC2000DL_VURenderTest)
 add_test(NAME UIRender       COMMAND BC2000DL_UIRenderTest)
-set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest StateRoundTrip StateFuzz VURender UIRender
+add_test(NAME NanRecovery    COMMAND BC2000DL_NanTest)
+set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest StateRoundTrip StateFuzz VURender UIRender NanRecovery
                      PROPERTIES LABELS "unit")
 
 # Integrations-tester (kräver installerad VST3 + pedalboard / pluginval)
@@ -475,7 +486,7 @@ set_tests_properties(HostRender PROPERTIES LABELS "integration")
 option(BC2000DL_SANITIZE "Bygg DSP-testmålen med ASan + UBSan" OFF)
 if(BC2000DL_SANITIZE)
     set(BC2000DL_SAN -fsanitize=address,undefined -fno-omit-frame-pointer)
-    foreach(t BC2000DL_Catch2 BC2000DL_GTest BC2000DL_Tests BC2000DL_BugFixTests BC2000DL_AudibilityTest BC2000DL_StateFuzzTest BC2000DL_VURenderTest BC2000DL_UIRenderTest)
+    foreach(t BC2000DL_Catch2 BC2000DL_GTest BC2000DL_Tests BC2000DL_BugFixTests BC2000DL_AudibilityTest BC2000DL_StateFuzzTest BC2000DL_VURenderTest BC2000DL_UIRenderTest BC2000DL_NanTest)
         target_compile_options(${t} PRIVATE ${BC2000DL_SAN})
         target_link_options   (${t} PRIVATE ${BC2000DL_SAN})
     endforeach()
