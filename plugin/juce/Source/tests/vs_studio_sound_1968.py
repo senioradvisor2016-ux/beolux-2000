@@ -67,13 +67,22 @@ def configure(speed="9.5 cm/s", formula="Agfa", echo=False, echo_amt=0.0,
 
 
 def process_blocks(signal):
-    """Process signal in BLOCK chunks via the singleton PLUGIN."""
-    out = np.zeros_like(signal)
+    """Process signal in BLOCK chunks via the singleton PLUGIN.
+
+    Pluggen rapporterar PDC-latens (~38 samples @ 48 kHz) och pedalboard
+    kompenserar genom att svälja de första latens-samplen — första blocket
+    kommer tillbaka kortare än input. Konkatenera och nollpadda i slutet så
+    output-längden matchar input (mätningarna sker i steady-state-segment).
+    """
     n = signal.shape[1]
+    outs = []
     for off in range(0, n, BLOCK):
         end = min(off + BLOCK, n)
-        out[:, off:end] = PLUGIN.process(signal[:, off:end], SR, reset=False)
-    return out
+        outs.append(PLUGIN.process(signal[:, off:end], SR, reset=False))
+    out = np.concatenate(outs, axis=1)
+    if out.shape[1] < n:
+        out = np.pad(out, ((0, 0), (0, n - out.shape[1])))
+    return out[:, :n].astype(np.float32)
 
 
 def warm_then_measure(signal, warm_blocks=20):

@@ -91,6 +91,8 @@ namespace bc2000dl::dsp
         L.bypassDelay.prepare (totalLatency);
         R.bypassDelay.prepare (totalLatency);
 
+        smInitialised = false;   // första blocket snappar till APVTS-targets
+
         echoL.prepare (sr);
         echoR.prepare (sr);
         balanceMaster.prepare (sr, blockSize);
@@ -140,6 +142,8 @@ namespace bc2000dl::dsp
         // Reset tape-transport counters so the UI counter returns to 0000
         // when the DAW transport rewinds or the processor is re-initialised.
         tapePositionSeconds.store (0.0, std::memory_order_relaxed);
+
+        smInitialised = false;   // snap (inte ramp) efter reset
     }
 
     void SignalChain::setParameters (const Parameters& p)
@@ -156,22 +160,14 @@ namespace bc2000dl::dsp
             lastSpeed = p.speed;
         }
 
-        L.tape.setBiasAmount (p.biasAmount);     R.tape.setBiasAmount (p.biasAmountR);
-        // Per-kanal saturation-drive (dubbla skydepotentiometre)
-        L.tape.setSaturationDrive (p.saturationDrive);  R.tape.setSaturationDrive (p.saturationDriveR);
-        L.wowFlutter.setAmount (p.wowFlutterAmount);    R.wowFlutter.setAmount (p.wowFlutterAmount);
+        // Kontinuerliga parametrar (bias, drive, wow, ton, echo, gains, trim)
+        // appliceras INTE här — de utjämnas per block i advanceSmoothedParams()
+        // (anropas från process()) för klickfri automation.
         L.powerAmp.setEnabled (p.speakerMonitor);       R.powerAmp.setEnabled (p.speakerMonitor);
         L.multiplay.setGeneration (p.multiplayGen);     R.multiplay.setGeneration (p.multiplayGen);
         L.multiplay.setEnabled (p.multiplayGen > 1);    R.multiplay.setEnabled (p.multiplayGen > 1);
 
-        // Per-kanal echo-amount
         echoL.setEnabled (p.echoEnabled); echoR.setEnabled (p.echoEnabled);
-        echoL.setAmount (p.echoAmount);   echoR.setAmount (p.echoAmountR);
-
-        // DELUXE ECHO TIME/FEEDBACK-knobbar — sätts varje block (åsidosätter
-        // auto-från-speed). Måste komma EFTER ev. setSpeed() ovan så override vinner.
-        echoL.setTimeMs   (p.echoTimeMs);   echoR.setTimeMs   (p.echoTimeMs);
-        echoL.setFeedback (p.echoFeedback); echoR.setFeedback (p.echoFeedback);
 
         // v60.5 — SoS+Echo cross-feedback (Christoffer-feedback):
         // Med Sound-on-Sound aktiv ska echo-feedbacken gå L→R och R→L
@@ -190,9 +186,6 @@ namespace bc2000dl::dsp
         // S-on-S korsmix-nivå (smoothad i process() → ingen klick vid toggle)
         sosSmooth.setTargetValue (p.soundOnSound ? 0.4f : 0.0f);
 
-        L.tone.setBassDb (p.bassDb);     R.tone.setBassDb (p.bassDb);
-        L.tone.setTrebleDb (p.trebleDb); R.tone.setTrebleDb (p.trebleDb);
-
         // PhonoPreamp-mode (H/L)
         L.phono.setMode (p.phonoMode == 0 ? PhonoMode::L : PhonoMode::H);
         R.phono.setMode (p.phonoMode == 0 ? PhonoMode::L : PhonoMode::H);
@@ -206,9 +199,6 @@ namespace bc2000dl::dsp
         const auto tf = (p.tapeFormula == 1 ? TapeFormula::BASF :
                         p.tapeFormula == 2 ? TapeFormula::Scotch : TapeFormula::Agfa);
         L.tape.setFormula (tf); R.tape.setFormula (tf);
-
-        // Print-through (specs §10)
-        L.tape.setPrintThrough (p.printThrough); R.tape.setPrintThrough (p.printThrough);
 
         // Bias-typ (NORMAL/HIGH) + track-width (1/4 vs 1/2) — schema 9224002/3
         L.tape.setBiasType (p.biasType);     R.tape.setBiasType (p.biasType);
@@ -228,12 +218,87 @@ namespace bc2000dl::dsp
             L.ac126_2.setChannelAsymmetry   (la);    R.ac126_2.setChannelAsymmetry   (ra);
         }
 
-        // Notera: mixer.setGains används bara för totalgain (för bypass-mode).
-        // Per-kanal-gain hanteras i processChannelChain.
-        mixer.setGains (p.micGain, p.phonoGain, p.radioGain);
         balanceMaster.setBalance (p.balance);
         balanceMaster.setMaster  (p.masterVolume);
         balanceMaster.setMasterR (p.masterVolumeR);
+    }
+
+    void SignalChain::advanceSmoothedParams (int numSamples)
+    {
+        smPrev = sm;
+
+        // En-pol mot target; alpha=1 (snap) på första blocket efter
+        // prepare()/reset() så kalibrerade tester förblir deterministiska.
+        const float alpha = smInitialised
+            ? 1.0f - std::exp (-static_cast<float> (numSamples)
+                               / (kParamSmoothSec * static_cast<float> (sampleRate)))
+            : 1.0f;
+
+        auto step = [alpha] (float& cur, float target)
+        {
+            cur += (target - cur) * alpha;
+            if (std::abs (target - cur) < 1.0e-5f) cur = target;
+        };
+
+        step (sm.micGain,          params.micGain);
+        step (sm.micGainR,         params.micGainR);
+        step (sm.phonoGain,        params.phonoGain);
+        step (sm.phonoGainR,       params.phonoGainR);
+        step (sm.radioGain,        params.radioGain);
+        step (sm.radioGainR,       params.radioGainR);
+        step (sm.bassDb,           params.bassDb);
+        step (sm.trebleDb,         params.trebleDb);
+        step (sm.biasAmount,       params.biasAmount);
+        step (sm.biasAmountR,      params.biasAmountR);
+        step (sm.saturationDrive,  params.saturationDrive);
+        step (sm.saturationDriveR, params.saturationDriveR);
+        step (sm.wowFlutterAmount, params.wowFlutterAmount);
+        step (sm.echoAmount,       params.echoAmount);
+        step (sm.echoAmountR,      params.echoAmountR);
+        step (sm.echoTimeMs,       params.echoTimeMs);
+        step (sm.echoFeedback,     params.echoFeedback);
+        step (sm.inputTrimDb,      params.inputTrimDb);
+        step (sm.outputTrimDb,     params.outputTrimDb);
+        step (sm.printThrough,     params.printThrough);
+        step (sm.mainsHum,         params.mainsHum);
+
+        const bool firstBlock = ! smInitialised;
+        if (firstBlock)
+            smPrev = sm;
+        smInitialised = true;
+
+        // Applicera mot DSP-modulerna — bara vid faktisk ändring, eftersom
+        // flera settrar räknar om filterkoefficienter (ToneControl allokerar).
+        auto changed = [&] (float ContParams::* m)
+        {
+            return firstBlock || sm.*m != smPrev.*m;
+        };
+
+        if (changed (&ContParams::biasAmount))       L.tape.setBiasAmount (sm.biasAmount);
+        if (changed (&ContParams::biasAmountR))      R.tape.setBiasAmount (sm.biasAmountR);
+        if (changed (&ContParams::saturationDrive))  L.tape.setSaturationDrive (sm.saturationDrive);
+        if (changed (&ContParams::saturationDriveR)) R.tape.setSaturationDrive (sm.saturationDriveR);
+        if (changed (&ContParams::printThrough))
+        {
+            L.tape.setPrintThrough (sm.printThrough);
+            R.tape.setPrintThrough (sm.printThrough);
+        }
+        if (changed (&ContParams::wowFlutterAmount))
+        {
+            L.wowFlutter.setAmount (sm.wowFlutterAmount);
+            R.wowFlutter.setAmount (sm.wowFlutterAmount);
+        }
+        if (changed (&ContParams::bassDb))   { L.tone.setBassDb (sm.bassDb);     R.tone.setBassDb (sm.bassDb); }
+        if (changed (&ContParams::trebleDb)) { L.tone.setTrebleDb (sm.trebleDb); R.tone.setTrebleDb (sm.trebleDb); }
+        if (changed (&ContParams::echoAmount))   echoL.setAmount (sm.echoAmount);
+        if (changed (&ContParams::echoAmountR))  echoR.setAmount (sm.echoAmountR);
+        // ECHO TIME/FEEDBACK åsidosätter auto-från-speed — Echo glider själv
+        // internt (~30 ms), utjämningen här tar bara bort blockstegen.
+        if (changed (&ContParams::echoTimeMs))   { echoL.setTimeMs (sm.echoTimeMs);     echoR.setTimeMs (sm.echoTimeMs); }
+        if (changed (&ContParams::echoFeedback)) { echoL.setFeedback (sm.echoFeedback); echoR.setFeedback (sm.echoFeedback); }
+
+        // mixer.setGains används bara för totalgain (bypass-mode)
+        mixer.setGains (sm.micGain, sm.phonoGain, sm.radioGain);
     }
 
     void SignalChain::processChannelChain (ChannelChain& ch, Echo& echo,
@@ -244,21 +309,26 @@ namespace bc2000dl::dsp
         auto* data = buffer.getWritePointer (channel);
 
         // ===== INPUT-MIXER: 3 parallella bussar (manual §1A — Mic/Phono/Radio) =====
-        // Per-kanal-fader (B&O dubbla skydepotentiometre)
-        const float micG   = (channel == 0) ? params.micGain   : params.micGainR;
-        const float phonoG = (channel == 0) ? params.phonoGain : params.phonoGainR;
-        const float radioG = (channel == 0) ? params.radioGain : params.radioGainR;
-        const float anyG = juce::jmax (micG, phonoG, radioG);
+        // Per-kanal-fader (B&O dubbla skydepotentiometre). Utjämnade värden
+        // (sm) + ramp från föregående block (smPrev) → klickfri automation.
+        const float micG   = (channel == 0) ? sm.micGain   : sm.micGainR;
+        const float phonoG = (channel == 0) ? sm.phonoGain : sm.phonoGainR;
+        const float radioG = (channel == 0) ? sm.radioGain : sm.radioGainR;
+        const float micG0   = (channel == 0) ? smPrev.micGain   : smPrev.micGainR;
+        const float phonoG0 = (channel == 0) ? smPrev.phonoGain : smPrev.phonoGainR;
+        const float radioG0 = (channel == 0) ? smPrev.radioGain : smPrev.radioGainR;
+        const float anyG  = juce::jmax (micG, phonoG, radioG);
+        const float anyG0 = juce::jmax (micG0, phonoG0, radioG0);
 
         // v60.5 — Christoffer-feedback: när echo aktivt med alla faders=0 ska
         // feedbacken FORTSÄTTA (inte klippas av).  Tidigare early-return tystade
         // hela kedjan inkl. echo-delaylinjen, vilket bröt klassiskt "tape-feedback-
         // jam" där man maxar echo + drar ner ingångar för att höra delay-loopen
         // dö ut / själv-oscillera.  Nu: skip-shortcut bara om echo också är av.
-        const float echoAmtL = params.echoAmount;
-        const float echoAmtR = params.echoAmountR;
+        const float echoAmtL = sm.echoAmount;
+        const float echoAmtR = sm.echoAmountR;
         const bool echoActive = params.echoEnabled && (echoAmtL > 1e-6f || echoAmtR > 1e-6f);
-        if (anyG <= 1e-6f && ! echoActive)
+        if (anyG <= 1e-6f && anyG0 <= 1e-6f && ! echoActive)
         {
             // Alla source-faders nere OCH echo av → tysta in-signalen men kör
             // fortfarande tape-state framåt (bias-fas + J-A magnetisering).
@@ -288,7 +358,7 @@ namespace bc2000dl::dsp
         // som primär färg eftersom det är vad användaren oftast monitorerar.
         if (params.bypassTape || params.monitorMode == 0)
         {
-            buffer.applyGain (channel, 0, n, anyG * kInputPad);
+            buffer.applyGainRamp (channel, 0, n, anyG0 * kInputPad, anyG * kInputPad);
             ch.micUw0029.process (buffer, channel);
             ch.micN2613.process (buffer, channel);
             ch.tone.process (buffer, channel);
@@ -302,15 +372,17 @@ namespace bc2000dl::dsp
 
         // 1. Kopiera DAW-input till tre scratch-buffrar (en per source-buss)
         //    Mic-vägen kör vi i huvudbufferten för att spara en kopia.
-        if (phonoG > 1e-6f)
+        //    Bussen hålls aktiv tills BÅDE nuvarande och föregående gain är 0
+        //    så gain-rampen hinner landa innan vägen stängs av.
+        if (phonoG > 1e-6f || phonoG0 > 1e-6f)
             phonoScratch.copyFrom (channel, 0, buffer, channel, 0, n);
-        if (radioG > 1e-6f)
+        if (radioG > 1e-6f || radioG0 > 1e-6f)
             radioScratch.copyFrom (channel, 0, buffer, channel, 0, n);
 
         // 2. MIC-bussen (i huvudbufferten)
-        if (micG > 1e-6f)
+        if (micG > 1e-6f || micG0 > 1e-6f)
         {
-            buffer.applyGain (channel, 0, n, micG * kInputPad);
+            buffer.applyGainRamp (channel, 0, n, micG0 * kInputPad, micG * kInputPad);
 
             // Mic-trafo (om lo-Z)
             if (params.micLoZ)
@@ -327,9 +399,9 @@ namespace bc2000dl::dsp
         }
 
         // 3. PHONO-bussen (i scratch-buffer) — kör genom PhonoPreamp (med RIAA i H-läge)
-        if (phonoG > 1e-6f)
+        if (phonoG > 1e-6f || phonoG0 > 1e-6f)
         {
-            phonoScratch.applyGain (channel, 0, n, phonoG * kInputPad);
+            phonoScratch.applyGainRamp (channel, 0, n, phonoG0 * kInputPad, phonoG * kInputPad);
             ch.phono.process (phonoScratch, channel);
 
             // Phono-tonsignatur (varm/fyllig vinyl) — utöver RIAA
@@ -359,9 +431,9 @@ namespace bc2000dl::dsp
         }
 
         // 4. RADIO-bussen (i scratch-buffer) — flat preamp (UW0029 + 2N2613, ingen EQ)
-        if (radioG > 1e-6f)
+        if (radioG > 1e-6f || radioG0 > 1e-6f)
         {
-            radioScratch.applyGain (channel, 0, n, radioG * kInputPad);
+            radioScratch.applyGainRamp (channel, 0, n, radioG0 * kInputPad, radioG * kInputPad);
 
             // Radio 50 Hz power-line hum (−58 dBFS, electromagnetic induction artefact)
             {
@@ -392,7 +464,7 @@ namespace bc2000dl::dsp
 
         // 5. Echo (record→play-head feedback-loop, manual §d)
         // Use per-channel amount so L/R echo amounts are independently gateable.
-        const float echoAmt = (channel == 0) ? params.echoAmount : params.echoAmountR;
+        const float echoAmt = (channel == 0) ? sm.echoAmount : sm.echoAmountR;
         if (params.echoEnabled && echoAmt > 1e-6f)
             echo.process (buffer, channel);
 
@@ -441,6 +513,10 @@ namespace bc2000dl::dsp
         const int numCh = buffer.getNumChannels();
         const int n     = buffer.getNumSamples();
 
+        // Utjämna kontinuerliga parametrar (~30 ms en-pol) mot APVTS-targets
+        // och applicera mot DSP-modulerna — klickfri automation (UAD-krav).
+        advanceSmoothedParams (n);
+
         // KRITISK: scratch-buffrarna allokeras till maxBlock i prepare(), men
         // host:en kan skicka mindre block (Logic gör så vid sample-accurate
         // automation eller bara olika I/O-buffer-storlek vs samplesPerBlock).
@@ -467,8 +543,10 @@ namespace bc2000dl::dsp
         // ----- A0. Input trim (PLUGIN UTILITY · pre-DSP gain) -----
         // Mätaren ovan visar rå input; trimmet appliceras före hela kedjan så
         // det driver tape/preamp-saturationen (autentisk gain-staging).
-        if (params.inputTrimDb != 0.0f)
-            buffer.applyGain (juce::Decibels::decibelsToGain (params.inputTrimDb));
+        if (sm.inputTrimDb != 0.0f || smPrev.inputTrimDb != 0.0f)
+            buffer.applyGainRamp (0, buffer.getNumSamples(),
+                                  juce::Decibels::decibelsToGain (smPrev.inputTrimDb),
+                                  juce::Decibels::decibelsToGain (sm.inputTrimDb));
 
         if (numCh >= 1)
             processChannelChain (L, echoL, buffer, 0);
@@ -556,17 +634,19 @@ namespace bc2000dl::dsp
         balanceMaster.processStereo (buffer);
 
         // ----- Output trim (PLUGIN UTILITY · post-DSP makeup-gain) -----
-        if (params.outputTrimDb != 0.0f)
-            buffer.applyGain (juce::Decibels::decibelsToGain (params.outputTrimDb));
+        if (sm.outputTrimDb != 0.0f || smPrev.outputTrimDb != 0.0f)
+            buffer.applyGainRamp (0, buffer.getNumSamples(),
+                                  juce::Decibels::decibelsToGain (smPrev.outputTrimDb),
+                                  juce::Decibels::decibelsToGain (sm.outputTrimDb));
 
         // ----- MAINS HUM — 1968-amparnas "slight unobtrusive mains hum" -----
         // Fundamental + 3:e harmonik (nät-trafo-mättnad ger udda övertoner).
         // Konservativ skalning: mainsHum∈[0,0.1] → max ≈ −34 dBFS, subtilt.
-        if (params.mainsHum > 1.0e-6f && numCh >= 1)
+        if (sm.mainsHum > 1.0e-6f && numCh >= 1)
         {
             const double inc = juce::MathConstants<double>::twoPi
                                  * (double) params.mainsHumFreqHz / sampleRate;
-            const float  amp = params.mainsHum * 0.2f;
+            const float  amp = sm.mainsHum * 0.2f;
             auto* l = buffer.getWritePointer (0);
             auto* r = numCh >= 2 ? buffer.getWritePointer (1) : nullptr;
             for (int i = 0; i < n; ++i)

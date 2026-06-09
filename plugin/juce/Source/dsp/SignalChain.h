@@ -235,6 +235,30 @@ namespace bc2000dl::dsp
 
         ChannelChain L, R;
 
+        // ----- Per-block-utjämning av kontinuerliga parametrar -----
+        // En-pol (~30 ms) mot APVTS-target, avancerad per block i process().
+        // Buffer-gains rampas dessutom inom blocket (applyGainRamp) →
+        // klickfri automation utan per-sample-kostnad i hela kedjan.
+        // Första blocket efter prepare()/reset() snappar till target så
+        // kalibrerade mätningar (spec-tester) förblir deterministiska.
+        struct ContParams
+        {
+            float micGain {}, micGainR {}, phonoGain {}, phonoGainR {};
+            float radioGain {}, radioGainR {};
+            float bassDb {}, trebleDb {};
+            float biasAmount { 1.0f }, biasAmountR { 1.0f };
+            float saturationDrive { 1.0f }, saturationDriveR { 1.0f };
+            float wowFlutterAmount { 1.0f };
+            float echoAmount {}, echoAmountR {};
+            float echoTimeMs { 150.0f }, echoFeedback { 0.5f };
+            float inputTrimDb {}, outputTrimDb {};
+            float printThrough {}, mainsHum {};
+        };
+        ContParams sm, smPrev;
+        bool smInitialised { false };
+        static constexpr float kParamSmoothSec = 0.03f;
+        void advanceSmoothedParams (int numSamples);
+
         // Scratch-buffrar för parallell-mixern (allokeras i prepare(), RT-safe)
         juce::AudioBuffer<float> phonoScratch;  // 2 kanaler
         juce::AudioBuffer<float> radioScratch;
