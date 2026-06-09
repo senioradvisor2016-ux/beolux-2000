@@ -14,6 +14,7 @@
 #pragma once
 
 #include <atomic>
+#include <cmath>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_dsp/juce_dsp.h>
 
@@ -124,6 +125,16 @@ namespace bc2000dl::dsp
         void process (juce::AudioBuffer<float>& buffer);
         void setParameters (const Parameters& p);
 
+        // Total fast latens (samples @ bas-SR): wow/flutter-basdelay +
+        // tape-oversamplerns gruppfördröjning. Rapporteras till värden via
+        // setLatencySamples() i prepareToPlay. Bypass/Source-vägen kompenseras
+        // med matchande FixedDelay så latensen är lägesoberoende.
+        int getLatencySamples() const
+        {
+            return L.wowFlutter.getLatencySamples()
+                 + static_cast<int> (std::round (L.tape.getLatencyInSamples()));
+        }
+
         // VU-meter atomic feed (UI-thread läser)
         std::atomic<float> inputLevelL_dBFS  { -60.0f };
         std::atomic<float> inputLevelR_dBFS  { -60.0f };
@@ -154,6 +165,30 @@ namespace bc2000dl::dsp
         TapeSpeed lastSpeed { TapeSpeed::Speed19 };
         double mainsHumPhase { 0.0 };   // ackumulator för MAINS HUM-injektion
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> sosSmooth;  // S-on-S on/off-ramp
+
+        // Fast integer-delay som håller bypass/Source-vägen i fas med den
+        // PDC-rapporterade tape-vägen (oversampler + wow/flutter-basdelay).
+        struct FixedDelay
+        {
+            void prepare (int delaySamples)
+            {
+                len = juce::jmax (0, delaySamples);
+                buf.assign (static_cast<size_t> (juce::jmax (1, len)), 0.0f);
+                idx = 0;
+            }
+            void reset() { std::fill (buf.begin(), buf.end(), 0.0f); idx = 0; }
+            float processSample (float x)
+            {
+                if (len <= 0) return x;
+                const float y = buf[static_cast<size_t> (idx)];
+                buf[static_cast<size_t> (idx)] = x;
+                idx = (idx + 1) % len;
+                return y;
+            }
+            std::vector<float> buf;
+            int idx { 0 };
+            int len { 0 };
+        };
 
         struct ChannelChain
         {
@@ -190,6 +225,7 @@ namespace bc2000dl::dsp
             ToneControl         tone;
             PowerAmp8004014     powerAmp;
             juce::dsp::IIR::Filter<float> dcBlock;
+            FixedDelay          bypassDelay;   // PDC-matchning för bypass/Source-vägen
 
             // Per-source noise generators (RT-safe, no allocation, no init cost)
             float        radioHumPhase    { 0.0f };

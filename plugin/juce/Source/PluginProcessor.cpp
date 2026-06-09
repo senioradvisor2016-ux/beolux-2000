@@ -266,6 +266,11 @@ BC2000DLProcessor::BC2000DLProcessor()
 void BC2000DLProcessor::prepareToPlay (double sr, int samplesPerBlock)
 {
     chain.prepare (sr, samplesPerBlock);
+
+    // PDC: wow/flutter-basdelay + tape-oversamplerns gruppfördröjning.
+    // Bypass/Source-vägen är delay-matchad i SignalChain → gäller alla lägen.
+    setLatencySamples (chain.getLatencySamples());
+
     updateChainParameters();
 }
 

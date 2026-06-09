@@ -48,6 +48,13 @@ namespace bc2000dl::dsp
 
         void process (juce::AudioBuffer<float>& buffer, int channel);
 
+        // Oversamplerns gruppfördröjning vid bas-samplerate (fraktionell) —
+        // ingår i pluginens totala PDC-rapport.
+        float getLatencyInSamples() const
+        {
+            return oversampler ? static_cast<float> (oversampler->getLatencyInSamples()) : 0.0f;
+        }
+
     private:
         double sampleRate { 48000.0 };
         TapeSpeed currentSpeed { TapeSpeed::Speed19 };

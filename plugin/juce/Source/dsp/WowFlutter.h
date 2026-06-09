@@ -24,6 +24,10 @@ namespace bc2000dl::dsp
         void setSpeed (TapeSpeed speed);
         void setAmount (float a) { amount = juce::jlimit (0.0f, 2.0f, a); }
 
+        // Fast basdelay (alltid aktiv, oavsett amount) — rapporteras som
+        // plugin-latens via setLatencySamples() så värden kan PDC-kompensera.
+        int getLatencySamples() const { return baseDelay; }
+
         float processSample (float x);
         void process (juce::AudioBuffer<float>& buffer, int channel);
 
@@ -37,9 +41,11 @@ namespace bc2000dl::dsp
         float wowFreqHz     { 1.5f };
         float flutterFreqHz { 30.0f };
 
-        // Ring-buffer för delay-line (~50 ms max)
+        // Ring-buffer för delay-line. Dimensioneras i prepare() till
+        // max modulationsdjup + marginal (~1 ms @ 48 kHz, inte 50 ms).
         std::vector<float> buf;
-        int writeIdx { 0 };
+        int writeIdx  { 0 };
+        int baseDelay { 0 };
 
         // LFO-faser
         float wowPhase     { 0.0f };

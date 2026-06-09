@@ -84,6 +84,13 @@ namespace bc2000dl::dsp
         prepareChannel (L, sr, +kAsymmetryAmount, 1000);
         prepareChannel (R, sr, -kAsymmetryAmount, 2000);
 
+        // Bypass/Source-vägen får samma fasta delay som tape-vägens
+        // oversampler + wow/flutter-basdelay → latensen är lägesoberoende
+        // och PDC-rapporten (getLatencySamples()) gäller alla lägen.
+        const int totalLatency = getLatencySamples();
+        L.bypassDelay.prepare (totalLatency);
+        R.bypassDelay.prepare (totalLatency);
+
         echoL.prepare (sr);
         echoR.prepare (sr);
         balanceMaster.prepare (sr, blockSize);
@@ -118,6 +125,7 @@ namespace bc2000dl::dsp
             ch->tone.reset();
             ch->powerAmp.reset();
             ch->dcBlock.reset();
+            ch->bypassDelay.reset();
             ch->phonoToneHf.reset(); ch->phonoToneLf.reset();
             ch->radioToneHf.reset(); ch->radioToneLf.reset();
         }
@@ -256,6 +264,7 @@ namespace bc2000dl::dsp
             // fortfarande tape-state framåt (bias-fas + J-A magnetisering).
             buffer.clear (channel, 0, n);
             ch.tape.process (buffer, channel);   // process zeros → state advances
+            ch.wowFlutter.process (buffer, channel);  // flusha delay-tail, håll latensvägen aktiv
             return;
         }
 
@@ -284,8 +293,10 @@ namespace bc2000dl::dsp
             ch.micN2613.process (buffer, channel);
             ch.tone.process (buffer, channel);
             ch.powerAmp.process (buffer, channel);
+            // bypassDelay matchar tape-vägens latens → klickfri växling
+            // Source/Tape och korrekt PDC i båda lägena.
             for (int i = 0; i < n; ++i)
-                data[i] = ch.dcBlock.processSample (data[i]);
+                data[i] = ch.dcBlock.processSample (ch.bypassDelay.processSample (data[i]));
             return;
         }
 

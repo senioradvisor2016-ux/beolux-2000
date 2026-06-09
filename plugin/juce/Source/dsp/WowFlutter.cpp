@@ -8,7 +8,17 @@ namespace bc2000dl::dsp
     void WowFlutter::prepare (double sr)
     {
         sampleRate = sr;
-        buf.assign (static_cast<size_t> (sr * 0.05), 0.0f);
+
+        // Max modulationsdjup i samples:
+        //   (wowAmount + flutterAmount)_max × amount_max × 0.005 × sr
+        //   = (0.0424 + 0.001698) × 2.0 × 0.005 × sr ≈ 4.4e-4 × sr  (~21 @ 48 kHz)
+        // 5e-4 ger marginal. Basdelay = djup + 8 samples Lagrange-marginal.
+        // Hela delayn är fast och PDC-rapporteras via getLatencySamples() —
+        // tidigare 50 ms-buffer med 25 ms centrum var ~100× större än nödvändigt
+        // och rapporterades aldrig till värden.
+        const int maxMod = static_cast<int> (std::ceil (sr * 5.0e-4)) + 1;
+        baseDelay = maxMod + 8;
+        buf.assign (static_cast<size_t> (baseDelay + maxMod + 8), 0.0f);
         writeIdx = 0;
         wowPhase = flutterPhase = 0.0f;
     }
@@ -39,19 +49,22 @@ namespace bc2000dl::dsp
 
     float WowFlutter::processSample (float x)
     {
-        if (amount < 1e-6f || buf.empty()) return x;
+        if (buf.empty()) return x;
 
         // Skriv input till ring-buffer
         buf[static_cast<size_t> (writeIdx)] = x;
         writeIdx = (writeIdx + 1) % static_cast<int> (buf.size());
 
-        // Beräkna instant delay-modulation
+        // Ingen early-return på amount — delayvägen är alltid aktiv så
+        // latensen är konstant (PDC-korrekt) även när wow/flutter
+        // automatiseras genom noll.
         const float wowMod     = wowAmount * std::sin (wowPhase) * amount;
         const float flutterMod = flutterAmount * std::sin (flutterPhase) * amount;
 
-        const float baseDelay  = static_cast<float> (buf.size()) * 0.5f;
-        const float delaySamps = baseDelay
-            + (wowMod + flutterMod) * static_cast<float> (sampleRate) * 0.005f;
+        const float delaySamps = juce::jlimit (
+            3.0f, static_cast<float> (buf.size()) - 2.0f,
+            static_cast<float> (baseDelay)
+                + (wowMod + flutterMod) * static_cast<float> (sampleRate) * 0.005f);
 
         // Lagrange 3:e-ordningens interpolation
         const int idxInt = static_cast<int> (std::floor (delaySamps));
@@ -85,7 +98,6 @@ namespace bc2000dl::dsp
 
     void WowFlutter::process (juce::AudioBuffer<float>& buffer, int channel)
     {
-        if (amount < 1e-6f) return;
         auto* data = buffer.getWritePointer (channel);
         const int n = buffer.getNumSamples();
         for (int i = 0; i < n; ++i)
