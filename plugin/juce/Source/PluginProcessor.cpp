@@ -64,6 +64,8 @@ namespace
     constexpr auto kP_MainsHumFreq     = "mains_hum_freq";    // 0=50Hz · 1=60Hz
     constexpr auto kP_InputTrim        = "input_trim";        // -24..+24 dB pre-DSP
     constexpr auto kP_OutputTrim       = "output_trim";       // -24..+24 dB post-DSP makeup
+    constexpr auto kP_Mix              = "mix";               // 0..1 dry/wet (1 = wet)
+    constexpr auto kP_TapeNoise        = "tape_noise";        // 0..2 bandbrus-skala (1 = spec)
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout
@@ -249,6 +251,16 @@ BC2000DLProcessor::createParameterLayout()
         juce::ParameterID { kP_OutputTrim, 1 }, "Output Trim",
         juce::NormalisableRange<float> { -24.0f, 24.0f, 0.1f }, 0.0f));
 
+    // ===== Fas 2 (UAD-paritet) =====
+    // MIX — dry/wet med latensjusterad dry-väg (parallellbearbetning)
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_Mix, 1 }, "Mix",
+        juce::NormalisableRange<float> { 0.0f, 1.0f, 0.01f }, 1.0f));
+    // TAPE NOISE — bandbrus-skala (0 = av, 1 = spec-nivå, 2 = sliten tape)
+    layout.add (std::make_unique<P> (
+        juce::ParameterID { kP_TapeNoise, 1 }, "Tape Noise",
+        juce::NormalisableRange<float> { 0.0f, 2.0f, 0.01f }, 1.0f));
+
     return layout;
 }
 
@@ -353,6 +365,8 @@ void BC2000DLProcessor::updateChainParameters()
     p.mainsHumFreqHz   = getF (kP_MainsHumFreq) > 0.5f ? 60.0f : 50.0f;
     p.echoTimeMs       = getF (kP_EchoTime);
     p.echoFeedback     = getF (kP_EchoFeedback);
+    p.mix              = getF (kP_Mix);
+    p.tapeNoise        = getF (kP_TapeNoise);
     // DELUXE MIC-mode driver micLoZ-DSP:n: läge 0/1 = LoZ, 2 = HiZ Crystal.
     p.micLoZ           = (p.micMode < 2);
 

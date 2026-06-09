@@ -118,6 +118,10 @@ namespace bc2000dl::dsp
             float mainsHumFreqHz  { 50.0f };   // HUM FRQ — 50 eller 60 Hz
             float echoTimeMs      { 150.0f };  // ECHO TIME — 30..350 ms (override auto-speed)
             float echoFeedback    { 0.5f };    // ECHO FEEDBACK — 0..1 (override)
+
+            // ===== Fas 2 (UAD-paritet) =====
+            float mix             { 1.0f };    // dry/wet — 1.0 = helt wet (default)
+            float tapeNoise       { 1.0f };    // bandbrus-skala — 1.0 = spec-nivå, 0 = av
         };
 
         void prepare (double sampleRate, int maximumBlockSize);
@@ -253,6 +257,7 @@ namespace bc2000dl::dsp
             float echoTimeMs { 150.0f }, echoFeedback { 0.5f };
             float inputTrimDb {}, outputTrimDb {};
             float printThrough {}, mainsHum {};
+            float mix { 1.0f }, tapeNoise { 1.0f };
         };
         ContParams sm, smPrev;
         bool smInitialised { false };
@@ -262,6 +267,11 @@ namespace bc2000dl::dsp
         // Scratch-buffrar för parallell-mixern (allokeras i prepare(), RT-safe)
         juce::AudioBuffer<float> phonoScratch;  // 2 kanaler
         juce::AudioBuffer<float> radioScratch;
+
+        // Dry-väg för MIX-ratten: rå input fördröjd med pluginens rapporterade
+        // latens (FixedDelay) så dry/wet-blandningen är fasriktig.
+        juce::AudioBuffer<float> dryScratch;
+        FixedDelay dryDelayL, dryDelayR;
 
         Mixer3Bus mixer;
         Echo echoL, echoR;

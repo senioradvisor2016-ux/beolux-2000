@@ -454,8 +454,9 @@ namespace bc2000dl::dsp
             // 4b. v60.3 — Bias-typ presence-shelf (HIGH/CrO₂ = +3 dB @ 4 kHz)
             y = biasShelfFilter.processSample (y);
 
-            // 5. Tape-egenbrus (LCG Gaussian — RT-safe, 30× snabbare än mt19937)
-            y += detail::fastGaussNoise (lcgState) * noiseAmpLin;
+            // 5. Tape-egenbrus (LCG Gaussian — RT-safe, 30× snabbare än mt19937).
+            //    noiseMult: user-styrd skala (0 = av, 1 = spec-nivå).
+            y += detail::fastGaussNoise (lcgState) * noiseAmpLin * noiseMult;
 
             data[i] = y;
         }

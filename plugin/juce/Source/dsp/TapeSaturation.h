@@ -46,6 +46,10 @@ namespace bc2000dl::dsp
         // 1/2 track: bredare gap → lägre brus + bredare head-bump-Q.
         void setTrackWidth (int t);
 
+        // Bandbrus-skala: 1.0 = spec-nivå (−82/−76/−70 dBFS per hastighet),
+        // 0 = brusfritt, upp till 2.0 = "sliten tape". UAD-paritet (noise enable).
+        void setNoiseLevel (float mult) { noiseMult = juce::jlimit (0.0f, 2.0f, mult); }
+
         void process (juce::AudioBuffer<float>& buffer, int channel);
 
         // Oversamplerns gruppfördröjning vid bas-samplerate (fraktionell) —
@@ -95,6 +99,7 @@ namespace bc2000dl::dsp
         // Brusgenerator — LCG Gaussian (30× snabbare än mt19937)
         std::uint32_t lcgState { 0u };
         float noiseAmpLin { 0.0f };
+        float noiseMult   { 1.0f };   // user-skala (setNoiseLevel)
 
         // DC-block för J-A remanens (en-pol HP, ~10 Hz)
         float dcBlockX1 { 0.0f }, dcBlockY1 { 0.0f };

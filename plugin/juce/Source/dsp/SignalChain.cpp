@@ -95,6 +95,11 @@ namespace bc2000dl::dsp
         L.bypassDelay.prepare (totalLatency);
         R.bypassDelay.prepare (totalLatency);
 
+        // Dry-väg för MIX: samma latens som wet-vägen → fasriktig blandning
+        dryScratch.setSize (2, blockSize, false, true, true);
+        dryDelayL.prepare (totalLatency);
+        dryDelayR.prepare (totalLatency);
+
         smInitialised = false;   // första blocket snappar till APVTS-targets
 
         echoL.prepare (sr);
@@ -139,6 +144,8 @@ namespace bc2000dl::dsp
         balanceMaster.reset();
         phonoScratch.clear();
         radioScratch.clear();
+        dryScratch.clear();
+        dryDelayL.reset(); dryDelayR.reset();
         // Reset per-source noise and modulation phases
         L.radioHumPhase = R.radioHumPhase = 0.0f;
         L.phonoRumbleState = R.phonoRumbleState = 0.0f;
@@ -265,6 +272,8 @@ namespace bc2000dl::dsp
         step (sm.outputTrimDb,     params.outputTrimDb);
         step (sm.printThrough,     params.printThrough);
         step (sm.mainsHum,         params.mainsHum);
+        step (sm.mix,              params.mix);
+        step (sm.tapeNoise,        params.tapeNoise);
 
         const bool firstBlock = ! smInitialised;
         if (firstBlock)
@@ -286,6 +295,11 @@ namespace bc2000dl::dsp
         {
             L.tape.setPrintThrough (sm.printThrough);
             R.tape.setPrintThrough (sm.printThrough);
+        }
+        if (changed (&ContParams::tapeNoise))
+        {
+            L.tape.setNoiseLevel (sm.tapeNoise);
+            R.tape.setNoiseLevel (sm.tapeNoise);
         }
         if (changed (&ContParams::wowFlutterAmount))
         {
@@ -535,6 +549,21 @@ namespace bc2000dl::dsp
             phonoScratch.setSize (2, n, false, false, true);
         if (radioScratch.getNumSamples() != n)
             radioScratch.setSize (2, n, false, false, true);
+        if (dryScratch.getNumSamples() != n)
+            dryScratch.setSize (2, n, false, false, true);
+
+        // ----- Dry-väg för MIX: fånga rå input (före trim/DSP) och fördröj
+        // med pluginens rapporterade latens → fasriktig dry/wet-blandning.
+        // Delayn matas ALLTID (även vid mix=1.0) så den är i fas när
+        // användaren drar ner mix-ratten.
+        for (int ch = 0; ch < juce::jmin (numCh, 2); ++ch)
+        {
+            dryScratch.copyFrom (ch, 0, buffer, ch, 0, n);
+            auto& dly = (ch == 0) ? dryDelayL : dryDelayR;
+            auto* d = dryScratch.getWritePointer (ch);
+            for (int i = 0; i < n; ++i)
+                d[i] = dly.processSample (d[i]);
+        }
 
         // Snapshot raw INPUT levels before any DSP touches the buffer.
         if (numCh >= 1)
@@ -662,6 +691,23 @@ namespace bc2000dl::dsp
                 mainsHumPhase += inc;
                 if (mainsHumPhase >= juce::MathConstants<double>::twoPi)
                     mainsHumPhase -= juce::MathConstants<double>::twoPi;
+            }
+        }
+
+        // ----- MIX (dry/wet) — equal-gain-crossfade mot latensjusterad dry --
+        if (sm.mix < 1.0f || smPrev.mix < 1.0f)
+        {
+            const float m0 = smPrev.mix, m1 = sm.mix;
+            const float invN = 1.0f / static_cast<float> (juce::jmax (1, n - 1));
+            for (int ch = 0; ch < juce::jmin (numCh, 2); ++ch)
+            {
+                auto* wet = buffer.getWritePointer (ch);
+                const auto* dry = dryScratch.getReadPointer (ch);
+                for (int i = 0; i < n; ++i)
+                {
+                    const float m = m0 + (m1 - m0) * static_cast<float> (i) * invN;
+                    wet[i] = wet[i] * m + dry[i] * (1.0f - m);
+                }
             }
         }
 
