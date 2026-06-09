@@ -342,6 +342,16 @@ target_link_libraries(BC2000DL_NanTest PRIVATE
     juce::juce_dsp juce::juce_audio_basics juce::juce_core
     juce::juce_recommended_config_flags)
 
+# --- CPU-benchmark (realtidsfaktor-regression för hela kedjan) ---
+juce_add_console_app(BC2000DL_CpuBench PRODUCT_NAME "BC2000DL_CpuBench")
+target_sources(BC2000DL_CpuBench PRIVATE Source/tests/CpuBenchTest.cpp ${BC2000DL_DSP_TEST_SOURCES})
+target_include_directories(BC2000DL_CpuBench PRIVATE Source)
+target_compile_definitions(BC2000DL_CpuBench PRIVATE
+    JUCE_USE_CURL=0 JUCE_WEB_BROWSER=0 JUCE_DISPLAY_SPLASH_SCREEN=0 JUCE_STANDALONE_APPLICATION=1)
+target_link_libraries(BC2000DL_CpuBench PRIVATE
+    juce::juce_dsp juce::juce_audio_basics juce::juce_core
+    juce::juce_recommended_config_flags)
+
 # --- State round-trip (länkar mot plugin-SharedCode för riktiga processorn) ---
 juce_add_console_app(BC2000DL_StateTest PRODUCT_NAME "BC2000DL_StateTest")
 target_sources(BC2000DL_StateTest PRIVATE Source/tests/StateRoundTripTest.cpp)
@@ -426,7 +436,8 @@ add_test(NAME StateFuzz      COMMAND BC2000DL_StateFuzzTest)
 add_test(NAME VURender       COMMAND BC2000DL_VURenderTest)
 add_test(NAME UIRender       COMMAND BC2000DL_UIRenderTest)
 add_test(NAME NanRecovery    COMMAND BC2000DL_NanTest)
-set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest StateRoundTrip StateFuzz VURender UIRender NanRecovery
+add_test(NAME CpuBench       COMMAND BC2000DL_CpuBench)
+set_tests_properties(Catch2 GTest DspSmoke BugFixTests AudibilityTest StateRoundTrip StateFuzz VURender UIRender NanRecovery CpuBench
                      PROPERTIES LABELS "unit")
 
 # Integrations-tester (kräver installerad VST3 + pedalboard / pluginval)
@@ -436,10 +447,14 @@ if(PYTHON3_EXE)
              COMMAND ${PYTHON3_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/Source/tests/signal_test.py)
     add_test(NAME StudioSound1968
              COMMAND ${PYTHON3_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/Source/tests/vs_studio_sound_1968.py)
+    add_test(NAME SpectralGuard
+             COMMAND ${PYTHON3_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/Source/tests/spectral_guard.py)
     set_tests_properties(SignalTest_pedalboard PROPERTIES
         LABELS "integration" PASS_REGULAR_EXPRESSION "0 underkända")
     set_tests_properties(StudioSound1968 PROPERTIES
         LABELS "integration" PASS_REGULAR_EXPRESSION "29/29")
+    set_tests_properties(SpectralGuard PROPERTIES
+        LABELS "integration" PASS_REGULAR_EXPRESSION "SPECTRAL GUARD: ALLT OK")
 endif()
 
 if(EXISTS "/Applications/pluginval.app/Contents/MacOS/pluginval")
