@@ -9,12 +9,12 @@ och printar PASS/FAIL med delta. Målet: alla rader gröna.
 Kör:  python3 plugin/juce/Source/tests/vs_studio_sound_1968.py [/path/to/Beolux.vst3]
 """
 
-import sys, math, time
+import os, sys, math, time
 import numpy as np
 import pedalboard
 
 PLUGIN_PATH = (sys.argv[1] if len(sys.argv) > 1
-               else "/Users/senioradvisor/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3")
+               else os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3"))
 SR = 48000
 BLOCK = 512
 

@@ -17,11 +17,11 @@ Fail-kriterier:
   - Plötslig DC-bias > 0.1
 """
 
-import sys, math
+import os, sys, math
 import numpy as np
 import pedalboard
 
-PLUGIN = "/Users/senioradvisor/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3"
+PLUGIN = os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3")
 SR = 48000
 BLOCK = 512
 WARM_BLOCKS = 30

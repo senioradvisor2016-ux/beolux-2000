@@ -8,12 +8,12 @@ Kräver:  pip install pedalboard numpy
 Testar det *kompilerade* VST3-binäret, inte DSP-koden direkt.
 """
 
-import sys, time, math
+import os, sys, time, math
 import numpy as np
 import pedalboard
 
 # ──────────────────────────────────────────────────────────────────
-PLUGIN_PATH = "/Users/senioradvisor/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3"
+PLUGIN_PATH = os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3")
 SR_DEFAULT  = 48000
 BLOCK       = 512
 WARM_BLOCKS = 40
