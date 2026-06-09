@@ -47,17 +47,9 @@ juce_add_plugin(BC2000DL
 target_sources(BC2000DL PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginProcessor.h
-    Source/PluginEditor.cpp
-    Source/PluginEditor.h
-    Source/WebEditor.cpp
-    Source/WebEditor.h
-    Source/NativeEditor.cpp
-    Source/NativeEditor.h
     Source/WireframeEditor.cpp
     Source/WireframeEditor.h
     Source/ui/FontAudioIcons.h
-    Source/ui/BC2000LookAndFeel.cpp
-    Source/ui/BC2000LookAndFeel.h
     Source/dsp/Constants.h
     Source/dsp/Ge2N2613Stage.h
     Source/dsp/Ge2N2613Stage.cpp
@@ -82,22 +74,6 @@ target_sources(BC2000DL PRIVATE
     Source/dsp/SignalChain.h
     Source/dsp/SignalChain.cpp
     Source/ui/BCColours.h
-    Source/ui/BCLookAndFeel.h
-    Source/ui/BCLookAndFeel.cpp
-    Source/ui/VUMeter.h
-    Source/ui/VUMeter.cpp
-    Source/ui/HybridHeroPanel.h
-    Source/ui/HybridHeroPanel.cpp
-    Source/ui/TransportLever.h
-    Source/ui/TransportLever.cpp
-    Source/ui/DualSlideFader.h
-    Source/ui/DualSlideFader.cpp
-    Source/ui/PhotorealReel.h
-    Source/ui/PhotorealReel.cpp
-    Source/ui/AssetRegistry.h
-    Source/ui/AssetRegistry.cpp
-    Source/ui/UADStyleSelector.h
-    Source/ui/UADStyleSelector.cpp
     Source/ui/PresetBrowser.h
     Source/ui/PresetBrowser.cpp
     Source/presets/Presets.h
@@ -105,8 +81,8 @@ target_sources(BC2000DL PRIVATE
 )
 
 target_compile_definitions(BC2000DL PRIVATE
-    JUCE_WEB_BROWSER=1
-    JUCE_USE_WIN_WEBVIEW2_WITH_STATIC_LINKING=1
+    # WebEditor borttagen (v62) → ingen WebBrowserComponent/WebKit-dependens
+    JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
     JUCE_DISPLAY_SPLASH_SCREEN=0

@@ -1,9 +1,6 @@
 /*  BC2000DL — AudioProcessor implementation. */
 
 #include "PluginProcessor.h"
-#include "PluginEditor.h"
-#include "WebEditor.h"
-#include "NativeEditor.h"
 #include "WireframeEditor.h"
 #include "presets/Presets.h"
 #include <cstring>
@@ -410,8 +407,8 @@ void BC2000DLProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 juce::AudioProcessorEditor* BC2000DLProcessor::createEditor()
 {
     // DELUXE-UI — WireframeEditor (matchar design_inbox/beolux_2000_deluxe_wireframe.html
-    // + B&O Beocord 2000 De Luxe-manualen). NativeEditor/BC2000DLEditor/WebEditor
-    // finns kvar i build:en som fallback men används inte.
+    // + B&O Beocord 2000 De Luxe-manualen). De gamla editorerna
+    // (NativeEditor/BC2000DLEditor/WebEditor) togs bort ur bygget i v62.
     return new bc2000dl::ui::WireframeEditor (*this);
 }
 
