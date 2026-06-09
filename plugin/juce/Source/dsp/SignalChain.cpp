@@ -57,6 +57,10 @@ namespace bc2000dl::dsp
         ch.tape.prepare (sr, baseSeed + 300);
         ch.multiplay.prepare (sr, baseSeed + 350);
         ch.wowFlutter.prepare (sr);
+        // L (asymOffset>0): weave +, R: weave − (motfas). Scrape-seed per
+        // kanal — pitch-jittret i övrigt delar sekvens (samma fysiska band).
+        ch.wowFlutter.setStereoRole (asymOffset >= 0.0f ? 1.0f : -1.0f,
+                                     baseSeed * 2654435761u + 17u);
         ch.playEq.prepare (sr);
         ch.tone.prepare (sr);
         ch.powerAmp.prepare (sr);
