@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Python-testberoenden (pedalboard-sviterna)
+        run: python3 -m pip install numpy pedalboard
+
+      # Måste installeras FÖRE configure — ctest-registreringen av
+      # Pluginval_strict10 är villkorad på att appen finns.
+      - name: Installera pluginval
+        run: |
+          curl -fsSL -o pluginval.zip \
+            https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
+          unzip -q pluginval.zip
+          sudo mv pluginval.app /Applications/
+
+      # arm64-only på CI: runnern är arm64 och x86_64-slicen kan ändå inte
+      # testas här. Release-paketet (universal) byggs via scripts/package-dist.sh.
+      - name: Configure
+        run: >
+          cmake -S plugin/juce -B plugin/juce/build
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_OSX_ARCHITECTURES=arm64
+
+      # Default-target bygger plugin (VST3/AU/Standalone, installeras till
+      # ~/Library/Audio/Plug-Ins — krävs av integrationstesterna) + alla testappar.
+      - name: Bygg plugin + tester
+        run: cmake --build plugin/juce/build --parallel 3
+
+      - name: ctest (unit + integration, pluginval strict 10)
+        run: ctest --test-dir plugin/juce/build --output-on-failure
+
+      - name: Spara pluginval-loggar vid fel
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pluginval-loggar
+          path: output/pluginval/
+          if-no-files-found: ignore
