@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include "Constants.h"
+#include "GeSoftClip.h"
 
 namespace bc2000dl::dsp
 {
@@ -54,7 +55,7 @@ namespace bc2000dl::dsp
 
         std::uint32_t lcgState { 0u };   // fast LCG state (replaces mt19937)
 
-        /** Ebers-Moll-derived asymmetric soft-clip. */
-        static double softClip (double x, double asymmetry, double Vt);
+        /** Ebers-Moll-fit soft-clip med ADAA1 — se GeSoftClip.h. */
+        detail::GeSoftClipADAA shaper;
     };
 }

@@ -8,31 +8,6 @@
 
 namespace bc2000dl::dsp
 {
-    namespace
-    {
-        // Identisk soft-clip som i Ge2N2613Stage (delad implementation)
-        double softClipShared (double x, double asym, double Vt)
-        {
-            constexpr double scale = 0.9;
-            const double xs = x * scale;
-
-            // Knee höjd från Vt*35 till Vt*100 (v62.5) — se Ge2N2613Stage.cpp
-            // för förklaring.  Linjär region för -3 dBFS test-signaler.
-            const double baseKnee = std::max (Vt * 100.0, 0.5);
-            const double a = std::clamp (asym * kAsymmetryGain, -0.7, 0.7);
-            const double kneePos = baseKnee * (1.0 + a);
-            const double kneeNeg = baseKnee * (1.0 - a);
-
-            const double xPos = std::max (xs, 0.0);
-            const double xNeg = std::max (-xs, 0.0);
-
-            const double yPos = kneePos * std::tanh (xPos / kneePos);
-            const double yNeg = -kneeNeg * std::tanh (xNeg / kneeNeg);
-
-            return (yPos + yNeg) / scale;
-        }
-    }
-
     void GeLowNoiseStage::prepare (double sr,
                                    GeStageType t,
                                    double gainDb,
@@ -65,7 +40,7 @@ namespace bc2000dl::dsp
 
     void GeLowNoiseStage::reset()
     {
-        // Ingen filter-state
+        shaper.reset();   // ADAA-historik (prevU)
     }
 
     void GeLowNoiseStage::setGain (double gainDb)
@@ -84,7 +59,9 @@ namespace bc2000dl::dsp
         const float noise = bc2000dl::dsp::detail::fastGaussNoise (lcgState)
                             * static_cast<float> (noiseSigma);
         const double xNoisy = static_cast<double> (x) + noise;
-        const double clipped = softClipShared (xNoisy * gainLinear, asymmetry, kVT_25C);
+        // Samma Ebers-Moll-fit som Ge2N2613Stage, evaluerad via ADAA1
+        // (GeSoftClip.h) — antialiserad i bas-samplerate.
+        const double clipped = shaper.process (xNoisy * gainLinear, asymmetry, kVT_25C);
         return static_cast<float> (clipped);
     }
 
