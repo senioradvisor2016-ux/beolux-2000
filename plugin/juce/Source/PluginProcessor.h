@@ -46,12 +46,34 @@ public:
     juce::AudioProcessorValueTreeState apvts;
     bc2000dl::dsp::SignalChain& getChain() { return chain; }
 
+    // ===== A/B-compare (UAD-paritet) =====
+    // Två settings-slots. Det LIVE APVTS-trädet är den aktiva slottens
+    // arbetskopia; den inaktiva hålls fryst. Persisteras i projektets state.
+    void abRecall (int slot);        // växla aktiv slot (sparar live → gammal, laddar ny)
+    void abCopyActiveToOther();      // kopiera aktiv → andra (matcha A och B)
+    void abSwap();                   // byt A↔B-innehåll, ladda om aktiv
+    int  getABSlot() const { return abSlot; }
+
+    // ===== User-presets på disk =====
+    static juce::File userPresetDirectory();          // skapas vid behov
+    bool saveUserPreset (const juce::String& name);   // skriv live-state → <dir>/<name>.beolux
+    bool loadUserPresetFile (const juce::File&);       // läs + applicera
+    juce::Array<juce::File> listUserPresets();
+
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void updateChainParameters();
 
+    // Applicera ett (saneringshärdat) state-träd på live-parametrarna.
+    // Delad av setStateInformation + A/B-recall + user-preset-load.
+    void applyStateTree (juce::ValueTree tree);
+
     bc2000dl::dsp::SignalChain chain;  // public-accessed via getChain()
     int currentProgramIndex { 0 };
+
+    // A/B-slots (giltiga efter första abRecall/store; init = aktuellt state)
+    juce::ValueTree abState[2];
+    int abSlot { 0 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BC2000DLProcessor)
 };

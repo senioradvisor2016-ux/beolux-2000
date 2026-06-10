@@ -1245,7 +1245,98 @@ namespace bc2000dl::ui
         addAndMakeVisible (btnPresetPrev);
         addAndMakeVisible (btnPresetNext);
 
+        // Högerklick på preset-namnet → user-preset-meny (spara/ladda/radera)
+        btnPresetName.onRightClick = [this] { showUserPresetMenu(); };
+
+        // ===== A/B-compare =====
+        auto setupAb = [&] (juce::TextButton& b, const juce::String& tip)
+        {
+            b.setTooltip (tip);
+            b.setMouseCursor (juce::MouseCursor::PointingHandCursor);
+            addAndMakeVisible (b);
+        };
+        setupAb (btnAbA, "A/B: setting A.\nKlicka för att jamfora.\nHogerklick preset-namn for att spara.");
+        setupAb (btnAbB, "A/B: setting B.\nKlicka for att jamfora med A.");
+        setupAb (btnAbCopy, "Kopiera aktiv setting till den andra\n(matcha A och B som startpunkt).");
+        btnAbA.onClick    = [this] { audioProc.abRecall (0); refreshAbButtons(); };
+        btnAbB.onClick    = [this] { audioProc.abRecall (1); refreshAbButtons(); };
+        btnAbCopy.onClick = [this] { audioProc.abCopyActiveToOther(); };
+        refreshAbButtons();
+
         startTimerHz (30);
+    }
+
+    void WireframeEditor::refreshAbButtons()
+    {
+        const bool aActive = (audioProc.getABSlot() == 0);
+        btnAbA.setToggleState (aActive,  juce::dontSendNotification);
+        btnAbB.setToggleState (! aActive, juce::dontSendNotification);
+    }
+
+    void WireframeEditor::showUserPresetMenu()
+    {
+        juce::PopupMenu m;
+        m.addItem (1, "Save User Preset...");
+        m.addItem (2, "Reveal Presets Folder...");
+
+        auto files = audioProc.listUserPresets();
+        if (! files.isEmpty())
+        {
+            m.addSeparator();
+            juce::PopupMenu loadSub, delSub;
+            for (int i = 0; i < files.size(); ++i)
+            {
+                loadSub.addItem (1000 + i, files[i].getFileNameWithoutExtension());
+                delSub .addItem (2000 + i, files[i].getFileNameWithoutExtension());
+            }
+            m.addSubMenu ("Load User Preset", loadSub);
+            m.addSubMenu ("Delete User Preset", delSub);
+        }
+
+        m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (btnPresetName),
+            [this, files] (int r)
+            {
+                if (r == 1)
+                {
+                    auto aw = std::make_shared<juce::AlertWindow> (
+                        "Save User Preset", "Namnge din preset:",
+                        juce::MessageBoxIconType::NoIcon);
+                    aw->addTextEditor ("name", "My Preset");
+                    aw->addButton ("Save",   1, juce::KeyPress (juce::KeyPress::returnKey));
+                    aw->addButton ("Cancel", 0, juce::KeyPress (juce::KeyPress::escapeKey));
+                    auto* awPtr = aw.get();
+                    awPtr->enterModalState (true,
+                        juce::ModalCallbackFunction::create (
+                            [this, aw] (int res)
+                            {
+                                if (res == 1)
+                                {
+                                    const auto name = aw->getTextEditorContents ("name");
+                                    if (audioProc.saveUserPreset (name))
+                                        btnPresetName.setButtonText (name.toUpperCase());
+                                }
+                                aw->exitModalState (res);
+                                aw->setVisible (false);
+                            }), false);
+                }
+                else if (r == 2)
+                {
+                    audioProc.userPresetDirectory().revealToUser();
+                }
+                else if (r >= 1000 && r < 2000)
+                {
+                    const int idx = r - 1000;
+                    if (idx < files.size() && audioProc.loadUserPresetFile (files[idx]))
+                        btnPresetName.setButtonText (
+                            files[idx].getFileNameWithoutExtension().toUpperCase());
+                }
+                else if (r >= 2000)
+                {
+                    const int idx = r - 2000;
+                    if (idx < files.size())
+                        files[idx].deleteFile();
+                }
+            });
     }
 
     WireframeEditor::~WireframeEditor()
@@ -1356,6 +1447,10 @@ namespace bc2000dl::ui
         btnPresetPrev.setBounds (70,  362, 22, 20);
         btnPresetName.setBounds (96, 362, 140, 20);
         btnPresetNext.setBounds (240, 362, 22, 20);
+        // A/B-compare-kluster i luckan efter avdelaren (x=276..335)
+        btnAbA   .setBounds (276, 362, 19, 20);
+        btnAbB   .setBounds (296, 362, 19, 20);
+        btnAbCopy.setBounds (316, 362, 19, 20);
 
         // ----- 9 service-knobs + 2 combos (y=406-430) — auth-restoration -----
         // Spacing: 75 px (was 90 for 8 items). Total 60-860 with 60 padding each side.
@@ -2119,9 +2214,10 @@ namespace bc2000dl::ui
                 g.drawRoundedRectangle (well, 2.5f, 0.7f);
             }
 
-            // Section divider between preset bar and brand
+            // Section dividers — runt A/B-klustret (preset | A/B | brand)
             g.setColour (juce::Colour (0x40000000));
             g.drawLine (272, 363, 272, 381, 0.5f);
+            g.drawLine (343, 363, 343, 381, 0.5f);
 
             // (PRESET caption removed — was overlapping behind the button)
 

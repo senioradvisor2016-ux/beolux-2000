@@ -476,62 +476,164 @@ void BC2000DLProcessor::setCurrentProgram (int index)
     set ("pa_enabled",      0.0f);
 }
 
+// Applicera ett state-träd på live-parametrarna med full NaN/range-härdning.
+// Delad av setStateInformation, A/B-recall och user-preset-load.
+void BC2000DLProcessor::applyStateTree (juce::ValueTree tree)
+{
+    if (! tree.hasType (apvts.state.getType())) return;
+
+    // HÄRDNING (steg 1): tvinga varje PARAM:s "value" till en ÄNDLIG double INNAN
+    // replaceState. APVTS läser värdet internt (choice/int castar NaN→int = UB i
+    // JUCE:s String-konvertering, och "nan"/"inf"-strängar från en korrupt fil
+    // överlever annars). Genom att skriva tillbaka en ren double ser APVTS aldrig
+    // ett icke-ändligt värde.
+    for (auto child : tree)
+        if (child.hasType ("PARAM"))
+        {
+            double v = (double) child["value"];
+            if (! std::isfinite (v)) v = 0.0;
+            child.setProperty ("value", v, nullptr);
+        }
+
+    apvts.replaceState (tree);
+
+    // JUCE 8: replaceState() uppdaterar ValueTree synkront men AudioParameter
+    // getValue() kan vara stale (atomic ej propagerad). Läs direkt från barnen
+    // och push via setValueNotifyingHost. KRITISKT: child["value"] är det FAKTISKA
+    // (denormaliserade) värdet, men setValueNotifyingHost förväntar NORMALISERAT
+    // 0..1 → konvertera först. Utan convertTo0to1 korrumperades alla params med
+    // icke-0..1-range (bias, trims, mains_hum, echo_time, ton-dB …).
+    for (auto child : apvts.state)
+        if (child.hasType ("PARAM"))
+            if (auto* prm = apvts.getParameter (child["id"].toString()))
+            {
+                // HÄRDNING: korrupt projektfil/illvillig preset kan mata in NaN/inf
+                // (överlever xml-round-trip via strtod) eller absurda värden. Sanera
+                // → default vid icke-ändligt, klamp [0,1] så DSP:n aldrig får NaN.
+                const float raw  = (float) child["value"];
+                const float norm = std::isfinite (raw)
+                                     ? prm->convertTo0to1 (raw)
+                                     : prm->getDefaultValue();
+                prm->setValueNotifyingHost (juce::jlimit (0.0f, 1.0f, norm));
+            }
+}
+
 void BC2000DLProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    auto state = apvts.copyState();
-    if (auto xml = state.createXml())
+    // Rot-träd = live APVTS-state, med A/B-slots + aktiv slot nästlade som barn
+    // (BC_AB) så A/B överlever projekt-spara/ladda.
+    auto root = apvts.copyState();
+    juce::ValueTree ab ("BC_AB");
+    ab.setProperty ("slot", abSlot, nullptr);
+    for (int i = 0; i < 2; ++i)
+        if (abState[i].isValid())
+        {
+            juce::ValueTree s ("SLOT");
+            s.setProperty ("idx", i, nullptr);
+            s.appendChild (abState[i].createCopy(), nullptr);
+            ab.appendChild (s, nullptr);
+        }
+    root.appendChild (ab, nullptr);
+
+    if (auto xml = root.createXml())
         copyXmlToBinary (*xml, destData);
 }
 
 void BC2000DLProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    if (auto xml = getXmlFromBinary (data, sizeInBytes))
+    auto xml = getXmlFromBinary (data, sizeInBytes);
+    if (xml == nullptr) return;
+
+    auto tree = juce::ValueTree::fromXml (*xml);
+    if (! tree.hasType (apvts.state.getType())) return;
+
+    // Plocka ut + ta bort BC_AB-barnet innan APVTS får trädet (APVTS ignorerar
+    // okända barn, men vi vill inte att det följer med in i live-state).
+    auto ab = tree.getChildWithName ("BC_AB");
+    if (ab.isValid())
     {
-        if (xml->hasTagName (apvts.state.getType()))
-        {
-            // HÄRDNING (steg 1): tvinga varje PARAM:s "value" till en ÄNDLIG double
-            // INNAN replaceState. APVTS läser värdet internt (choice/int castar
-            // NaN→int = UB i JUCE:s String-konvertering, och "nan"/"inf"-strängar
-            // från en korrupt fil överlever annars). Genom att skriva tillbaka en
-            // ren double ser APVTS aldrig ett icke-ändligt värde.
-            auto tree = juce::ValueTree::fromXml (*xml);
-            for (auto child : tree)
-                if (child.hasType ("PARAM"))
-                {
-                    double v = (double) child["value"];
-                    if (! std::isfinite (v)) v = 0.0;
-                    child.setProperty ("value", v, nullptr);
-                }
-
-            apvts.replaceState (tree);
-
-            // JUCE 8: replaceState() updates the ValueTree synchronously but the
-            // AudioParameter getValue() can remain stale (atomic not yet propagated).
-            // Read direkt från ValueTree-barnen och push till setValueNotifyingHost.
-            // KRITISKT: child["value"] är det FAKTISKA (denormaliserade) värdet, men
-            // setValueNotifyingHost förväntar NORMALISERAT 0..1 → konvertera först.
-            // Utan convertTo0to1 korrumperades alla params med icke-0..1-range
-            // (bias, trims, mains_hum, echo_time, ton-dB …) vid varje session-laddning.
-            for (auto child : apvts.state)
+        abSlot = juce::jlimit (0, 1, (int) ab.getProperty ("slot", 0));
+        abState[0] = abState[1] = {};
+        for (auto slot : ab)
+            if (slot.hasType ("SLOT") && slot.getNumChildren() > 0)
             {
-                if (child.hasType ("PARAM"))
-                {
-                    if (auto* prm = apvts.getParameter (child["id"].toString()))
-                    {
-                        // HÄRDNING: en korrupt projektfil / illvillig preset kan mata
-                        // in NaN/inf (överlever t.o.m. xml-round-trip via strtod) eller
-                        // absurda värden. Sanera → default vid icke-ändligt, klamp till
-                        // [0,1] efter normalisering så DSP:n aldrig får ett NaN-param.
-                        const float raw  = (float) child["value"];
-                        const float norm = std::isfinite (raw)
-                                             ? prm->convertTo0to1 (raw)
-                                             : prm->getDefaultValue();
-                        prm->setValueNotifyingHost (juce::jlimit (0.0f, 1.0f, norm));
-                    }
-                }
+                const int idx = juce::jlimit (0, 1, (int) slot.getProperty ("idx", 0));
+                abState[idx] = slot.getChild (0).createCopy();
             }
-        }
+        tree.removeChild (ab, nullptr);
     }
+
+    applyStateTree (tree);
+}
+
+// ===================== A/B-compare =====================
+
+void BC2000DLProcessor::abRecall (int slot)
+{
+    slot = juce::jlimit (0, 1, slot);
+    if (slot == abSlot) return;
+    abState[abSlot] = apvts.copyState();   // frys nuvarande edits i aktiv slot
+    abSlot = slot;
+    if (abState[slot].isValid())
+        applyStateTree (abState[slot].createCopy());
+    // Om mål-slotten är tom (aldrig fylld) → lämna live-state orört; den nya
+    // aktiva slotten ärver då nuvarande inställning (UAD-beteende vid första bytet).
+}
+
+void BC2000DLProcessor::abCopyActiveToOther()
+{
+    abState[1 - abSlot] = apvts.copyState();
+}
+
+void BC2000DLProcessor::abSwap()
+{
+    abState[abSlot] = apvts.copyState();   // fånga live in i aktiv först
+    std::swap (abState[0], abState[1]);
+    if (abState[abSlot].isValid())
+        applyStateTree (abState[abSlot].createCopy());
+}
+
+// ===================== User-presets på disk =====================
+
+juce::File BC2000DLProcessor::userPresetDirectory()
+{
+    auto dir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
+                   .getChildFile ("Soundboys")
+                   .getChildFile ("Beolux 2000")
+                   .getChildFile ("Presets");
+    if (! dir.exists())
+        dir.createDirectory();
+    return dir;
+}
+
+bool BC2000DLProcessor::saveUserPreset (const juce::String& name)
+{
+    const auto clean = juce::File::createLegalFileName (name).trim();
+    if (clean.isEmpty()) return false;
+    auto file = userPresetDirectory().getChildFile (clean + ".beolux");
+    auto state = apvts.copyState();          // bara params — inte A/B-slots
+    if (auto xml = state.createXml())
+        return xml->writeTo (file);
+    return false;
+}
+
+bool BC2000DLProcessor::loadUserPresetFile (const juce::File& file)
+{
+    if (! file.existsAsFile()) return false;
+    auto xml = juce::XmlDocument::parse (file);
+    if (xml == nullptr) return false;
+    auto tree = juce::ValueTree::fromXml (*xml);
+    if (! tree.hasType (apvts.state.getType())) return false;
+    applyStateTree (tree);
+    return true;
+}
+
+juce::Array<juce::File> BC2000DLProcessor::listUserPresets()
+{
+    juce::Array<juce::File> out;
+    userPresetDirectory().findChildFiles (out, juce::File::findFiles, false, "*.beolux");
+    out.sort();
+    return out;
 }
 
 // VST3 / AU entry point

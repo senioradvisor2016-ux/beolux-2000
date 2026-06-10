@@ -145,6 +145,20 @@ namespace bc2000dl::ui
         bool baseCaptured     { false };
     };
 
+    // TextButton med separat högerklicks-callback (user-preset-meny på
+    // preset-namnet — vanlig DAW-idiom, kräver ingen extra panelyta).
+    class MenuTextButton : public juce::TextButton
+    {
+    public:
+        using juce::TextButton::TextButton;
+        std::function<void()> onRightClick;
+        void mouseDown (const juce::MouseEvent& e) override
+        {
+            if (e.mods.isPopupMenu() && onRightClick) { onRightClick(); return; }
+            juce::TextButton::mouseDown (e);
+        }
+    };
+
     class WireframeEditor : public juce::AudioProcessorEditor,
                              private juce::Timer,
                              private juce::ComponentListener
@@ -210,11 +224,18 @@ namespace bc2000dl::ui
         WireframeVU       vuOutR { "OUT R" };
 
         // ===== Preset bank =====
-        juce::TextButton btnPresetName { "FACTORY" };
+        MenuTextButton   btnPresetName { "FACTORY" };
         juce::TextButton btnPresetPrev { "<" };
         juce::TextButton btnPresetNext { ">" };
         int  currentPresetIdx { 0 };
         void applyPreset (int idx);
+
+        // ===== A/B-compare + user-preset-meny =====
+        juce::TextButton btnAbA    { "A" };
+        juce::TextButton btnAbB    { "B" };
+        juce::TextButton btnAbCopy { juce::String::charToString ((juce::juce_wchar) 0x2192) }; // →
+        void refreshAbButtons();
+        void showUserPresetMenu();   // högerklick på preset-namnet
 
         // ===== Premium preset browser (UAD-style modal overlay) =====
         // Backdrop dims the case behind the browser and consumes clicks-outside.
