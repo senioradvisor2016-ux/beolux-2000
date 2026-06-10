@@ -52,8 +52,24 @@ namespace bc2000dl::dsp
             H_prev = 0.0;
         }
 
-        // Sample-för-sample-process (history-dependent)
+        // Sample-för-sample-process (history-dependent).
         inline float processSample (float H) noexcept
+        {
+            return processSampleBiased (H, 0.0);
+        }
+
+        // Som processSample men blandar utdata mot den ANHYSTERETISKA
+        // magnetiseringen M_an.  anhystFrac = 0 → ren hysteres (M + M_rev),
+        // = 1 → ren anhysteretisk (M_an).
+        //
+        // Fysikalisk grund: AC-bias linjäriserar inspelningen genom att tvinga
+        // tape-partiklarna genom den anhysteretiska processen — den remanenta
+        // magnetiseringen följer då M_an (nästan linjär) i stället för den
+        // krökta hysteres-kurvan.  Bias-nivån bestämmer hur fullständigt detta
+        // sker (anhystFrac): under-bias → låg frac → hysteres-distorsion syns;
+        // optimal/över-bias → frac ≈ 1 → linjärt.  Detta gör bias-knappens
+        // distorsionseffekt EMERGENT ur modellen, inte en pålagd multiplikator.
+        inline float processSampleBiased (float H, double anhystFrac) noexcept
         {
             // NaN-guard på input — annars förorenar M/H_prev permanent
             if (! std::isfinite (H))
@@ -88,7 +104,12 @@ namespace bc2000dl::dsp
             if (M < -params.Ms) M = -params.Ms;
 
             const double M_rev = params.c * (M_an - M);
-            double out = M + M_rev;
+            const double hysteretic = M + M_rev;
+
+            // Anhysteretisk blandning (bias-linjärisering).  clamp av frac så
+            // ett felaktigt anrop inte kan extrapolera utanför [hysteres, M_an].
+            const double f = (anhystFrac < 0.0) ? 0.0 : (anhystFrac > 1.0 ? 1.0 : anhystFrac);
+            double out = hysteretic + f * (M_an - hysteretic);
 
             // Slutlig NaN-guard — om något ändå läcker igenom, returnera
             // 0 och nollställ state så nästa sample kan börja från ren grund.

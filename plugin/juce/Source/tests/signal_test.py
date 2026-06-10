@@ -933,6 +933,57 @@ def test_multiplay(plugin):
 
 
 # ══════════════════════════════════════════════════════════════════
+# TEST: Bias-fysik — EMERGENT bias-kurva (v63)
+#   Bias-knappen drevs förr av en heuristik (asymMul 16×) med FEL HF-
+#   riktning (över-bias gav MER HF). Nu emergent ur den anhysteretiska
+#   blandningen i J-A. Två fysikaliska signaturer låses fast:
+#     1. THD sjunker monotont med bias (under-bias = mer hysteres-distorsion)
+#     2. HF self-erasure: över-bias < optimal HF (förr inverterat)
+# ══════════════════════════════════════════════════════════════════
+
+def test_bias_physics(plugin):
+    print("\n── Test: Bias-fysik (emergent bias-kurva) ──────────────────────")
+    SR = SR_DEFAULT
+
+    def setup(bias):
+        plugin.reset(); default_params(plugin)
+        plugin.tape_speed = "19 cm/s"; plugin.tape_formula = "Agfa"
+        plugin.wow_flutter = 0.0; plugin.tape_noise = 0.0
+        plugin.bias_amount = bias
+
+    def thd_at(bias):
+        setup(bias)
+        n = SR * 2; t = np.arange(n) / SR
+        amp = 10 ** (-3 / 20)
+        x = np.stack([(amp * np.sin(2 * np.pi * 1000 * t))] * 2, axis=1).astype(np.float32)
+        o = plugin(x, sample_rate=SR, buffer_size=BLOCK, reset=True)[SR:, 0]
+        w = np.hanning(len(o)); F = np.abs(np.fft.rfft(o * w)); fr = np.fft.rfftfreq(len(o), 1 / SR)
+        amp_at = lambda f: F[max(0, np.argmin(np.abs(fr - f)) - 2):np.argmin(np.abs(fr - f)) + 3].max()
+        return 100 * np.sqrt(sum(amp_at(1000 * k) ** 2 for k in range(2, 8))) / amp_at(1000)
+
+    def hf_at(bias):
+        setup(bias)
+        n = SR * 2; t = np.arange(n) / SR
+        def lvl(f):
+            x = np.stack([(0.05 * np.sin(2 * np.pi * f * t))] * 2, axis=1).astype(np.float32)
+            o = plugin(x, sample_rate=SR, buffer_size=BLOCK, reset=True)[SR:, 0]
+            w = np.hanning(len(o)); F = np.abs(np.fft.rfft(o * w)); ff = np.fft.rfftfreq(len(o), 1 / SR)
+            return 20 * np.log10(F[np.argmin(np.abs(ff - f))] + 1e-12)
+        return lvl(10000) - lvl(1000)
+
+    thd_under, thd_opt, thd_over = thd_at(0.5), thd_at(1.0), thd_at(1.5)
+    report("Bias: under-bias mer THD än optimal (≥ +0.35%)",
+           thd_under > thd_opt + 0.35, f"under {thd_under:.2f}% vs opt {thd_opt:.2f}%")
+    report("Bias: THD sjunker monotont (over ≤ opt ≤ under)",
+           thd_over <= thd_opt + 0.2 <= thd_under, f"{thd_under:.2f} → {thd_opt:.2f} → {thd_over:.2f}%")
+    report("Bias: optimal THD i spec (<3%)", thd_opt < 3.0, f"{thd_opt:.2f}%")
+
+    hf_opt, hf_over = hf_at(1.0), hf_at(1.5)
+    report("Bias: HF self-erasure — över-bias < optimal (förr inverterat)",
+           hf_over < hf_opt - 1.5, f"over {hf_over:+.1f} < opt {hf_opt:+.1f} dB")
+
+
+# ══════════════════════════════════════════════════════════════════
 # TEST: MONO-spår (Ableton) — pluggen får inte vara tyst/krascha i mono
 #   (regression: isBusesLayoutSupported accepterade förut BARA stereo →
 #    monospår i Live blev tysta.)
@@ -994,6 +1045,7 @@ if __name__ == "__main__":
     test_source_differentiation(plugin)
     test_sound_on_sound(plugin)
     test_multiplay(plugin)
+    test_bias_physics(plugin)
     test_mono_track(plugin)
 
     print("\n" + "═" * 66)

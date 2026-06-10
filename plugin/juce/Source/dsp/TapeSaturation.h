@@ -101,6 +101,12 @@ namespace bc2000dl::dsp
         float noiseAmpLin { 0.0f };
         float noiseMult   { 1.0f };   // user-skala (setNoiseLevel)
 
+        // Bias-self-erasure HF-shelf — kontinuerlig funktion av biasAmount,
+        // uppdateras per block i setBiasAmount. Över-bias eraserar korta
+        // våglängder (HF-förlust), under-bias ger mer HF. Centrerad flat @ optimal.
+        juce::dsp::IIR::Filter<float> biasErasureFilter;
+        float biasErasureDbCached { 999.0f };   // skippa coeff-recompute om oförändrad
+
         // DC-block för J-A remanens (en-pol HP, ~10 Hz)
         float dcBlockX1 { 0.0f }, dcBlockY1 { 0.0f };
 

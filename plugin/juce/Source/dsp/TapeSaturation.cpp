@@ -6,6 +6,22 @@
 
 namespace bc2000dl::dsp
 {
+    namespace
+    {
+        // ===== Bias-fysik-konstanter (emergent modell) =====
+        // anhystFrac = 1 − underBias·kUnderDeLin → under-bias minskar den
+        // anhysteretiska linjäriseringen så J-A:s hysteres-distorsion syns.
+        // bias=0.5 → underBias=0.5 → frac≈0.30 (märkbart mer THD).
+        constexpr float kUnderDeLin    = 1.70f;
+        // Bias-self-erasure HF-shelf (per block, setBiasAmount):
+        constexpr float kBiasHfShelfHz = 6000.0f;
+        constexpr float kBiasHfBoostDb = 4.0f;   // under-bias: +HF vid bias=0.5 → +2 dB
+        constexpr float kBiasHfEraseDb = 8.0f;   // över-bias: −HF vid bias=1.5 → −4 dB
+        // Mild under-bias-koppling till post-J-A-asymmetri (2:a-harmonik stiger
+        // också vid under-bias — sekundärt mot den J-A-emergenta 3:e-harmoniken).
+        constexpr float kAsymUnderMul  = 10.0f;
+    }
+
     void TapeSaturation::prepare (double sr, std::uint32_t seed)
     {
         sampleRate = sr;
@@ -35,6 +51,13 @@ namespace bc2000dl::dsp
 
         hysteresis.reset();
 
+        // Bias-self-erasure-shelf init: flat (0 dB) tills setBiasAmount sätter
+        // den. Annars null-koefficienter om process() körs före param-push.
+        biasErasureFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (
+            sr, kBiasHfShelfHz, 0.707f, 1.0f);
+        biasErasureFilter.reset();
+        biasErasureDbCached = 0.0f;
+
         // Bias-oscillator: förberäkna rotations-steg.  ω = 2π·f_bias/sr_over.
         // Init (cos,sin) = (1,0) → start vid sin-phase 0 (matchar gamla biasPhase=0).
         const double omega = juce::MathConstants<double>::twoPi * kBiasFreq_Hz / srOversampled;
@@ -51,6 +74,7 @@ namespace bc2000dl::dsp
         hfFilter.reset();
         bumpFilter.reset();
         biasShelfFilter.reset();
+        biasErasureFilter.reset();
         biasReject.reset();
         hysteresis.reset();   // clears J-A magnetisation history
         biasCosState = 1.0;
@@ -77,7 +101,26 @@ namespace bc2000dl::dsp
         if (oversampler) oversampler->reset();
     }
 
-    void TapeSaturation::setBiasAmount (float a)        { biasAmount      = a; }
+    void TapeSaturation::setBiasAmount (float a)
+    {
+        biasAmount = a;
+
+        // Bias-self-erasure: HF-shelf som kontinuerlig funktion av bias.
+        // Under-bias (a<1) → +HF (kort-våglängder bevaras), över-bias (a>1) →
+        // −HF (HF-fältet eraserar korta våglängder djupt i bandet). Fysikalisk
+        // "bias trade-off": HF-headroom byts mot distorsion. Centrerad flat @ 1.
+        const float underB = juce::jmax (0.0f, 1.0f - a);
+        const float overB  = juce::jmax (0.0f, a - 1.0f);
+        const float erasureDb = underB * kBiasHfBoostDb - overB * kBiasHfEraseDb;
+        if (std::abs (erasureDb - biasErasureDbCached) > 0.01f)
+        {
+            biasErasureDbCached = erasureDb;
+            biasErasureFilter.coefficients =
+                juce::dsp::IIR::Coefficients<float>::makeHighShelf (
+                    sampleRate, kBiasHfShelfHz, 0.707f,
+                    juce::Decibels::decibelsToGain (erasureDb));
+        }
+    }
     void TapeSaturation::setSaturationDrive (float d)   { saturationDrive = d; }
     void TapeSaturation::setPrintThrough (float p)      { printThrough    = p; }
 
@@ -315,29 +358,23 @@ namespace bc2000dl::dsp
         // (≈ 0.5-1 %) + GE cascade (≈ 0.5-1 %) summerar till <3 % spec.
         constexpr float kDriveScaling = 0.1f;
 
-        // Bias-koppling.  Tidigare hade biasAmount-knappen ingen audibel
-        // effekt:  den 100 kHz bias-sinus som adderas till H filtreras bort
-        // av LP @ 40 kHz, och vid den linjära region som J-A opererar i
-        // (H ≪ a) ger bias-ditheringen inga intermodulationsprodukter i
-        // baseband.  Fysikaliskt fungerar real tape så att under-bias ger
-        // mer 3:e-harmonik och under-magnetisering (i praktiken: hörbart
-        // mer distortion), över-bias ger HF-roll-off + mjukare ton.
-        //
-        // Vi modellerar detta genom att (a) skala drive in i J-A, (b) skala
-        // den asymmetriska post-J-A-mättnadens koefficient och (c) shifta
-        // HF-rolloff vid över-bias.  J-A själv opererar i sin linjära region
-        // vid typiska signal-nivåer (H ≪ a=0.3), så drive-mul ensam räcker
-        // inte — den asymmetriska stage är där baseband-THD genereras.
-        const float biasUnder      = juce::jmax (0.0f, 1.0f - biasAmount);  // 0..0.5
-        const float biasOver       = juce::jmax (0.0f, biasAmount - 1.0f);  // 0..0.5
-        const float biasDriveMul   = 1.0f + biasUnder * 2.0f - biasOver * 0.3f;
-        const float satDrive       = saturationDrive * kDriveScaling * biasDriveMul;
-        // Asymmetri-multiplikator: under-bias → upp till 9× h2-distortion,
-        // over-bias → 0.7× (mjukare).  Detta är det DOMINERANDE bidraget
-        // till THD-skillnaden mellan låg och hög bias.  Behövs aggressiv
-        // skalning eftersom basala koefficienterna (0.02 totalt h2) är
-        // små i förhållande till post-J-A flux-amplituden (~0.16).
-        const float biasAsymMul    = 1.0f + biasUnder * 16.0f - biasOver * 0.6f;
+        // ===== Bias-fysik — EMERGENT ur J-A (v63, ersätter heuristiken) =====
+        // Real AC-bias linjäriserar genom att tvinga inspelningen att följa den
+        // ANHYSTERETISKA kurvan M_an (se JilesAtherton::processSampleBiased).
+        // En enda fysisk storhet — graden av anhysteretisk linjärisering —
+        // styr distorsionen; HF-self-erasure hanteras separat (setBiasAmount).
+        //   under-bias  → ofullständig linjärisering → J-A:s hysteres-distorsion
+        //                 syns (mer 3:e-harmonik) + HF-boost + mer brus
+        //   optimal     → ≈full linjärisering (M_an) → ren ton
+        //   över-bias   → bibehållen linjärisering + HF-erasure (kort-våglängd)
+        const float biasUnder   = juce::jmax (0.0f, 1.0f - biasAmount);  // 0..0.5
+        const float anhystFrac  = juce::jlimit (0.0f, 1.0f, 1.0f - biasUnder * kUnderDeLin);
+        const float satDrive    = saturationDrive * kDriveScaling;
+        // Sekundär 2:a-harmonik-koppling: under-bias höjer post-J-A-asymmetrin
+        // mildt (verklig under-biased tape har mer udda OCH jämn distorsion).
+        const float biasAsymMul = 1.0f + biasUnder * kAsymUnderMul;
+        // Under-bias höjer brusgolvet (sämre SNR vid otillräcklig magnetisering).
+        const float biasNoiseMul = 1.0f + biasUnder * 1.2f;
 
         // Lokal kopia av oscillator-state — låter compilern hålla i register.
         double oscC = biasCosState;
@@ -361,7 +398,8 @@ namespace bc2000dl::dsp
             // in i NaN-läge.
             const float H = juce::jlimit (-5.0f, 5.0f,
                                           up[i] * satDrive + biasSig);
-            float fluxOut = hysteresis.processSample (H);
+            // Bias-linjärisering EMERGENT: blanda mot anhysteretisk M_an.
+            float fluxOut = hysteresis.processSampleBiased (H, anhystFrac);
             // NaN-guard: BASF-presetens lilla k (0.07) kan vid stora dH ge
             // ackumulerad numerisk drift som fortplantar sig som NaN.
             if (! std::isfinite (fluxOut))
@@ -422,15 +460,13 @@ namespace bc2000dl::dsp
             float y = data[i];
 
             // Asymmetric saturation: pos/neg flux har olika expansion-curva.
-            // Matchar real tape's 2nd-harmonic content men i spec-skala.
-            // biasAsymMul ger Bias-knappen audibel effekt här: under-bias
-            // multiplicerar tape-asymmetrin upp till 4× → hörbart mer h2.
+            // Matchar real tape's 2nd-harmonic content i spec-skala. biasAsymMul
+            // är nu en MILD sekundär under-bias-koppling (den primära bias-THD:n
+            // kommer emergent ur den anhysteretiska blandningen i J-A ovan).
             const float yClamped = juce::jlimit (-1.0f, 1.0f, y);
             y = y * (1.0f + (baseAsym + perFormulaAsym) * biasAsymMul * yClamped);
 
             // Subtilt 2nd-harmonic bias (pos > neg compression).
-            // Halverat från 0.015/0.005 → 0.005/0.002 (v62.0).  Skalas också
-            // med biasAsymMul så hela compression-banan följer bias-knappen.
             if (y > 0.0f)
                 y = y * (1.0f - 0.005f * biasAsymMul * y);    // mer kompression på pos
             else
@@ -454,9 +490,15 @@ namespace bc2000dl::dsp
             // 4b. v60.3 — Bias-typ presence-shelf (HIGH/CrO₂ = +3 dB @ 4 kHz)
             y = biasShelfFilter.processSample (y);
 
+            // 4c. Bias-self-erasure HF-shelf (emergent, v63): över-bias dämpar
+            //     HF (kort-våglängds-erasure), under-bias lyfter. Rätt riktning
+            //     på "bias trade-off" (förr inverterad i heuristiken).
+            y = biasErasureFilter.processSample (y);
+
             // 5. Tape-egenbrus (LCG Gaussian — RT-safe, 30× snabbare än mt19937).
             //    noiseMult: user-styrd skala (0 = av, 1 = spec-nivå).
-            y += detail::fastGaussNoise (lcgState) * noiseAmpLin * noiseMult;
+            //    biasNoiseMul: under-bias höjer golvet (sämre magnetisering).
+            y += detail::fastGaussNoise (lcgState) * noiseAmpLin * noiseMult * biasNoiseMul;
 
             data[i] = y;
         }
