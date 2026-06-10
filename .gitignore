@@ -20,3 +20,6 @@ output/
 # Claude Code agent runtime state — never track (gitlinks + transient locks)
 .claude/worktrees/
 .claude/scheduled_tasks.lock
+
+# macOS-webgenvägar (kolon i namn → bryter Windows-checkout)
+*.webloc
