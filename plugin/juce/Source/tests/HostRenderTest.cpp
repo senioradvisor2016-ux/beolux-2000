@@ -35,8 +35,8 @@ namespace
     {
         const auto home = juce::File::getSpecialLocation (juce::File::userHomeDirectory);
         const juce::File cands[] = {
-            home.getChildFile ("Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3"),
-            juce::File ("/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3")
+            home.getChildFile ("Library/Audio/Plug-Ins/VST3/Germanium 2000 Deluxe.vst3"),
+            juce::File ("/Library/Audio/Plug-Ins/VST3/Germanium 2000 Deluxe.vst3")
         };
         for (const auto& f : cands) if (f.exists()) return f;
         return {};

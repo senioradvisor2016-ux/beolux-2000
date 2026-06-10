@@ -1,12 +1,12 @@
-# BC2000DL — Danish Tape 2000
+# Germanium 2000 Deluxe
 
-VST3 / AU / Standalone-plugin som emulerar Bang & Olufsen BeoCord 2000 De Luxe (1967–69) — en 3-hastighets stereorullbandspelare med separata record/playback-huvuden, germaniumtransistorer, 100 kHz bias och DIN-1962 EQ.
+VST3 / AU / Standalone-plugin: en emulering av en dansk 3-hastighets stereorullbandspelare från 1967–69 — separata record/playback-huvuden, germaniumtransistorer, 100 kHz bias och DIN-1962 EQ. Modellerad ur servicemanual + periodmätningar.
 
 **Status:** v28 (FullSpec) produktionsklar — VST3 + AU + Standalone, universal macOS 14+ (arm64 + x86_64). Validering: 22/22 mätningar pass mot Studio-Sound 1968 + service manual.
 
 ## Disclaimer
 
-This is an independent emulation project. **Not affiliated with, endorsed by, or sponsored by Bang & Olufsen A/S.** "BeoCord", "BeoGram", "Beogram", and "B&O" are trademarks of their respective owner. The product name in this project is **BC2000DL** / **Danish Tape 2000**.
+This is an independent emulation project. **Not affiliated with, endorsed by, or sponsored by Bang & Olufsen A/S.** "BeoCord", "BeoGram", "Beolab", "Beosound", and "B&O" are trademarks of their respective owner; this product is not named after, and does not use, any of them. The product name is **Germanium 2000 Deluxe** by Soundboys.
 
 ## Snabbstart
 

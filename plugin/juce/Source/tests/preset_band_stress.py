@@ -21,7 +21,7 @@ import os, sys, math
 import numpy as np
 import pedalboard
 
-PLUGIN = os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3")
+PLUGIN = os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Germanium 2000 Deluxe.vst3")
 SR = 48000
 BLOCK = 512
 WARM_BLOCKS = 30
@@ -176,7 +176,7 @@ def run_transitions(label, transitions, prefix):
 
 def main():
     print("══════════════════════════════════════════════════════════════════")
-    print("  Beolux 2000 — Preset/Band Stress Test")
+    print("  Germanium 2000 Deluxe — Preset/Band Stress Test")
     print(f"  pedalboard {pedalboard.__version__}  •  SR={SR}  •  block={BLOCK}")
     print("══════════════════════════════════════════════════════════════════")
 

@@ -25,9 +25,9 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD="$REPO/plugin/juce/build/BC2000DL_artefacts/Release"
-VST3_SRC="$BUILD/VST3/Beolux 2000.vst3"
-AU_SRC="$BUILD/AU/Beolux 2000.component"
-PRODUCT="Beolux 2000"
+VST3_SRC="$BUILD/VST3/Germanium 2000 Deluxe.vst3"
+AU_SRC="$BUILD/AU/Germanium 2000 Deluxe.component"
+PRODUCT="Germanium 2000 Deluxe"
 VERSION="$(sed -n 's/^project(BC2000DL VERSION \([0-9.]*\)).*/\1/p' "$REPO/plugin/juce/CMakeLists.txt")"
 OUT="$REPO/output/pkg"
 PKG="$OUT/${PRODUCT// /_}_${VERSION}_macOS.pkg"
@@ -78,16 +78,16 @@ cat > "$DIST" <<XML
 <installer-gui-script minSpecVersion="2">
   <title>$PRODUCT $VERSION</title>
   <options customize="never" require-scripts="false"/>
-  <pkg-ref id="com.soundboys.beolux2000.vst3"/>
-  <pkg-ref id="com.soundboys.beolux2000.au"/>
+  <pkg-ref id="com.soundboys.germanium2000.vst3"/>
+  <pkg-ref id="com.soundboys.germanium2000.au"/>
   <choices-outline>
     <line choice="default"><line choice="vst3"/><line choice="au"/></line>
   </choices-outline>
   <choice id="default"/>
-  <choice id="vst3" title="VST3"><pkg-ref id="com.soundboys.beolux2000.vst3"/></choice>
-  <choice id="au"   title="Audio Unit"><pkg-ref id="com.soundboys.beolux2000.au"/></choice>
-  <pkg-ref id="com.soundboys.beolux2000.vst3" version="$VERSION">vst3.pkg</pkg-ref>
-  <pkg-ref id="com.soundboys.beolux2000.au"   version="$VERSION">au.pkg</pkg-ref>
+  <choice id="vst3" title="VST3"><pkg-ref id="com.soundboys.germanium2000.vst3"/></choice>
+  <choice id="au"   title="Audio Unit"><pkg-ref id="com.soundboys.germanium2000.au"/></choice>
+  <pkg-ref id="com.soundboys.germanium2000.vst3" version="$VERSION">vst3.pkg</pkg-ref>
+  <pkg-ref id="com.soundboys.germanium2000.au"   version="$VERSION">au.pkg</pkg-ref>
 </installer-gui-script>
 XML
 

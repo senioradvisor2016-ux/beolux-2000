@@ -1,6 +1,6 @@
 # Release-signering & notarisering
 
-Detta beskriver hur en **kommersiell** Beolux 2000-release signeras så att den
+Detta beskriver hur en **kommersiell** Germanium 2000 Deluxe-release signeras så att den
 laddas utan varningar på slutanvändares maskiner. Skilt från
 `scripts/package-dist.sh` (ad-hoc-signering för utvecklingsdistribution till en
 kompis).
@@ -31,7 +31,7 @@ DEV_ID_INSTALLER="Developer ID Installer: Soundboys ApS (TEAMID)" \
 AC_NOTARY_PROFILE="AC_NOTARY_PROFILE" \
 scripts/release-mac-notarize.sh
 ```
-Resultat: `output/pkg/Beolux_2000_<version>_macOS.pkg` — notariserad + stapled,
+Resultat: `output/pkg/Germanium_2000_Deluxe_<version>_macOS.pkg` — notariserad + stapled,
 verifierad med `spctl --assess --type install`.
 
 Scriptet använder hardened runtime + secure timestamp (krav för notarisering)
@@ -49,12 +49,12 @@ inarbetat rykte innan varningar försvinner; **EV** ger omedelbart förtroende
 **Signera den byggda VST3:n:**
 ```powershell
 pwsh scripts/release-windows-sign.ps1 `
-    -Vst3 "plugin\juce\build\BC2000DL_artefacts\Release\VST3\Beolux 2000.vst3" `
+    -Vst3 "plugin\juce\build\BC2000DL_artefacts\Release\VST3\Germanium 2000 Deluxe.vst3" `
     -PfxPath C:\certs\soundboys.pfx -PfxPassword $env:PFX_PW
 ```
 eller via cert i Windows-arkivet: `-Thumbprint "ABCD…"`.
 
-Scriptet signerar `.vst3\Contents\x86_64-win\Beolux 2000.vst3` (SHA256 +
+Scriptet signerar `.vst3\Contents\x86_64-win\Germanium 2000 Deluxe.vst3` (SHA256 +
 RFC3161-tidsstämpel) och verifierar med `signtool verify /pa`.
 
 ---

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-reaper.sh — build the Beolux 2000 plugin and relaunch REAPER.
+# dev-reaper.sh — build the Germanium 2000 Deluxe plugin and relaunch REAPER.
 #
 # Usage:
 #   scripts/dev-reaper.sh                # build + relaunch REAPER

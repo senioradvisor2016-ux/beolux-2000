@@ -1,6 +1,11 @@
 # Trade dress & varumärke — beslutsunderlag
 
-**Status:** utkast för beslut · **Datum:** 2026-06-10 · **Gäller:** Beolux 2000 (Soundboys)
+**Status:** namnbyte GENOMFÖRT 2026-06-10 (Beolux 2000 → **Germanium 2000 Deluxe**) · **Gäller:** Soundboys
+
+> ✅ **Uppdatering:** Den HÖGA risken (namnet "Beolux"/"Beo-"-prefixet) är åtgärdad —
+> produkten heter nu **Germanium 2000 Deluxe**. Kvar: panelens helhetsintryck (MEDEL,
+> §4.2) och go/no-go-juristbedömningen inför kommersiell release. Texten nedan
+> beskriver läget FÖRE namnbytet som underlag för det beslutet.
 
 > ⚠️ **Detta är inte juridisk rådgivning.** Det är en intern produkt-/ingenjörsmässig
 > riskbedömning som ska hjälpa er att (a) avgöra om ni behöver konsultera en IP-jurist

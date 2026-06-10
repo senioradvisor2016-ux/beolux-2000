@@ -20,7 +20,7 @@ import numpy as np
 import pedalboard
 
 PLUGIN_PATH = (sys.argv[1] if len(sys.argv) > 1
-               else os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3"))
+               else os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Germanium 2000 Deluxe.vst3"))
 BLOCK = 512
 
 g_fail = 0
@@ -106,7 +106,7 @@ def test_sr_consistency():
 
 def main():
     print("══════════════════════════════════════════════════════")
-    print("  Beolux 2000 — spectral guard (aliasing + SR-konsistens)")
+    print("  Germanium 2000 Deluxe — spectral guard (aliasing + SR-konsistens)")
     print("══════════════════════════════════════════════════════")
     P = pedalboard.load_plugin(PLUGIN_PATH)
     test_aliasing(P)

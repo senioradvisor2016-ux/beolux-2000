@@ -1,4 +1,4 @@
-/*  WireframeEditor — clean-slate native JUCE-UI för Beolux 2000 De Luxe.
+/*  WireframeEditor — clean-slate native JUCE-UI för Germanium 2000 Deluxe.
 
     Estetik: B&O Beocord 2000 De Luxe operating-instructions card
     (cream-coloured paper diagram with thin black line-art, two reels,

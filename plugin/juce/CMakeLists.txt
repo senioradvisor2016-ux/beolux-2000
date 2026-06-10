@@ -46,7 +46,7 @@ endif()
 juce_add_plugin(BC2000DL
     VERSION                  ${PROJECT_VERSION}
     COMPANY_NAME             "Soundboys"
-    BUNDLE_ID                "com.soundboys.beolux2000.plugin"
+    BUNDLE_ID                "com.soundboys.germanium2000.plugin"
     IS_SYNTH                 FALSE
     NEEDS_MIDI_INPUT         FALSE
     NEEDS_MIDI_OUTPUT        FALSE
@@ -54,10 +54,10 @@ juce_add_plugin(BC2000DL
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     COPY_PLUGIN_AFTER_BUILD  TRUE
     PLUGIN_MANUFACTURER_CODE Sbys
-    PLUGIN_CODE              Blx2
+    PLUGIN_CODE              Gm2d
     FORMATS                  ${BC2000DL_FORMATS}
-    PRODUCT_NAME             "Beolux 2000"
-    DESCRIPTION              "Beolux 2000 — Danish tape emulation by Soundboys"
+    PRODUCT_NAME             "Germanium 2000 Deluxe"
+    DESCRIPTION              "Germanium 2000 Deluxe — Danish tape emulation by Soundboys"
 )
 
 target_sources(BC2000DL PRIVATE

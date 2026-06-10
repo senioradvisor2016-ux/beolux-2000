@@ -27,7 +27,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override                  { return true; }
 
-    const juce::String getName() const override      { return "Beolux 2000"; }
+    const juce::String getName() const override      { return "Germanium 2000 Deluxe"; }
     bool acceptsMidi() const override                { return false; }
     bool producesMidi() const override               { return false; }
     bool isMidiEffect() const override               { return false; }
@@ -56,7 +56,7 @@ public:
 
     // ===== User-presets på disk =====
     static juce::File userPresetDirectory();          // skapas vid behov
-    bool saveUserPreset (const juce::String& name);   // skriv live-state → <dir>/<name>.beolux
+    bool saveUserPreset (const juce::String& name);   // skriv live-state → <dir>/<name>.germanium
     bool loadUserPresetFile (const juce::File&);       // läs + applicera
     juce::Array<juce::File> listUserPresets();
 

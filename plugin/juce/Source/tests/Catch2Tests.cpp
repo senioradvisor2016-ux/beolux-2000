@@ -1,4 +1,4 @@
-/*  Catch2-baserade DSP-enhetstester för Beolux 2000.
+/*  Catch2-baserade DSP-enhetstester för Germanium 2000 Deluxe.
     Bygg/kör:  cmake --build build --target BC2000DL_Catch2
                ./build/BC2000DL_Catch2_artefacts/Release/BC2000DL_Catch2
 */

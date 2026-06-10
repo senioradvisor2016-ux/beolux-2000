@@ -599,7 +599,7 @@ juce::File BC2000DLProcessor::userPresetDirectory()
 {
     auto dir = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
                    .getChildFile ("Soundboys")
-                   .getChildFile ("Beolux 2000")
+                   .getChildFile ("Germanium 2000 Deluxe")
                    .getChildFile ("Presets");
     if (! dir.exists())
         dir.createDirectory();
@@ -610,7 +610,7 @@ bool BC2000DLProcessor::saveUserPreset (const juce::String& name)
 {
     const auto clean = juce::File::createLegalFileName (name).trim();
     if (clean.isEmpty()) return false;
-    auto file = userPresetDirectory().getChildFile (clean + ".beolux");
+    auto file = userPresetDirectory().getChildFile (clean + ".germanium");
     auto state = apvts.copyState();          // bara params — inte A/B-slots
     if (auto xml = state.createXml())
         return xml->writeTo (file);
@@ -631,7 +631,7 @@ bool BC2000DLProcessor::loadUserPresetFile (const juce::File& file)
 juce::Array<juce::File> BC2000DLProcessor::listUserPresets()
 {
     juce::Array<juce::File> out;
-    userPresetDirectory().findChildFiles (out, juce::File::findFiles, false, "*.beolux");
+    userPresetDirectory().findChildFiles (out, juce::File::findFiles, false, "*.germanium");
     out.sort();
     return out;
 }

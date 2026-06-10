@@ -1,6 +1,6 @@
 /*  VURenderTest — definitivt RENDERINGS-test av WireframeVU-nålen.
 
-    Renderar den riktiga WireframeVU-komponenten (samma klass som BEOLUX 2000
+    Renderar den riktiga WireframeVU-komponenten (samma klass som GERMANIUM 2000 DELUXE
     DELUXE-editorn använder) offscreen till en juce::Image över ett dB-svep och
     detekterar nålens X-position per nivå.  Verifierar att:
 

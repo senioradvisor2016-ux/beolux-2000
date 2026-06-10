@@ -5,7 +5,7 @@
 # Gör:
 #   1. Genererar en 440 Hz ton-WAV (stdlib python).
 #   2. Installerar ett __startup.lua som i REAPER: nytt projekt-tab → ny spår →
-#      lägger tonen som media-item → laddar VST3 "Beolux 2000" som FX (bevisar att
+#      lägger tonen som media-item → laddar VST3 "Germanium 2000 Deluxe" som FX (bevisar att
 #      en riktig DAW scannar + instansierar pluggen) → drar spårets ljud via en
 #      audio accessor → mäter peak/RMS/NaN (signal-flöde, bounded, ingen NaN) →
 #      skriver resultat till en fil.
@@ -16,7 +16,7 @@
 # olicensierad REAPER visar periodvis en nag-dialog vid start som blockerar
 # startup-scriptet (kräver klick) → då time-outar testet. När REAPER startar
 # utan nag passerar det rent. Bekräftat resultat (utan nag):
-#   fx=0  name="VST3: Beolux 2000 (Soundboys)"  got=1  peak~0.30  rms~0.21  nan=0
+#   fx=0  name="VST3: Germanium 2000 Deluxe (Soundboys)"  got=1  peak~0.30  rms~0.21  nan=0
 # dvs REAPER scannar + instansierar pluggen och ljud flödar utan NaN/blowup.
 #   3. Startar REAPER, väntar på resultatfilen, parsar PASS/FAIL.
 #   4. Städar ALLTID bort __startup.lua + ton-WAV och avslutar REAPER (trap).
@@ -30,7 +30,7 @@ STARTUP_BAK="$RES_DIR/Scripts/__startup.lua.bc2000bak"
 TONE="/tmp/bc2000_tone.wav"
 RESULT="/tmp/bc2000_reaper_result.txt"
 REAPER_BIN="/Applications/REAPER.app/Contents/MacOS/REAPER"
-PLUGIN_NAME="${BC2000_PLUGIN_NAME:-Beolux 2000}"
+PLUGIN_NAME="${BC2000_PLUGIN_NAME:-Germanium 2000 Deluxe}"
 
 cleanup() {
   # återställ ALLTID användarens startup-script FÖRST (även om REAPER hänger)
@@ -128,7 +128,7 @@ nan="$(echo "$LINE"  | sed -n 's/.*nan=\([0-9]*\).*/\1/p')"
 
 fail=0
 [ "${fx:-"-1"}" -ge 0 ] 2>/dev/null && echo "  [OK]   pluggen instansierad i REAPER (fx-idx $fx, namn: $name)" || { echo "  [FAIL] pluggen kunde ej laddas i REAPER"; fail=1; }
-case "$name" in *Beolux*) echo "  [OK]   FX-namn matchar (Beolux)";; *) echo "  [FAIL] FX-namn oväntat: $name"; fail=1;; esac
+case "$name" in *Germanium*) echo "  [OK]   FX-namn matchar (Germanium)";; *) echo "  [FAIL] FX-namn oväntat: $name"; fail=1;; esac
 [ "${nan:-1}" = "0" ] && echo "  [OK]   ingen NaN i host-signalflöde" || { echo "  [FAIL] NaN i output: $nan"; fail=1; }
 awk -v p="${peak:-99}" 'BEGIN{exit !(p<8.0)}' && echo "  [OK]   signal bounded (peak $peak < 8)" || { echo "  [FAIL] signal ej bounded: $peak"; fail=1; }
 awk -v r="${rms:-0}" 'BEGIN{exit !(r>0.0001)}' && echo "  [OK]   ljud flödar genom spåret (rms $rms)" || echo "  [info] låg/ingen rms ($rms)"

@@ -6,7 +6,7 @@ vs_studio_sound_1968.py — exakt spec-compliance-test mot plugin/specs.md
 Varje rad i §2/§3/§4/§5/§6/§7/§8/§9/§10/§11 mäts mot ett konkret target
 och printar PASS/FAIL med delta. Målet: alla rader gröna.
 
-Kör:  python3 plugin/juce/Source/tests/vs_studio_sound_1968.py [/path/to/Beolux.vst3]
+Kör:  python3 plugin/juce/Source/tests/vs_studio_sound_1968.py [/path/to/Germanium 2000 Deluxe.vst3]
 """
 
 import os, sys, math, time
@@ -14,7 +14,7 @@ import numpy as np
 import pedalboard
 
 PLUGIN_PATH = (sys.argv[1] if len(sys.argv) > 1
-               else os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3"))
+               else os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Germanium 2000 Deluxe.vst3"))
 SR = 48000
 BLOCK = 512
 
@@ -389,7 +389,7 @@ def test_wow_flutter():
 
 def main():
     print("══════════════════════════════════════════════════════════════════")
-    print("  Beolux 2000 — Studio Sound 1968 spec compliance")
+    print("  Germanium 2000 Deluxe — Studio Sound 1968 spec compliance")
     print(f"  pedalboard {pedalboard.__version__}  •  SR={SR}  •  block={BLOCK}")
     print("══════════════════════════════════════════════════════════════════")
 

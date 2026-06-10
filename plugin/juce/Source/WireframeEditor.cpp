@@ -2225,7 +2225,7 @@ namespace bc2000dl::ui
             g.setColour (juce::Colour (LnF::kStroke));
             g.setFont (juce::Font (juce::FontOptions (14.0f, juce::Font::bold))
                             .withExtraKerningFactor (0.28f));
-            g.drawText ("BEOLUX 2000 DELUXE",
+            g.drawText ("GERMANIUM 2000 DELUXE",
                          juce::Rectangle<int> (60, 360, 800, 16),
                          juce::Justification::centred, false);
             // UX: subtitle bumpad 6.5 → 8.5 + ökad kontrast (0xFF3A3A3A → 0xFF5A5A5A)

@@ -10,11 +10,11 @@
 #
 # Användning (pfx-fil):
 #   pwsh scripts/release-windows-sign.ps1 `
-#       -Vst3 "plugin\juce\build\BC2000DL_artefacts\Release\VST3\Beolux 2000.vst3" `
+#       -Vst3 "plugin\juce\build\BC2000DL_artefacts\Release\VST3\Germanium 2000 Deluxe.vst3" `
 #       -PfxPath C:\certs\soundboys.pfx -PfxPassword $env:PFX_PW
 #
 # Användning (cert i arkivet via thumbprint):
-#   pwsh scripts/release-windows-sign.ps1 -Vst3 "...\Beolux 2000.vst3" `
+#   pwsh scripts/release-windows-sign.ps1 -Vst3 "...\Germanium 2000 Deluxe.vst3" `
 #       -Thumbprint "ABCD1234..."
 
 param(

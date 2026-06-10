@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# validate.sh — run pluginval against the installed Beolux 2000 VST3 + AU.
+# validate.sh — run pluginval against the installed Germanium 2000 Deluxe VST3 + AU.
 #
 # Usage:
 #   scripts/validate.sh                  # default: strictness 5, both formats
@@ -14,8 +14,8 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PLUGINVAL="/Applications/pluginval.app/Contents/MacOS/pluginval"
-VST3_PATH="$HOME/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3"
-AU_PATH="$HOME/Library/Audio/Plug-Ins/Components/Beolux 2000.component"
+VST3_PATH="$HOME/Library/Audio/Plug-Ins/VST3/Germanium 2000 Deluxe.vst3"
+AU_PATH="$HOME/Library/Audio/Plug-Ins/Components/Germanium 2000 Deluxe.component"
 LOG_DIR="$REPO_ROOT/output/pluginval"
 
 STRICT=5

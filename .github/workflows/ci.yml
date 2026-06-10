@@ -85,6 +85,6 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: Beolux2000-VST3-Windows-x64
+          name: Germanium2000-VST3-Windows-x64
           path: plugin/juce/build/BC2000DL_artefacts/Release/VST3/
           if-no-files-found: warn

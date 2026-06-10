@@ -1,4 +1,4 @@
-/*  UIRenderTest — smoke-test av HELA BEOLUX 2000 DELUXE-editorn.
+/*  UIRenderTest — smoke-test av HELA GERMANIUM 2000 DELUXE-editorn.
 
     Konstruerar den riktiga editorn via processor.createEditor(), renderar hela
     komponentträdet (faceplate, rattar, knappar, faders, VU-metrar, text) offscreen

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-signal_test.py — BC2000DL / Beolux 2000 signal-level test via pedalboard.
+signal_test.py — BC2000DL / Germanium 2000 Deluxe signal-level test via pedalboard.
 
 Kör:  python3 Source/tests/signal_test.py
 Kräver:  pip install pedalboard numpy
@@ -13,7 +13,7 @@ import numpy as np
 import pedalboard
 
 # ──────────────────────────────────────────────────────────────────
-PLUGIN_PATH = os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Beolux 2000.vst3")
+PLUGIN_PATH = os.path.expanduser("~/Library/Audio/Plug-Ins/VST3/Germanium 2000 Deluxe.vst3")
 SR_DEFAULT  = 48000
 BLOCK       = 512
 WARM_BLOCKS = 40
@@ -1020,7 +1020,7 @@ def test_mono_track(plugin):
 
 if __name__ == "__main__":
     print("═" * 66)
-    print("  BC2000DL / Beolux 2000  —  Python signal-test via pedalboard")
+    print("  BC2000DL / Germanium 2000 Deluxe  —  Python signal-test via pedalboard")
     print(f"  pedalboard {pedalboard.__version__}  •  numpy {np.__version__}")
     print("═" * 66)
 
