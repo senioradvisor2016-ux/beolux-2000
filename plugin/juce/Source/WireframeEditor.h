@@ -127,6 +127,24 @@ namespace bc2000dl::ui
         float peakHold { -60.0f };   // visible peak marker (decays toward current)
     };
 
+    // Slider med fininställning: håll Shift eller Cmd/Ctrl under drag → 5×
+    // lägre känslighet (precis ratt-trim). Dubbelklick-reset + värde-popup
+    // sätts redan av setupFader/setupKnob. UAD/FabFilter-standard.
+    class FineSlider : public juce::Slider
+    {
+    public:
+        void mouseDown (const juce::MouseEvent& e) override
+        {
+            if (! baseCaptured) { baseSensitivity = getMouseDragSensitivity(); baseCaptured = true; }
+            const bool fine = e.mods.isShiftDown() || e.mods.isCommandDown();
+            setMouseDragSensitivity (fine ? baseSensitivity * 5 : baseSensitivity);
+            juce::Slider::mouseDown (e);
+        }
+    private:
+        int  baseSensitivity { 250 };
+        bool baseCaptured     { false };
+    };
+
     class WireframeEditor : public juce::AudioProcessorEditor,
                              private juce::Timer,
                              private juce::ComponentListener
@@ -148,26 +166,27 @@ namespace bc2000dl::ui
 
         // ===== 10 individuella faders (5 källor × L+R) =====
         // 14 ♀ RADIO · 15 ◇ GRAM · 16 ◇ MIK · 12 EKO/SoS · 11 MASTER
-        juce::Slider faderRadioL, faderRadioR;
-        juce::Slider faderPhonoL, faderPhonoR;
-        juce::Slider faderMicL,   faderMicR;
-        juce::Slider faderEchoL,  faderEchoR;
-        juce::Slider faderMasterL, faderMasterR;
+        FineSlider faderRadioL, faderRadioR;
+        FineSlider faderPhonoL, faderPhonoR;
+        FineSlider faderMicL,   faderMicR;
+        FineSlider faderEchoL,  faderEchoR;
+        FineSlider faderMasterL, faderMasterR;
 
         // ===== 9 service-knobs + 2 selectors + 1 toggle (1968 service-manual auth) =====
-        juce::Slider knobBiasL, knobBiasR;                  // L/R bias trimmers (manual p.4)
-        juce::Slider knobSatL, knobSatR, knobWow;
-        juce::Slider knobPrintTh, knobStereoAsym, knobMultiplay;
-        juce::Slider knobMainsHum;                          // 50/60 Hz hum intensity
+        FineSlider knobBiasL, knobBiasR;                  // L/R bias trimmers (manual p.4)
+        FineSlider knobSatL, knobSatR, knobWow;
+        FineSlider knobPrintTh, knobStereoAsym, knobMultiplay;
+        FineSlider knobMainsHum;                          // 50/60 Hz hum intensity
         juce::ComboBox cbTapeFormula;
         juce::ComboBox cbMainsHumFreq;                      // 50/60 Hz selector
 
         // ===== Höger zon =====
         juce::ComboBox cbSpeed;            // 28 (top-deck position; combo bound to choice)
-        juce::Slider   knobBass, knobTreble, knobBalance;  // #9 bas, #8 diskant, #10 balans
-        juce::Slider   knobInputTrim, knobOutputTrim;  // plugin-utility I/O trim
+        FineSlider   knobBass, knobTreble, knobBalance;  // #9 bas, #8 diskant, #10 balans
+        FineSlider   knobInputTrim, knobOutputTrim;  // plugin-utility I/O trim
+        FineSlider   knobMix, knobTapeNoise;         // Fas 2 plugin-utility (dry/wet + brus)
         juce::ToggleButton tEchoPluginOn;   // plugin-extension
-        juce::Slider   knobEchoTime, knobEchoFb;  // visuella plugin-knobs (ej APVTS-bundna)
+        FineSlider   knobEchoTime, knobEchoFb;  // visuella plugin-knobs (ej APVTS-bundna)
 
         // ===== Vänster zon — rockers =====
         juce::ToggleButton btnTrack1, btnTrack2;          // 26, 27 → track_1, track_2

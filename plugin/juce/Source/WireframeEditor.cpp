@@ -1126,6 +1126,8 @@ namespace bc2000dl::ui
         setupKnob  (knobBalance,    "balance",     0.0);   // #10 — bipolär L/R
         setupKnob  (knobInputTrim,  "input_trim",  0.0);
         setupKnob  (knobOutputTrim, "output_trim", 0.0);
+        setupKnob  (knobMix,        "mix",         1.0);   // Fas 2 — dry/wet
+        setupKnob  (knobTapeNoise,  "tape_noise",  1.0);   // Fas 2 — bandbrus-skala
 
         cbSpeed        .setTooltip ("TAPE SPEED\n4.75 cm/s = warmest, narrowest BW\n9.5 cm/s = nominal\n19 cm/s = brightest, widest BW");
         knobBass       .setTooltip ("BASS (#9)\nLow-shelf tone control\nfrom B&O manual.\nRange: -12 to +12 dB");
@@ -1133,6 +1135,8 @@ namespace bc2000dl::ui
         knobBalance    .setTooltip ("BALANCE (#10)\nL/R output balance.\nCenter = lika kanaler.\nVrid mot L/R för att vikta utgangen.");
         knobInputTrim  .setTooltip ("INPUT TRIM\nPre-DSP gain staging.\nLower hot DAW signals before\nthey hit tape saturation.\nRange: -24 to +24 dB");
         knobOutputTrim .setTooltip ("OUTPUT TRIM\nPost-DSP makeup gain.\nCompensate for tape-sat\nlevel reduction.\nRange: -24 to +24 dB");
+        knobMix        .setTooltip ("MIX (dry/wet)\nParallel blend of the dry input\nwith the full tape chain.\nLatency-compensated → phase-correct.\n100% = fully wet (default).");
+        knobTapeNoise  .setTooltip ("TAPE NOISE\nTape-hiss level (oxide self-noise).\n1.0 = authentic spec level,\n0 = silent, 2.0 = worn tape.");
 
         // Echo plugin-extension — now backed by real APVTS params + DSP
         setupToggle (tEchoPluginOn, "ON",   "echo_enabled");
@@ -1433,8 +1437,12 @@ namespace bc2000dl::ui
         // INPUT/OUTPUT-knobs flyttade 6 px upp (492 → 486) + BASS/TREBLE 4 px ner
         // (544 → 548) så label-luckan mellan raderna växte från 8 → 18 px.
         // Behövs för att 8.5 pt INPUT/OUTPUT-label ska få plats utan knob-överlapp.
-        knobInputTrim .setBounds (660 - 22, 486 - 22, 44, 44);  // 464-508
-        knobOutputTrim.setBounds (740 - 22, 486 - 22, 44, 44);
+        // Topprad: 4 plugin-utility-rattar symmetriskt kring panelmitten x=704,
+        // 56 px delning (centers 620/676/732/788) → 12 px lucka mellan 44-px-knobs.
+        knobInputTrim .setBounds (620 - 22, 486 - 22, 44, 44);  // 464-508
+        knobOutputTrim.setBounds (676 - 22, 486 - 22, 44, 44);
+        knobMix       .setBounds (732 - 22, 486 - 22, 44, 44);
+        knobTapeNoise .setBounds (788 - 22, 486 - 22, 44, 44);
         // Bass + Treble — y=548 center (range 526-570, ends within panel y=580)
         // Ton-trio: BASS · BALANCE · TREBLE (3 knobs i bottenraden, inom panelen 594–814)
         knobBass   .setBounds (648 - 22, 548 - 22, 44, 44);
@@ -2535,10 +2543,12 @@ namespace bc2000dl::ui
                                   juce::Colour (0xFF000000).withAlpha (0.55f), 9.0f);
                 icons::drawIcon (g, icons::Powerswitch, r, juce::Colour (LnF::kSilkDim), 9.0f);
             }
-            // Row 1 — INPUT/OUTPUT labels i 18-px lucka mellan knob-rader (508→526)
-            // Knob-bottom 508, BASS-knob-top 526 → 18 px lucka, label vid 511-521.
-            drawEngraved ("INPUT",  juce::Rectangle<int> (632, 511, 56, 11), silk, labelFont);
-            drawEngraved ("OUTPUT", juce::Rectangle<int> (712, 511, 56, 11), silk, labelFont);
+            // Row 1 — 4 plugin-utility-labels i 18-px lucka mellan knob-rader.
+            // Centrerade på knob-centers 620/676/732/788 (label-rect = center-26).
+            drawEngraved ("INPUT",  juce::Rectangle<int> (594, 511, 52, 11), silk, labelFont);
+            drawEngraved ("OUTPUT", juce::Rectangle<int> (650, 511, 52, 11), silk, labelFont);
+            drawEngraved ("MIX",    juce::Rectangle<int> (706, 511, 52, 11), silk, labelFont);
+            drawEngraved ("NOISE",  juce::Rectangle<int> (762, 511, 52, 11), silk, labelFont);
             // Row 2 — BASS/TREBLE labels (knob-bottom 570, ECHO-header 602 = 32 px lucka)
             drawEngraved ("BASS",    juce::Rectangle<int> (620, 573, 56, 11), silk, labelFont);
             drawEngraved ("BALANCE", juce::Rectangle<int> (676, 573, 56, 11), silk, labelFont);
