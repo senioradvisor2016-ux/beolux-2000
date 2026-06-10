@@ -6,6 +6,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0" CACHE STRING "macOS deployment target")
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "macOS build architectures (universal)")
 
+# Windows/MSVC-portabilitet (Fas 4):
+#  /utf-8  — källfilerna innehåller svenska kommentarer (å/ä/ö) + symboler
+#            (→ ² × …); utan denna tolkar MSVC dem i systemets codepage och
+#            kan förstöra strängliteraler. KRITISKT för korrekt bygge.
+#  /bigobj — JUCE:s mallar genererar fler sektioner än COFF-defaulten klarar.
+# Sätts före JUCE-add_subdirectory så det gäller JUCE OCH plugin-koden.
+if(MSVC)
+    add_compile_options(/utf-8 /bigobj)
+endif()
+
+# Pluginformat per plattform: VST3 + Standalone överallt, AU endast på Apple.
+set(BC2000DL_FORMATS VST3 Standalone)
+if(APPLE)
+    list(APPEND BC2000DL_FORMATS AU)
+endif()
+
 # JUCE: använd lokal kopia om JUCE_PATH är satt eller ~/JUCE finns,
 # annars FetchContent (kräver internet vid första bygget).
 if(DEFINED JUCE_PATH AND EXISTS "${JUCE_PATH}/CMakeLists.txt")
@@ -39,7 +55,7 @@ juce_add_plugin(BC2000DL
     COPY_PLUGIN_AFTER_BUILD  TRUE
     PLUGIN_MANUFACTURER_CODE Sbys
     PLUGIN_CODE              Blx2
-    FORMATS                  AU VST3 Standalone
+    FORMATS                  ${BC2000DL_FORMATS}
     PRODUCT_NAME             "Beolux 2000"
     DESCRIPTION              "Beolux 2000 — Danish tape emulation by Soundboys"
 )

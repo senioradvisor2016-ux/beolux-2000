@@ -53,3 +53,38 @@ jobs:
           name: pluginval-loggar
           path: output/pluginval/
           if-no-files-found: ignore
+
+  # ──────────────────────────────────────────────────────────────────
+  #  Windows VST3 (Fas 4) — bevisar att koden kompilerar på MSVC och att
+  #  kärn-DSP:n (C++-enhetstesterna) passerar. Integrations-/pedalboard-
+  #  testerna är macOS-sökvägsberoende och körs i mac-jobbet ovan.
+  # ──────────────────────────────────────────────────────────────────
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure (MSVC, Release)
+        run: >
+          cmake -S plugin/juce -B plugin/juce/build
+          -G "Visual Studio 17 2022" -A x64
+
+      # Bygger VST3 + Standalone + alla C++-testmål i Release.
+      - name: Bygg plugin + tester
+        run: cmake --build plugin/juce/build --config Release --parallel 3
+
+      # Endast 'unit'-label: C++-tester utan externa beroenden (ingen
+      # installerad VST3, ingen python/pedalboard, ingen pluginval).
+      - name: ctest (unit)
+        run: ctest --test-dir plugin/juce/build -C Release -L unit --output-on-failure
+
+      - name: Spara VST3-artefakt
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Beolux2000-VST3-Windows-x64
+          path: plugin/juce/build/BC2000DL_artefacts/Release/VST3/
+          if-no-files-found: warn

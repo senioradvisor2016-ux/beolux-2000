@@ -9,6 +9,8 @@
 #pragma once
 
 #include <cstdint>
+#include <algorithm>   // std::fill/min/max/clamp — MSVC ger dem inte transitivt
+#include <cmath>       // std::pow/exp/tanh m.fl. — samma skäl
 
 namespace bc2000dl::dsp
 {
