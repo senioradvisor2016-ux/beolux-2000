@@ -2221,12 +2221,16 @@ namespace bc2000dl::ui
 
             // (PRESET caption removed — was overlapping behind the button)
 
-            // Brand — centered across the full title strip (preset bar floats on top-left)
+            // Brand — centrerat i ZONEN TILL HÖGER om kontrollerna (A/B-avdelaren
+            // @343 → power-LED @838, mitt = 590). Centrering i hela remsan gjorde
+            // att det längre "GERMANIUM 2000 DELUXE" trängdes mot A/B-klustret och
+            // lämnade död yta till höger. Nu balanserat i sin egen rymd.
+            constexpr int kBrandL = 348, kBrandW = 484;   // mitt = 590
             g.setColour (juce::Colour (LnF::kStroke));
             g.setFont (juce::Font (juce::FontOptions (14.0f, juce::Font::bold))
                             .withExtraKerningFactor (0.28f));
             g.drawText ("GERMANIUM 2000 DELUXE",
-                         juce::Rectangle<int> (60, 360, 800, 16),
+                         juce::Rectangle<int> (kBrandL, 360, kBrandW, 16),
                          juce::Justification::centred, false);
             // UX: subtitle bumpad 6.5 → 8.5 + ökad kontrast (0xFF3A3A3A → 0xFF5A5A5A)
             // + rect-höjd 9 → 12.  Tidigare osynlig mot mörk bakgrund.
@@ -2234,7 +2238,7 @@ namespace bc2000dl::ui
             g.setFont (juce::Font (juce::FontOptions (8.5f))
                             .withExtraKerningFactor (0.35f));
             g.drawText ("SOUNDBOYS TAPE EMULATION",
-                         juce::Rectangle<int> (60, 373, 800, 12),
+                         juce::Rectangle<int> (kBrandL, 373, kBrandW, 12),
                          juce::Justification::centred, false);
 
             // ===== Power-on LED — period-correct green dome at top-right of title strip =====
