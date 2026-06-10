@@ -871,6 +871,68 @@ def test_sound_on_sound(plugin):
 
 
 # ══════════════════════════════════════════════════════════════════
+# TEST: Multiplay — generationsmodell aktiv + INGA blockgräns-klick
+#   (regression: hfFilter resetades förr VARJE block → klicktransient
+#    var ~10:e ms = kornigt oljud. OBS: param heter multiplay_generation
+#    i pedalboard — displaynamnet snake_caseas, INTE parameter-id:t.)
+# ══════════════════════════════════════════════════════════════════
+
+def test_multiplay(plugin):
+    print("\n── Test: Multiplay (generationer + klickfrihet) ────────────────")
+
+    def render(gen, freq, amp=0.05, seconds=2):
+        plugin.reset(); default_params(plugin)
+        plugin.wow_flutter = 0.0
+        plugin.tape_noise = 0.0
+        plugin.multiplay_generation = gen
+        n = SR_DEFAULT * seconds
+        t = np.arange(n) / SR_DEFAULT
+        x = np.stack([(amp * np.sin(2 * np.pi * freq * t))] * 2,
+                     axis=1).astype(np.float32)
+        o = plugin(x, sample_rate=SR_DEFAULT, buffer_size=BLOCK, reset=True)
+        return o[SR_DEFAULT:, 0]
+
+    def tone_level(o, freq):
+        w = np.hanning(len(o))
+        F = np.abs(np.fft.rfft(o * w))
+        fr = np.fft.rfftfreq(len(o), 1 / SR_DEFAULT)
+        return 20 * np.log10(F[np.argmin(np.abs(fr - freq))] + 1e-12)
+
+    # 1. Generations-rolloffen är AKTIV (gen 5 = 1-pol LP @ 4 kHz → ~−7 dB @ 8 kHz)
+    ref = tone_level(render(1, 8000), 8000)
+    d3 = tone_level(render(3, 8000), 8000) - ref
+    d5 = tone_level(render(5, 8000), 8000) - ref
+    report("Multiplay gen 3 dämpar 8 kHz (−2..−8 dB)", -8.0 < d3 < -2.0, f"{d3:+.1f} dB")
+    report("Multiplay gen 5 dämpar 8 kHz mer än gen 3", d5 < d3 - 1.0,
+           f"gen5 {d5:+.1f} vs gen3 {d3:+.1f} dB")
+
+    # 2. INGA blockgräns-klick (gamla buggen: filter-reset per block).
+    #    Klick = spik i andraderivatan exakt vid blockgränserna — buggen gav
+    #    50×+ över median, frisk kedja ligger i brusstatistik (< 15×).
+    o = render(5, 1000, amp=0.15, seconds=3)
+    d2 = np.abs(np.diff(o, 2))
+    boundary = max(d2[k - 2:k + 2].max()
+                   for k in range(BLOCK, len(d2) - 2, BLOCK))
+    ratio = boundary / (np.median(d2) + 1e-12)
+    report("Multiplay gen 5: inga blockgräns-klick (< 15x median)",
+           ratio < 15.0, f"{ratio:.1f}x")
+    report("Multiplay gen 5: ändlig output", bool(np.all(np.isfinite(o))), "")
+
+    # 3. Generationsbrus aktivt: gen 5 höjer golvet (≥ 3 dB över gen 1)
+    def floor(gen):
+        plugin.reset(); default_params(plugin)
+        plugin.wow_flutter = 0.0; plugin.tape_noise = 0.0
+        plugin.multiplay_generation = gen
+        x = np.zeros((SR_DEFAULT * 2, 2), dtype=np.float32)
+        o = plugin(x, sample_rate=SR_DEFAULT, buffer_size=BLOCK, reset=True)
+        return 20 * np.log10(rms(o[SR_DEFAULT:]) + 1e-12)
+
+    f1, f5 = floor(1), floor(5)
+    report("Multiplay gen 5: generationsbrus aktivt (≥ +3 dB golv)",
+           f5 > f1 + 3.0, f"gen1 {f1:.1f} → gen5 {f5:.1f} dBFS")
+
+
+# ══════════════════════════════════════════════════════════════════
 # TEST: MONO-spår (Ableton) — pluggen får inte vara tyst/krascha i mono
 #   (regression: isBusesLayoutSupported accepterade förut BARA stereo →
 #    monospår i Live blev tysta.)
@@ -931,6 +993,7 @@ if __name__ == "__main__":
     test_headroom(plugin)
     test_source_differentiation(plugin)
     test_sound_on_sound(plugin)
+    test_multiplay(plugin)
     test_mono_track(plugin)
 
     print("\n" + "═" * 66)
