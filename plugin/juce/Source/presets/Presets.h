@@ -45,9 +45,14 @@ namespace bc2000dl
         bool  echo_enabled       = false;
         float echo_amount        = 0.0f;
         float echo_amount_r      = 0.0f;
+
+        // --- Sound-on-Sound (manual §C: multiplay-bounce L→R) ---
+        // echo_amount_r dubblar som fader #12 ("die Regulierung") och styr
+        // bounce-nivån när sound_on_sound är satt.
+        bool  sound_on_sound     = false;
     };
 
-    static constexpr int kNumPresets    = 43;
+    static constexpr int kNumPresets    = 46;
     static constexpr int kNumCategories = 8;
 
     /** Full preset list — index 0 is FACTORY (the "reset" state). */

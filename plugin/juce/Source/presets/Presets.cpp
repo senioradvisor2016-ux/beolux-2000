@@ -1,6 +1,6 @@
 /*  BC2000DL — Preset data definitions.
 
-    43 presets in 7 categories, plus FACTORY (idx 0).
+    46 presets in 7 categories, plus FACTORY (idx 0).
     All values validated at authoring time:
       mic_gain >= 0.5, master >= 0.75, drive >= 0.5, wow <= 2.0
 */
@@ -541,6 +541,54 @@ namespace bc2000dl
             .echo_enabled   = true,
             .echo_amount    = 0.65f,
             .echo_amount_r  = 0.6f,
+        },
+
+        // ---- S-on-S overdub-workflow (manual §C, sid 10) -----------------
+        // Hårdvarans multiplay: stämma 1 på L-spåret → bounce till R mixad
+        // med stämma 2 → nästa pass korsar tillbaka.  I DAW:en: lägg stämma 1
+        // på L-kanalen, spela in stämma 2 på R, höj generation per pass.
+        // echo_amount_r = fader #12 ("die Regulierung") = bounce-nivån.
+        {
+            .name     = "S-ON-S PASS 2",
+            .category = "SPECIAL",
+            .tip      = "Multiplay bounce, 2nd pass — voice 1 on L folds onto R with one generation of tape wear",
+            .tape_formula   = 0,
+            .speed          = 1,
+            .saturation_drive   = 1.15f,
+            .saturation_drive_r = 1.15f,
+            .wow_flutter    = 0.4f,
+            .multiplay_gen  = 2,
+            .echo_amount_r  = 0.55f,
+            .sound_on_sound = true,
+        },
+        {
+            .name     = "S-ON-S PASS 3",
+            .category = "SPECIAL",
+            .tip      = "Multiplay bounce, 3rd pass — two generations deep, softer highs and thicker mids",
+            .tape_formula   = 0,
+            .speed          = 1,
+            .saturation_drive   = 1.25f,
+            .saturation_drive_r = 1.25f,
+            .wow_flutter    = 0.6f,
+            .multiplay_gen  = 3,
+            .treble_db      = -0.5f,
+            .echo_amount_r  = 0.5f,
+            .sound_on_sound = true,
+        },
+        {
+            .name     = "S-ON-S PASS 4",
+            .category = "SPECIAL",
+            .tip      = "Multiplay bounce, 4th pass — deep generation loss, the classic 60s home-overdub haze",
+            .tape_formula   = 0,
+            .speed          = 1,
+            .saturation_drive   = 1.35f,
+            .saturation_drive_r = 1.35f,
+            .wow_flutter    = 0.85f,
+            .multiplay_gen  = 4,
+            .treble_db      = -1.0f,
+            .bass_db        = 0.5f,
+            .echo_amount_r  = 0.45f,
+            .sound_on_sound = true,
         },
 
     }; // kPresets[]

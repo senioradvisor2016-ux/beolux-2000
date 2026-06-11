@@ -467,12 +467,14 @@ void BC2000DLProcessor::setCurrentProgram (int index)
     set ("echo_enabled",       p.echo_enabled ? 1.0f : 0.0f);
     set ("echo_amount",        p.echo_amount);
     set ("echo_amount_r",      p.echo_amount_r);
+    // S-on-S styrs av presetdata (S-ON-S PASS-presetsen sätter den; alla
+    // andra presets nollställer — samma effekt som tidigare hårda reset).
+    set ("sos_enabled",     p.sound_on_sound ? 1.0f : 0.0f);
     // Nollställ alltid transienta tillstånd — förhindrar kvar-mute efter pause
     set ("bypass_tape",     0.0f);
     set ("pause",           0.0f);
     set ("speaker_monitor", 0.0f);
     set ("synchroplay",     0.0f);
-    set ("sos_enabled",     0.0f);
     set ("pa_enabled",      0.0f);
 }
 

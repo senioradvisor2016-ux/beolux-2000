@@ -169,6 +169,7 @@ namespace bc2000dl::dsp
         TapeSpeed lastSpeed { TapeSpeed::Speed19 };
         double mainsHumPhase { 0.0 };   // ackumulator för MAINS HUM-injektion
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> sosSmooth;  // S-on-S on/off-ramp
+        bool sosFeedActive { false };   // satt per block i process(): post-tape L matas in i R-kedjan
 
         // Fast integer-delay som håller bypass/Source-vägen i fas med den
         // PDC-rapporterade tape-vägen (oversampler + wow/flutter-basdelay).
@@ -272,6 +273,10 @@ namespace bc2000dl::dsp
         // latens (FixedDelay) så dry/wet-blandningen är fasriktig.
         juce::AudioBuffer<float> dryScratch;
         FixedDelay dryDelayL, dryDelayR;
+
+        // S-on-S-bussen (manual §C sid 10): post-tape L fångas här mellan
+        // L- och R-kedjans processning och summeras in i höger record-amp.
+        juce::AudioBuffer<float> sosScratch;    // 1 kanal
 
         Mixer3Bus mixer;
         Echo echoL, echoR;

@@ -1088,8 +1088,8 @@ namespace bc2000dl::ui
         faderPhonoR .setTooltip ("PHONO R (#14 ◇)\nRight-channel gain for phono input.");
         faderMicL   .setTooltip ("MIC L (#15 ◇)\nLeft-channel gain for microphone input.\n50Ω/200Ω LoZ via 8012003 transformer,\nor HiZ direct (per MIC INPUT MODE).");
         faderMicR   .setTooltip ("MIC R (#15 ◇)\nRight-channel gain for microphone input.");
-        faderEchoL  .setTooltip ("ECHO L (#10a)\nEcho SEND-niva (record->play-head-loop).\nKraver ECHO ON. Med S on S aktiv blir\nekot ping-pong (L<->R). Styr INTE\nsjalva S-on-S-lagernivan (den ar fast).");
-        faderEchoR  .setTooltip ("ECHO R (#10a)\nEcho SEND-niva, hoger kanal.\nKraver ECHO ON.");
+        faderEchoL  .setTooltip ("ECHO L (#10a)\nEcho SEND-niva (record->play-head-loop).\nKraver ECHO ON. Med S on S aktiv blir\nekot ping-pong (L<->R).");
+        faderEchoR  .setTooltip ("ECHO/SoS R (#12 \"die Regulierung\")\nEcho SEND-niva hoger + S-on-S bounce-niva.\nTrippelroll som pa originalet: Echo, S on S\noch Line regleras av samma fader.\nMed S on S PA styr den hur mycket av\nL-playbacken som spelas in pa R.");
         faderMasterL.setTooltip ("MASTER L (#12)\nOutput level — vänster kanal.\nOberoende av MASTER R (egen skydepotentiometer).\nBALANCE-knoben viktar därutöver L/R.");
         faderMasterR.setTooltip ("MASTER R (#12)\nOutput level — höger kanal.\nOberoende av MASTER L.");
 
@@ -1170,7 +1170,7 @@ namespace bc2000dl::ui
         btnMoment     .setTooltip ("PAUSE (#11 MOMENTANSTOP)\nMomentary stop — reels freeze in place.\nMutes output (master_volume → 0).\nClick again to resume.");
         btnPA         .setTooltip ("PUBLIC ADDRESS (manual s.8)\nDucks phono/radio when mic is active.\nClassic vintage live-PA function.");
         btnForstarkare.setTooltip ("BYPASS TAPE (#23 'FÖRSTÄRKARE')\nRoute mixer direct to output, skip\ntape pipeline. Use as line mixer\nwithout tape coloring.");
-        btnSoSOn      .setTooltip ("SOUND ON SOUND (S on S)\nLagrar L<->R (mono-vard bounce, fast niva).\nKombinera med ECHO ON -> ping-pong-eko\n(L<->R korsmatat genom bandvagen).\nLayer takes utan extern bouncing.");
+        btnSoSOn      .setTooltip ("SOUND ON SOUND (S on S, manual sid 10)\nMultiplay-bounce: post-tape L spelas in pa R\ngenom hoger record-amp + tape (enkelriktad L->R).\nNivan styrs av ECHO/SoS R-fadern (#12).\nOverdub-recept: stamma 1 pa L, stamma 2 pa R,\nSoS PA, hoj MULTIPL-generation per pass.\nMed ECHO ON dessutom ping-pong-eko (Kreuzung).\nPresets: S-ON-S PASS 2/3/4.");
         btnSpkInt     .setTooltip ("SPEAKER I (#5 INT)\nInternal monitor speaker on.\nMutually exclusive with EXT / MUTE.");
         btnSpkExt     .setTooltip ("SPEAKER II (#4 EXT)\nExternal speaker output on.\nFeeds the power-amp stage (8004014).");
         btnSpkMute    .setTooltip ("SPEAKER MUTE (#6)\nKill all speaker output.\nHeadphones still active.");

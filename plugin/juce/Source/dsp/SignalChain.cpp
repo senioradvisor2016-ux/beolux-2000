@@ -100,6 +100,9 @@ namespace bc2000dl::dsp
         dryDelayL.prepare (totalLatency);
         dryDelayR.prepare (totalLatency);
 
+        // S-on-S-bussen: post-tape L → höger record-amp (manual §C sid 10)
+        sosScratch.setSize (1, blockSize, false, true, true);
+
         smInitialised = false;   // första blocket snappar till APVTS-targets
 
         echoL.prepare (sr);
@@ -180,19 +183,22 @@ namespace bc2000dl::dsp
 
         echoL.setEnabled (p.echoEnabled); echoR.setEnabled (p.echoEnabled);
 
-        // ===== S-on-S har TVÅ samverkande mekanismer (dokumenterat 2026-06) =====
+        // ===== S-on-S har TVÅ samverkande mekanismer (omskrivet 2026-06, manual-
+        // verifierat mot service-manualen sid 10) =====
         // sos_enabled aktiverar BÅDA:
-        //   (a) Echo-ping-pong: echo läser partner-kanalens delay-buffer (nedan).
-        //       Hörs BARA om Echo är ON + echo-fadern > 0. echo-fadern styr alltså
-        //       hur mycket cross-fed eko man hör — INTE S-on-S-lagernivån.
-        //   (b) Direkt symmetrisk L↔R-korsmix, fast 0.4 (sist i process(), rad ~600).
-        //       Detta ÄR själva S-on-S-lagringen och är OBEROENDE av echo-fadern.
-        // SOS + Echo korsmatar genom bandvägen — autentisk ping-pong-layering.
+        //   (a) Echo-ping-pong ("Kreuzung", manual sid 10 överst): echo läser
+        //       partner-kanalens delay-buffer (nedan). Hörs BARA om Echo är ON +
+        //       echo-fadern > 0.
+        //   (b) Multiplay-bouncen (manual sid 10 nederst): post-tape L summeras
+        //       in i HÖGER record-amp, reglerad av fader #12 (echo_amount_r =
+        //       "die Regulierung"). Enkelriktad L→R precis som hårdvaran:
+        //       "Vom Wiedergabekopf aus wird dieses Signal ... durch den 'S on
+        //       S'-Druckknopf und die Regulierung zum rechten Aufnahmeverstärker
+        //       zusammen mit der 2. Stimme geführt."  Se process() + injektions-
+        //       punkten i processChannelChain() (S-on-S-bussen).
         // (En tidig cross-feed-bugg läste partnerns FRUSNA writeIdx → block-rate-
-        // trappstegning = "distat oljud"; fixad i Echo.cpp 2026-06.) Resterande
-        // karaktär vid SOS+Echo+Multi är måttlig och kalibreras mot fysisk maskin
-        // (Fas 5). Verifierat STABIL + RENT: SosEchoStability-test (peak bounded,
-        // ingen NaN, icke-harmoniskt skräp < −20 dB).
+        // trappstegning = "distat oljud"; fixad i Echo.cpp 2026-06.) Stabilitet
+        // skyddad av SosEchoStability-testet (peak bounded, ingen NaN).
         if (p.soundOnSound)
         {
             echoL.setCrossFeedSource (&echoR);
@@ -203,8 +209,9 @@ namespace bc2000dl::dsp
             echoL.setCrossFeedSource (nullptr);
             echoR.setCrossFeedSource (nullptr);
         }
-        // S-on-S korsmix-nivå (smoothad i process() → ingen klick vid toggle)
-        sosSmooth.setTargetValue (p.soundOnSound ? 0.4f : 0.0f);
+        // S-on-S on/off-gate 0..1 (smoothad → ingen klick vid toggle).
+        // Nivån styrs av fader #12 (sm.echoAmountR) vid injektionspunkten.
+        sosSmooth.setTargetValue (p.soundOnSound ? 1.0f : 0.0f);
 
         // PhonoPreamp-mode (H/L)
         L.phono.setMode (p.phonoMode == 0 ? PhonoMode::L : PhonoMode::H);
@@ -355,7 +362,11 @@ namespace bc2000dl::dsp
         const float echoAmtL = sm.echoAmount;
         const float echoAmtR = sm.echoAmountR;
         const bool echoActive = params.echoEnabled && (echoAmtL > 1e-6f || echoAmtR > 1e-6f);
-        if (anyG <= 1e-6f && anyG0 <= 1e-6f && ! echoActive)
+        // S-on-S-bussen räknas som aktiv källa för HÖGER kanal (manual §C):
+        // R-kedjan måste köras även med alla R-faders nere så det korsmatade
+        // L-lagret spelas in genom record-amp + tape.
+        const bool sosFeed = (channel == 1) && sosFeedActive;
+        if (anyG <= 1e-6f && anyG0 <= 1e-6f && ! echoActive && ! sosFeed)
         {
             // Alla source-faders nere OCH echo av → tysta in-signalen men kör
             // fortfarande tape-state framåt (bias-fas + J-A magnetisering).
@@ -489,6 +500,33 @@ namespace bc2000dl::dsp
 
         // ===== Efter input-mixern: gemensam record-tape-playback-pipeline =====
 
+        // 4b. S-on-S-BUSSEN (manual §C sid 10 — Multiplay/"Sound on Sound").
+        // Post-tape L (= playback-huvudets signal, fångad i sosScratch mellan
+        // L- och R-kedjans processning) summeras in i höger record-amp-ingång,
+        // reglerad av fader #12 ("die Regulierung" = echo_amount_r).  Lagret
+        // passerar därmed record-EQ + AC126-steg + tape-saturation precis som
+        // hårdvarans bounce — och får ytterligare en generations bandfärg.
+        // Ingen makeup-gain: nivån hanteras med fadern, som på originalet
+        // (manual sid 12: "Mischbereich 0-6" på inspelningspotentiometern).
+        if (sosFeed)
+        {
+            // "Mischbereich 0-6" (manual sid 12): mixning sker i nedre delen av
+            // inspelningspotentiometern.  kSosMix = 0.7 ger fadern det headroom
+            // hårdvarans VU-disciplin förutsatte, så worst-case-summan (full
+            // nivå på båda kanaler + bounce) håller sig bounded utan att äta
+            // fader-reglerbarheten.
+            constexpr float kSosMix = 0.7f;
+            auto* d = buffer.getWritePointer (channel);
+            const auto* s = sosScratch.getReadPointer (0);
+            const float f0 = smPrev.echoAmountR, f1 = sm.echoAmountR;
+            const float invN = 1.0f / (float) juce::jmax (1, n);
+            for (int i = 0; i < n; ++i)
+            {
+                const float fader = f0 + (f1 - f0) * (float) i * invN;
+                d[i] += sosSmooth.getNextValue() * fader * kSosMix * s[i];
+            }
+        }
+
         // 5. Echo (record→play-head feedback-loop, manual §d)
         // Use per-channel amount so L/R echo amounts are independently gateable.
         const float echoAmt = (channel == 0) ? sm.echoAmount : sm.echoAmountR;
@@ -592,35 +630,33 @@ namespace bc2000dl::dsp
 
         if (numCh >= 1)
             processChannelChain (L, echoL, buffer, 0);
-        if (numCh >= 2)
-            processChannelChain (R, echoR, buffer, 1);
 
-        // ----- B. Sound-on-Sound (manualens S-on-S: bouncing/lagring) -----
-        // Tidigare la vi BARA in vänster i höger (r += l*a). Det gjorde signalen
-        // lopsided: höger blev högre + bildens tyngdpunkt drogs åt höger, och en
-        // mono-källa fick +3 dB bara i R → lät trasigt ("knas"). S-on-S ska låta
-        // som tätare/lagrat material, inte panorerat fel.
-        // Nu: SYMMETRISK korsmix (båda kanalerna får en del av den andra) som
-        // mjukt fäller ihop mot mono — med makeup-gain så NIVÅN inte hoppar.
-        // SMOOTHAD on/off (15 ms) → inga klick. Balanserad bild, tätare ljud.
-        if (numCh >= 2 && (params.soundOnSound || sosSmooth.isSmoothing()))
+        // ----- B. Sound-on-Sound-tap (manual §C sid 10: Multiplay-bounce) -----
+        // Efter L-kedjan innehåller buffer ch 0 playback-huvudets signal
+        // ("Vom Wiedergabekopf aus").  Fånga den i sosScratch så R-kedjan kan
+        // summera in den i höger record-amp (S-on-S-bussen i
+        // processChannelChain).  Enkelriktad L→R precis som hårdvaran.
+        // Bypass/Source-monitor: ingen bounce (hårdvarans S-on-S verkar bara
+        // i record-läge) — R-kedjan tar bypass-grenen före injektionspunkten.
+        if (numCh >= 2)
         {
-            const int n = buffer.getNumSamples();
-            auto* l = buffer.getWritePointer (0);
-            auto* r = buffer.getWritePointer (1);
-            for (int i = 0; i < n; ++i)
+            sosFeedActive = (params.soundOnSound || sosSmooth.isSmoothing())
+                            && ! params.bypassTape && params.monitorMode != 0;
+            if (sosFeedActive)
             {
-                const float a  = sosSmooth.getNextValue();      // 0..0.4
-                const float mk = 1.0f / (1.0f + a);             // makeup → konstant nivå
-                const float l0 = l[i], r0 = r[i];
-                l[i] = (l0 + a * r0) * mk;
-                r[i] = (r0 + a * l0) * mk;
+                const int n = buffer.getNumSamples();
+                if (sosScratch.getNumSamples() != n)
+                    sosScratch.setSize (1, n, false, false, true);
+                sosScratch.copyFrom (0, 0, buffer, 0, 0, n);
             }
+            processChannelChain (R, echoR, buffer, 1);
         }
         else
         {
-            sosSmooth.skip (buffer.getNumSamples());
+            sosFeedActive = false;
         }
+        if (! sosFeedActive)
+            sosSmooth.skip (buffer.getNumSamples());
 
         // ----- C. Monitor track-routing (manual knap 19/20) -----
         // Båda nedtryckta = stereo (default, manualens Bild C)
