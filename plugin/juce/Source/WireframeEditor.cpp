@@ -2223,11 +2223,11 @@ namespace bc2000dl::ui
 
             // (PRESET caption removed — was overlapping behind the button)
 
-            // Brand — ÄKTA centrerat i remsan. Preset-bar (vänster, slutar @262)
-            // och A/B-kluster (höger, börjar @755) flankerar symmetriskt, så
-            // texten centreras över hela bredden utan att krocka med någondera.
-            // Rect 40..840 → mitt = 440 = panelens mittlinje.
-            constexpr int kBrandL = 40, kBrandW = 800;   // mitt = 440
+            // Brand — centrerat på SAMMA mittlinje (x=460) som raden under,
+            // "TAPE MACHINE ALIGNMENT" (rect 60+800/2). Måste matcha den exakt,
+            // annars ser varumärket osymmetriskt ut mot referensraden.
+            // Preset-bar (slutar @262) och A/B (börjar @755) flankerar och clearas.
+            constexpr int kBrandL = 60, kBrandW = 800;   // mitt = 460
             g.setColour (juce::Colour (LnF::kStroke));
             g.setFont (juce::Font (juce::FontOptions (14.0f, juce::Font::bold))
                             .withExtraKerningFactor (0.28f));
