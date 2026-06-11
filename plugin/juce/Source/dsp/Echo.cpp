@@ -111,9 +111,14 @@ namespace bc2000dl::dsp
         const std::vector<float>& readBuf = (feedbackSource != nullptr)
                                           ? feedbackSource->getDelayBuffer()
                                           : buf;
-        const int writeIdxForRead         = (feedbackSource != nullptr)
-                                          ? feedbackSource->getWriteIdx()
-                                          : writeIdx;
+        // BUGFIX (2026-06): läspekaren MÅSTE avancera per sample. Partnerns
+        // writeIdx är FRUSEN under hela detta blocket (partner-kanalen processas
+        // vid en annan tidpunkt — L hela blocket, sedan R), så att indexera med
+        // den gav en STATISK läsning → trappstegning vid varje blockgräns =
+        // bredbandigt skräp ("distat oljud" vid SOS+echo). Använd EGEN writeIdx
+        // (avancerar per sample); båda buffrarna skrivs i lockstep så de är i
+        // synk vid blockgräns. Bevarar ping-pong-karaktären, tar bort skräpet.
+        const int writeIdxForRead = writeIdx;
         const int bufLen = static_cast<int> (readBuf.size());
         int r0 = writeIdxForRead - delayInt;
         int r1 = writeIdxForRead - delayInt - 1;

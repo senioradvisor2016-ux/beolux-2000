@@ -187,10 +187,12 @@ namespace bc2000dl::dsp
         //       hur mycket cross-fed eko man hör — INTE S-on-S-lagernivån.
         //   (b) Direkt symmetrisk L↔R-korsmix, fast 0.4 (sist i process(), rad ~600).
         //       Detta ÄR själva S-on-S-lagringen och är OBEROENDE av echo-fadern.
-        // Att stapla SOS + Echo + hög Multiplay korskopplar genom germanium-
-        // mättnaden → avsiktligt grungigt (autentiskt tape-S-on-S/dub). Magnituden
-        // ska kalibreras mot fysisk maskin (Fas 5), inte gissas bort som "bugg".
-        // Verifierat STABIL: ingen runaway/NaN, peak bounded (SosEchoStability-test).
+        // SOS + Echo korsmatar genom bandvägen — autentisk ping-pong-layering.
+        // (En tidig cross-feed-bugg läste partnerns FRUSNA writeIdx → block-rate-
+        // trappstegning = "distat oljud"; fixad i Echo.cpp 2026-06.) Resterande
+        // karaktär vid SOS+Echo+Multi är måttlig och kalibreras mot fysisk maskin
+        // (Fas 5). Verifierat STABIL + RENT: SosEchoStability-test (peak bounded,
+        // ingen NaN, icke-harmoniskt skräp < −20 dB).
         if (p.soundOnSound)
         {
             echoL.setCrossFeedSource (&echoR);

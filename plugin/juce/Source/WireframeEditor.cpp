@@ -1170,7 +1170,7 @@ namespace bc2000dl::ui
         btnMoment     .setTooltip ("PAUSE (#11 MOMENTANSTOP)\nMomentary stop — reels freeze in place.\nMutes output (master_volume → 0).\nClick again to resume.");
         btnPA         .setTooltip ("PUBLIC ADDRESS (manual s.8)\nDucks phono/radio when mic is active.\nClassic vintage live-PA function.");
         btnForstarkare.setTooltip ("BYPASS TAPE (#23 'FÖRSTÄRKARE')\nRoute mixer direct to output, skip\ntape pipeline. Use as line mixer\nwithout tape coloring.");
-        btnSoSOn      .setTooltip ("SOUND ON SOUND (S on S)\nLagrar L<->R (mono-vard bounce, fast niva).\nKombinera med ECHO ON -> ping-pong-eko.\nOBS: SOS + ECHO + hog Multiplay staplar\nkorskoppling + mattnad = avsiktligt grungigt\n(autentiskt tape-S-on-S/dub-beteende).");
+        btnSoSOn      .setTooltip ("SOUND ON SOUND (S on S)\nLagrar L<->R (mono-vard bounce, fast niva).\nKombinera med ECHO ON -> ping-pong-eko\n(L<->R korsmatat genom bandvagen).\nLayer takes utan extern bouncing.");
         btnSpkInt     .setTooltip ("SPEAKER I (#5 INT)\nInternal monitor speaker on.\nMutually exclusive with EXT / MUTE.");
         btnSpkExt     .setTooltip ("SPEAKER II (#4 EXT)\nExternal speaker output on.\nFeeds the power-amp stage (8004014).");
         btnSpkMute    .setTooltip ("SPEAKER MUTE (#6)\nKill all speaker output.\nHeadphones still active.");

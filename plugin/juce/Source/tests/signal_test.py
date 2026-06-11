@@ -128,6 +128,8 @@ def default_params(plugin):
     plugin.tape_speed      = "9.5 cm/s"
     plugin.bypass_tape     = False
     plugin.echo_enabled    = False
+    plugin.sound_on_sound  = False         # annars läcker SOS-state mellan tester
+    plugin.multiplay_generation = 1        # annars läcker gen=5 från multiplay/SOS-test
     plugin.monitor_mode    = "Tape"   # kritisk — "Source" kringgår tape-sektionen
 
 
@@ -967,6 +969,41 @@ def test_sos_echo_stability(plugin):
     end = 20 * np.log10(rms(out[-SR_DEFAULT // 2:]) + 1e-12)
     report("SOS+Echo+Multi: nivå skenar inte (Δ < +3 dB)",
            end - mid < 3.0, f"mid {mid:.0f} → end {end:.0f} dBFS (Δ{end-mid:+.1f})")
+
+    # RENLIGHET — fångar cross-feed-buggen (2026-06): korsfeeden läste partnerns
+    # FRUSNA writeIdx → statisk block-rate-trappstegning = bredbandigt skräp.
+    # Buggen gav icke-harm/harm ≈ −5 dB (dominant skräp) på ackord; fixad ≈ −36.
+    # Tröskel −20 dB: långt över fixat, långt under buggen.
+    def chord(freqs, n, amp):
+        t = np.arange(n) / SR_DEFAULT
+        return (amp * sum(np.sin(2 * np.pi * f * t) for f in freqs) / len(freqs)).astype(np.float32)
+
+    def nonharm_ratio(sos, echo):
+        plugin.reset(); default_params(plugin)
+        plugin.tape_speed = "19 cm/s"; plugin.wow_flutter = 0.0; plugin.tape_noise = 0.0
+        plugin.echo_enabled = bool(echo); plugin.echo_amount_l = 0.7; plugin.echo_amount_r = 0.7
+        plugin.sound_on_sound = bool(sos); plugin.multiplay_generation = 1
+        n = SR_DEFAULT * 3
+        fL = [220, 277, 330, 440]; fR = [262, 330, 392, 523]   # olika L/R-ackord
+        x = np.stack([chord(fL, n, 0.18), chord(fR, n, 0.18)], axis=1).astype(np.float32)
+        o = plugin(x, sample_rate=SR_DEFAULT, buffer_size=BLOCK, reset=True)[SR_DEFAULT:, 0]
+        w = np.hanning(len(o)); F = np.abs(np.fft.rfft(o * w)) ** 2; fr = np.fft.rfftfreq(len(o), 1 / SR_DEFAULT)
+        bm = np.zeros(len(fr), bool)
+        for f in fL + fR:
+            for k in range(1, 6):
+                i = np.argmin(np.abs(fr - f * k)); bm[max(0, i - 3):i + 4] = True
+        return 10 * np.log10(F[~bm & (fr > 40)].sum() / (F[bm].sum() + 1e-12) + 1e-12)
+
+    # Robust mått: korsfeeden ska inte göra SOS+echo DRAMATISKT smutsigare än
+    # echo ensamt. Buggen gav Δ ≈ +45 dB; fixad ≈ +1–3 dB.
+    # Tröskel 20 dB fångar den block-rate-trappstegande buggen (gav Δ ≈ +30 i
+    # denna mätkontext) med marginal. Den exakta äkta cross-feed-magnituden
+    # (fixad ≈ +13 dB här, +1 vid lägre nivå) kalibreras mot fysisk maskin.
+    r_echo = nonharm_ratio(0, 1)
+    r_sos_echo = nonharm_ratio(1, 1)
+    report("SOS+Echo: ingen block-rate cross-feed-garbage (Δ vs echo < 20 dB)",
+           r_sos_echo - r_echo < 20.0,
+           f"echo {r_echo:.1f} → SOS+echo {r_sos_echo:.1f} dB (Δ{r_sos_echo-r_echo:+.1f}; bugg gav ≈+30)")
 
 
 # ══════════════════════════════════════════════════════════════════
