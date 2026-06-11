@@ -1447,10 +1447,11 @@ namespace bc2000dl::ui
         btnPresetPrev.setBounds (70,  362, 22, 20);
         btnPresetName.setBounds (96, 362, 140, 20);
         btnPresetNext.setBounds (240, 362, 22, 20);
-        // A/B-compare-kluster i luckan efter avdelaren (x=276..335)
-        btnAbA   .setBounds (276, 362, 19, 20);
-        btnAbB   .setBounds (296, 362, 19, 20);
-        btnAbCopy.setBounds (316, 362, 19, 20);
+        // A/B-compare-kluster på HÖGER sida (preset-bar vänster, A/B höger →
+        // varumärket äkta centrerat mellan dem). Slutar @816, power-LED @838.
+        btnAbA   .setBounds (755, 362, 19, 20);
+        btnAbB   .setBounds (776, 362, 19, 20);
+        btnAbCopy.setBounds (797, 362, 19, 20);
 
         // ----- 9 service-knobs + 2 combos (y=406-430) — auth-restoration -----
         // Spacing: 75 px (was 90 for 8 items). Total 60-860 with 60 padding each side.
@@ -2214,18 +2215,19 @@ namespace bc2000dl::ui
                 g.drawRoundedRectangle (well, 2.5f, 0.7f);
             }
 
-            // Section dividers — runt A/B-klustret (preset | A/B | brand)
+            // Section dividers: cappar preset-baren (vänster) och A/B (höger),
+            // varumärket centrerat i mitten emellan.
             g.setColour (juce::Colour (0x40000000));
-            g.drawLine (272, 363, 272, 381, 0.5f);
-            g.drawLine (343, 363, 343, 381, 0.5f);
+            g.drawLine (272, 363, 272, 381, 0.5f);   // efter preset-bar
+            g.drawLine (746, 363, 746, 381, 0.5f);   // före A/B-kluster
 
             // (PRESET caption removed — was overlapping behind the button)
 
-            // Brand — centrerat i ZONEN TILL HÖGER om kontrollerna (A/B-avdelaren
-            // @343 → power-LED @838, mitt = 590). Centrering i hela remsan gjorde
-            // att det längre "GERMANIUM 2000 DELUXE" trängdes mot A/B-klustret och
-            // lämnade död yta till höger. Nu balanserat i sin egen rymd.
-            constexpr int kBrandL = 348, kBrandW = 484;   // mitt = 590
+            // Brand — ÄKTA centrerat i remsan. Preset-bar (vänster, slutar @262)
+            // och A/B-kluster (höger, börjar @755) flankerar symmetriskt, så
+            // texten centreras över hela bredden utan att krocka med någondera.
+            // Rect 40..840 → mitt = 440 = panelens mittlinje.
+            constexpr int kBrandL = 40, kBrandW = 800;   // mitt = 440
             g.setColour (juce::Colour (LnF::kStroke));
             g.setFont (juce::Font (juce::FontOptions (14.0f, juce::Font::bold))
                             .withExtraKerningFactor (0.28f));
