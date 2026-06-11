@@ -65,7 +65,15 @@ namespace bc2000dl::dsp
         ch.tone.prepare (sr);
         ch.powerAmp.prepare (sr);
 
-        // DC-block (HP @ 20 Hz)
+        // DC-block (HP @ 20 Hz, 2:a ordn. Butterworth).
+        // OBS: höjdes prövande till 35 Hz för att kapa den DC-energi (≈0.13) som
+        // asymmetrisk J-A-mättnad rektifierar ur sub-bas vid 4.75 cm/s — MEN det
+        // åt in i Studio Sound 1968 LF-specen (19 cm/s @ 30 Hz, 4.75 @ 50 Hz),
+        // eftersom DC-artefakten (10-20 Hz) och den äkta LF-responsen (30-50 Hz)
+        // överlappar. DC ≈0.13 visade sig vara en VITT-BRUS-artefakt (musikaliskt
+        // material ger DC ≈0.016) — så vi behåller 20 Hz och bevarar LF-specen
+        // hellre än att skada äkta lågbas för en testsignal som inte motsvarar
+        // verkligt program-material.
         const auto coef = juce::dsp::IIR::Coefficients<float>::makeHighPass (sr, 20.0f);
         ch.dcBlock.coefficients = coef;
         ch.dcBlock.reset();
