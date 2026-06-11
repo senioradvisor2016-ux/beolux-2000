@@ -180,10 +180,17 @@ namespace bc2000dl::dsp
 
         echoL.setEnabled (p.echoEnabled); echoR.setEnabled (p.echoEnabled);
 
-        // v60.5 — SoS+Echo cross-feedback (Christoffer-feedback):
-        // Med Sound-on-Sound aktiv ska echo-feedbacken gå L→R och R→L
-        // (cross-feed mellan tape-trackarna, klassisk SoS-överdubbings-loop).
-        // Utan SoS = normal L→L, R→R.
+        // ===== S-on-S har TVÅ samverkande mekanismer (dokumenterat 2026-06) =====
+        // sos_enabled aktiverar BÅDA:
+        //   (a) Echo-ping-pong: echo läser partner-kanalens delay-buffer (nedan).
+        //       Hörs BARA om Echo är ON + echo-fadern > 0. echo-fadern styr alltså
+        //       hur mycket cross-fed eko man hör — INTE S-on-S-lagernivån.
+        //   (b) Direkt symmetrisk L↔R-korsmix, fast 0.4 (sist i process(), rad ~600).
+        //       Detta ÄR själva S-on-S-lagringen och är OBEROENDE av echo-fadern.
+        // Att stapla SOS + Echo + hög Multiplay korskopplar genom germanium-
+        // mättnaden → avsiktligt grungigt (autentiskt tape-S-on-S/dub). Magnituden
+        // ska kalibreras mot fysisk maskin (Fas 5), inte gissas bort som "bugg".
+        // Verifierat STABIL: ingen runaway/NaN, peak bounded (SosEchoStability-test).
         if (p.soundOnSound)
         {
             echoL.setCrossFeedSource (&echoR);

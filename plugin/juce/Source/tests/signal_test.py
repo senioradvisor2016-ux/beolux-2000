@@ -933,6 +933,43 @@ def test_multiplay(plugin):
 
 
 # ══════════════════════════════════════════════════════════════════
+# TEST: SOS + Echo + Multiplay — STABILITET (får skena/NaN)
+#   Anv.-rapport: SOS + Multi + uppdragen echo lät "distat oljud". Det är
+#   delvis autentiskt (korskoppling genom germanium-mättnad — magnituden
+#   kalibreras mot maskin i Fas 5). MEN det får ALDRIG skena, NaN:a eller
+#   bygga upp obegränsat. Detta test låser fast den hårda säkerhetsgränsen,
+#   oberoende av var karaktärs-magnituden landar.
+# ══════════════════════════════════════════════════════════════════
+
+def test_sos_echo_stability(plugin):
+    print("\n── Test: SOS+Echo+Multiplay-stabilitet ─────────────────────────")
+    plugin.reset(); default_params(plugin)
+    plugin.tape_speed = "19 cm/s"; plugin.wow_flutter = 0.0
+    plugin.echo_enabled = True
+    plugin.echo_amount_l = 1.0; plugin.echo_amount_r = 1.0
+    plugin.echo_feedback = 1.0                      # max regeneration
+    plugin.sound_on_sound = True
+    plugin.multiplay_generation = 5
+
+    # Kontinuerligt olika L/R (triggar korsmix) i 5 s — värsta uppbyggnaden
+    n = SR_DEFAULT * 5
+    t = np.arange(n) / SR_DEFAULT
+    x = np.stack([0.15 * np.sin(2 * np.pi * 330 * t),
+                  0.15 * np.sin(2 * np.pi * 440 * t)], axis=1).astype(np.float32)
+    out = plugin(x, sample_rate=SR_DEFAULT, buffer_size=BLOCK, reset=True)
+
+    report("SOS+Echo+Multi: ändlig output (ingen NaN/Inf)",
+           bool(np.all(np.isfinite(out))), "")
+    report("SOS+Echo+Multi: bounded (peak < 2.0, ej runaway)",
+           peak(out) < 2.0, f"peak {peak(out):.3f}")
+    # Stabil = sista 0.5 s-RMS växer inte > 3 dB över mitt-segmentet
+    mid = 20 * np.log10(rms(out[SR_DEFAULT:int(SR_DEFAULT * 1.5)]) + 1e-12)
+    end = 20 * np.log10(rms(out[-SR_DEFAULT // 2:]) + 1e-12)
+    report("SOS+Echo+Multi: nivå skenar inte (Δ < +3 dB)",
+           end - mid < 3.0, f"mid {mid:.0f} → end {end:.0f} dBFS (Δ{end-mid:+.1f})")
+
+
+# ══════════════════════════════════════════════════════════════════
 # TEST: Bias-fysik — EMERGENT bias-kurva (v63)
 #   Bias-knappen drevs förr av en heuristik (asymMul 16×) med FEL HF-
 #   riktning (över-bias gav MER HF). Nu emergent ur den anhysteretiska
@@ -1045,6 +1082,7 @@ if __name__ == "__main__":
     test_source_differentiation(plugin)
     test_sound_on_sound(plugin)
     test_multiplay(plugin)
+    test_sos_echo_stability(plugin)
     test_bias_physics(plugin)
     test_mono_track(plugin)
 
