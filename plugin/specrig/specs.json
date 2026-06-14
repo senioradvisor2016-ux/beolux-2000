@@ -26,8 +26,9 @@
     "_note": "specs.md §6 / servicemanual DIN 1962. +resonans tillåten (tape glow); detta är grova band-edge-grindar."
   },
   "harmonic_profile": {
-    "_note": "Germanium-PNP-karaktär = h2-dominans vid NOMINELLA nivåer (<= -12 dBFS). Vid -6/0 dBFS tar tape-mättnaden (Jiles-Atherton, symmetrisk) över med h3-dominans — autentiskt germanium→tape-beteende, inte en bugg. Mät därför h2>h3 vid -12 dBFS.",
+    "_note": "Germanium-PNP-karaktär = h2-dominans vid NOMINELLA nivåer, mätt @ -12 dBFS. Vid -6/0 dBFS tar tape-mättnaden (Jiles-Atherton) över med h3. OBS: vid 4,75 cm/s är tape-mättnaden så stark (smalt band + kraftig EQ-boost) att h3 >= h2 redan @ -12 dBFS. A/B-verifierat (2026-06-14): gäller BÅDE germanium- och kisel-ingång (h2=0,58 / h3=0,64-0,65 %) → inneboende tape-beteende, ej ingångssteget. Grinden gäller därför 19/9,5 cm/s; 4,75 är informativ.",
     "test_level_dbfs": -12,
-    "h2_gt_h3": true
+    "h2_gt_h3": true,
+    "h2_gt_h3_speeds": ["19", "9.5"]
   }
 }

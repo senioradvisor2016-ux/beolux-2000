@@ -206,9 +206,17 @@ def main() -> None:
     seg_name = f"thd_1k_{lvl}"
     if seg_name in results["segments"]:
         m = results["segments"][seg_name]
-        ok = m["h2_pct"] > m["h3_pct"] if hp.get("h2_gt_h3") else True
-        rows.append((f"h2>h3 @ {lvl} dBFS",
-                     f"h2={m['h2_pct']:.2f}% h3={m['h3_pct']:.2f}%", "h2 > h3", ok))
+        gate_speeds = hp.get("h2_gt_h3_speeds")   # None = alla hastigheter
+        enforce = hp.get("h2_gt_h3") and (gate_speeds is None or args.speed in gate_speeds)
+        h2gt = m["h2_pct"] > m["h3_pct"]
+        if enforce:
+            rows.append((f"h2>h3 @ {lvl} dBFS",
+                         f"h2={m['h2_pct']:.2f}% h3={m['h3_pct']:.2f}%", "h2 > h3", h2gt))
+        else:
+            # 4,75 cm/s: tape-mättnadens h3 dominerar autentiskt → informativ, ej grind
+            note = "h2>h3" if h2gt else "h3≥h2 (tape-mättnad, ok)"
+            rows.append((f"h2/h3 @ {lvl} dBFS [{args.speed}, info]",
+                         f"h2={m['h2_pct']:.2f}% h3={m['h3_pct']:.2f}%", note, True))
 
     # rapport
     print("\n  Mätning                       Uppmätt                 Spec            ")
