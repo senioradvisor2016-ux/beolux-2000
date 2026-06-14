@@ -62,7 +62,7 @@ Mål: ±2 dB i specifierat band per hastighet.
 **9.5 cm/s:** flat 40 Hz–12 kHz ±2 dB, +5 dB @ 4–7 kHz, -3 dB @ 35 Hz, -3 dB @ 13 kHz
 **4.75 cm/s:** flat 50 Hz–6 kHz ±3 dB, +6 dB @ 3–5 kHz, -3 dB @ 45 Hz, -3 dB @ 7 kHz
 
-> ⚠️ **19 cm/s avviker från manualen:** ovan anges flat till 20 kHz, men manualens ±2 dB-band slutar vid **16 kHz**. Modellen extenderar alltså HF (jfr `kTapeHF_Speed19 = 30000` höjd v62.1). Avsiktligt val → behåll men dokumentera; manual-trohet → stryp till 16 kHz. ÖPPET. 9,5 kHz matchar manualen; 4,75 är aningen lösare (50 Hz/±3 dB vs 40 Hz/±2 dB).
+> ✅ **BESLUTAT (2026-06-14) — behåll HF-extensionen (avsiktligt val).** Stegad-FR-mätning (`analyze_fr.py`, ej sweep) bekräftar 19 cm/s: +0,7 dB @ 16 k, −1,5 dB @ 20 k — alltså ±2 dB till ~20 kHz, något bredare än manualens ±2 dB-band (16 kHz). Medvetet: manualens 16 kHz var en mekanisk 1968-/huvud-gräns, inte ett klangmål; en lätt utsträckt topp låter renare på moderna källor och tape-glow + rolloff-karaktären bevaras (`kTapeHF_Speed19 = 30000`, höjd v62.1). 9,5 cm/s matchar manualen; 4,75 aningen lösare (50 Hz/±3 dB vs 40 Hz/±2 dB) — godtaget.
 
 ## 7. Wow & Flutter
 
@@ -72,7 +72,9 @@ Mål: ±2 dB i specifierat band per hastighet.
 | 9.5 cm/s | 0.10–0.15 % | 0.08–0.12 % |
 | 4.75 cm/s | 0.15–0.25 % | 0.12–0.20 % |
 
-**Servicemanualens auktoritativa kombinerade W&F** (sm5cbw-tabellen, rms / peak-pk): 19 cm/s **<0,07 % / <0,2 %**, 9,5 cm/s **<0,11 % / <0,3 %**, 4,75 cm/s **<0,18 % / <0,5 %**. OBS: manualens tal är ett *max*; modellens kvadratsummerade total (~0,10 % rms @ 19 cm/s) ligger något över taket → mät faktisk output via specrig och justera ned om trohet eftersträvas (eller behåll som avsiktlig vintage-karaktär).
+**Servicemanualens auktoritativa kombinerade W&F** (sm5cbw-tabellen, rms / peak-pk): 19 cm/s **<0,07 % / <0,2 %**, 9,5 cm/s **<0,11 % / <0,3 %**, 4,75 cm/s **<0,18 % / <0,5 %**.
+
+✅ **BESLUTAT (2026-06-14) — behåll som avsiktlig vintage-karaktär.** Manualens tal är ett *max* (maskinen är bättre än så vid leverans); modellens ~0,10 % rms @ 19 cm/s ligger något över men inom rimligt vintage-spann och ger en hörbar, levande bandmaskinsrörelse. Detta är ett klangval, inte en trohets-bugg. (Vill man strama åt mot manual-max: sänk wow/flutter-budgeten i `WowFlutter.cpp::rebuildComponents`.)
 
 ## 8. Kanalseparation
 
