@@ -9,14 +9,6 @@ name: Package (ad-hoc, macOS universal)
 
 on:
   workflow_dispatch:
-  # Tillfällig push-trigger på arbetsbranchen så paketeringen kan startas
-  # härifrån (API-dispatch är blockerat för integrationen). Tas bort när
-  # zip-artifacten är hämtad — annars kör macOS-runnern (10× kostnad) på
-  # varje push till branchen.
-  push:
-    branches: [claude/beolux-2000-dl-connection-l59lvc]
-    paths-ignore:
-      - '**.md'
 
 jobs:
   package:
