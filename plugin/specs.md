@@ -54,11 +54,15 @@ Mätbara mål härledda från B&O servicemanual + dansk användarmanual + 2N2613
 
 ## 6. Frekvensgång (totalkedja, in→ut)
 
-Mål: ±2 dB i specifierat band per hastighet (matchar manualens DIN-1962-mätning).
+Mål: ±2 dB i specifierat band per hastighet.
+
+**Servicemanualens auktoritativa ±2 dB-band** (sm5cbw-tabellen, "data from the service manual"): 19 cm/s = **40–16000 Hz**, 9,5 cm/s = **40–12000 Hz**, 4,75 cm/s = **40–6000 Hz**.
 
 **19 cm/s:** flat 30 Hz–20 kHz ±2 dB, +3 dB resonans @ 5–8 kHz ("tape glow"), -3 dB @ 25 Hz, -3 dB @ 22 kHz
 **9.5 cm/s:** flat 40 Hz–12 kHz ±2 dB, +5 dB @ 4–7 kHz, -3 dB @ 35 Hz, -3 dB @ 13 kHz
 **4.75 cm/s:** flat 50 Hz–6 kHz ±3 dB, +6 dB @ 3–5 kHz, -3 dB @ 45 Hz, -3 dB @ 7 kHz
+
+> ⚠️ **19 cm/s avviker från manualen:** ovan anges flat till 20 kHz, men manualens ±2 dB-band slutar vid **16 kHz**. Modellen extenderar alltså HF (jfr `kTapeHF_Speed19 = 30000` höjd v62.1). Avsiktligt val → behåll men dokumentera; manual-trohet → stryp till 16 kHz. ÖPPET. 9,5 kHz matchar manualen; 4,75 är aningen lösare (50 Hz/±3 dB vs 40 Hz/±2 dB).
 
 ## 7. Wow & Flutter
 
@@ -67,6 +71,8 @@ Mål: ±2 dB i specifierat band per hastighet (matchar manualens DIN-1962-mätni
 | 19 cm/s | 0.05–0.10 % | 0.05–0.08 % |
 | 9.5 cm/s | 0.10–0.15 % | 0.08–0.12 % |
 | 4.75 cm/s | 0.15–0.25 % | 0.12–0.20 % |
+
+**Servicemanualens auktoritativa kombinerade W&F** (sm5cbw-tabellen, rms / peak-pk): 19 cm/s **<0,07 % / <0,2 %**, 9,5 cm/s **<0,11 % / <0,3 %**, 4,75 cm/s **<0,18 % / <0,5 %**. OBS: manualens tal är ett *max*; modellens kvadratsummerade total (~0,10 % rms @ 19 cm/s) ligger något över taket → mät faktisk output via specrig och justera ned om trohet eftersträvas (eller behåll som avsiktlig vintage-karaktär).
 
 ## 8. Kanalseparation
 
@@ -142,36 +148,66 @@ Mappade direkt från manualens "Anvisning Side 1":
 
 ## 12. 2N2613 / UW0029 / AC126 — DSP-konstanter
 
-Härledda från databladet (2N2613) + funktionell motsvarighet (UW0029 = utvald lågbrus-PNP, AC126 = NPN motsvarighet).
+Härledda från databladet (2N2613) + funktionell motsvarighet (UW0029 = utvald lågbrus-PNP, AC126 = germanium **PNP**).
+
+**Verifierad komponent-topologi (servicemanualens scheman + Studio Sound 1968):**
+- **Preamp-ingång** (radio/mic/phono, kort 8904003/04/02): **UW0029 = kisel-NPN** (BC109-ekvivalent, se ✅ LÖST nedan) som lågbrus-ingångssteg, följt av **2N2613 = germanium-PNP**.
+- **Optage-amp** (8004005) och **gengive-amp** (8004006): **AC126 + 2N2613 = germanium-PNP** (databladsbekräftat).
+- **Slutsteg** (8004014): 2N2613/AC153/AC127/AC132/AD139 — germanium, varav **AC127 = NPN** (enda germanium-NPN), utanför den modellerade tape-vägen.
+- **Nätdel/slette-osc** (8004008): OC75/AC128/AD149 — germanium-PNP, ej signalväg.
+
+Alltså: ett **kisel-NPN lågbrus-ingångssteg** (UW0029/BC109) matar **germanium-PNP-förstärkarsteg** (2N2613, AC126). `GeStageType::AC126` är korrekt germanium-PNP (AC126 modellerades tidigare felaktigt som NPN — fixat v0.62.x). `GeStageType::UW0029` modellerar däremot ett *kisel*-steg och bör inte dela germanium-matematiken (se nedan).
+
+**✅ LÖST — UW0029 är KISEL-NPN (BC109-ekvivalent), INTE germanium-PNP.** `UW0029` är ett B&O-husnummer (i 4119/4121-halvledarlistan), inte branschstandard. Studio Sound aug 1968 (Hellyer, s.354) avgör typen explicit:
+> *"In the preamplifiers, BC109 transistors are being more widely used, whereas some of the earlier units employed UW0029 transistors."*
+
+UW0029 och BC109 sitter alltså i **samma preamp-ingångsposition** — tidiga enheter UW0029, senare BC109 — funktionellt utbytbara. BC109 = **kisel-NPN lågbrus** (NF ~1,4 dB). Stödjs av FIG 2-omritningarnas positiva arbetspunkter (8/5,5/10/11 V = NPN) och Etcetera-music:s kisel-kors-refs (2N2303/BC239).
+
+**DSP-konsekvens (IMPLEMENTERAT v0.63.0):** preamp-ingången (mic/phono/radio, kort 8904002/03/04) är kisel-NPN — INTE germanium-PNP. `GeStageType::UW0029` modelleras nu som kisel: symmetriskt knä (`kAsymmetrySi = 0`, ingen h2-värme), bredare/renare knä (`kSiKneeFactor = 1,5`, eff. Vt ×1,5) och lägre brus (`kNoiseVrms_UW0029 = 1,4 µV`, BC109-klass). Rec/play-kärnan (2N2613, AC126, kort 8004005/06) är *fortfarande* databladsbekräftad germanium-PNP och orörd — germanium-färgningen bor där, inte i ingången.
+
+Övriga reservdels-substitutioner (Hellyer s.354): AC151 ↔ AC126; 2N2613 ↔ AC126 i direkt-kopplade par; AC153 ersätter AC128 i driver-/PSU-steg.
+
+**Studio Sound 1968 oberoende bekräftar:** raderström 45 mA, bias 2,3 mA, bias/raderfrekvens 100 kHz, bias-trap 7,5 mH + 330 pF + 10–40 pF trimmer, S/N-spec 55 dB, samt PSU/osc-transistorerna (AD149/OC75×2/AC128/ZF9.1).
 
 ```python
 # Ebers-Moll-konstanter @ 25 °C
 GE_VT_25C   = 0.02585     # V (kT/q vid 25 °C)
 GE_IS_2N2613 = 1.0e-7    # A (saturation current, fittad mot transferkurva)
 GE_IS_UW0029 = 0.7e-7    # A (lägre brus, lägre Is)
-GE_IS_AC126  = 0.7e-7    # A (~UW0029-class)
+GE_IS_AC126  = 0.7e-7    # A (~UW0029-class, germanium PNP)
 
 # Brusparametrar
-GE_NF_2N2613 = 4.0       # dB max NF @ 1 kHz, Rg=1 kΩ
+GE_NF_2N2613 = 4.0       # dB max NF @ 1 kHz, Rg=1 kΩ  (DATABLADSVERIFIERAT, RCA 2N2613)
 GE_NF_UW0029 = 2.5       # dB typ (utvald lågbrus)
-GE_NF_AC126  = 3.0       # dB typ (NPN low-noise audio)
+GE_NF_AC126  = 3.0       # dB typ (germanium PNP, low-noise audio)
 
 # Input-refererat brus per stage @ 20 Hz–20 kHz
-GE_NOISE_VRMS_2N2613 = 50e-6   # V RMS (databladet)
+# DATABLADSVERIFIERAT (RCA 2N2613): brus anges som STRÖM, inte spänning —
+# "Equivalent RMS Noise Input Current 0.001 µA max, 20–20000 cps, Rg=50 kΩ" + NF 4 dB.
+# 50 µV är EXAKT den brusströmmen genom databladets test-källa: 1 nA × 50 kΩ = 50 µV.
+# Det är dock test-källans 50 kΩ, inte kretsens verkliga källimpedans (tape-huvud/mic).
+# Den fysiska bottnen vid Rg=1 kΩ (NF 4 dB) är ~0.9 µV. Det IMPLEMENTERADE värdet
+# (Constants.h) är omkalibrerat till 2.9 µV (mellan dessa) för chain-S/N ≥55 dB — konservativt.
+GE_NOISE_VRMS_2N2613 = 50e-6   # V RMS = 1 nA × 50 kΩ (databladets brusström × test-Rg)
 GE_NOISE_VRMS_UW0029 = 30e-6   # V RMS (lower NF)
 GE_NOISE_VRMS_AC126  = 35e-6   # V RMS (estimat)
 
 # Bandwidth (audio band aldrig begränsat av transistor)
-GE_FT_HZ = 10e6          # 10 MHz typ för 2N2613/UW0029/AC126
+# 2N2613 fT = 10 MHz typ (DATABLADSVERIFIERAT, RCA: "cutoff freq 10 typ Mc").
+# AC126 fT ≈ 1 MHz (Valvo-datablad). Båda ≫ 20 kHz → irrelevant för ljudbandet,
+# ej separat modellerat.
+GE_FT_HZ = 10e6          # Hz (2N2613-värde; AC126 ~1 MHz men spelar ingen roll i audio)
 
-# Asymmetri-bias för waveshaper
+# Asymmetri-bias för waveshaper (alla stages = PNP germanium)
 GE_ASYMMETRY_PNP = +0.10  # PNP biased mot positiv → 2:a-harmonics-dominans
-GE_ASYMMETRY_NPN = -0.10  # NPN spegelvänd
+GE_ASYMMETRY_NPN = -0.10  # (oanvänd — ingen NPN i HW; behålls som referens)
 ```
 
-## 13. DIN-1962 EQ-koefficienter (Fas 1 placeholder)
+## 13. DIN-1962 EQ-koefficienter
 
-Per hastighet — fittas exakt från SPICE-simulering av 8004005 + 8004006-kretsen i Fas 1. För prototypen approximeras med 2-pol IIR-shelves:
+**Standard-bekräftad, ej placeholder.** Servicemanualen anger uttryckligen att både record- (Einspielkennlinie) och playback-kurvan (Abspielkurven) följer **DIN 1962** vid alla tre hastigheter. Det betyder att kodens DIN-1962-tidskonstanter (70/90/120 µs HF + 3180 µs bas) *är* det korrekta målet — en full SPICE-fit av den verkliga kretsen (8004005 record-EQ via 0854661-switchen + styroflex St1-caps; 8004006 playback-EQ via 0972129 = 700 mH-spole) skulle i huvudsak reproducera DIN 1962, så när på huvudresonansen + komponent-toleranser. Den enda äkta avvikelsen från ideal DIN är alltså resonans-färgningen (se "tape glow" nedan), inte tidskonstanterna.
+
+Per hastighet, implementerat som 2-pol IIR-shelves:
 
 ```python
 DIN1962_PLAYBACK_19_CM = {  # de-emphasis
@@ -204,6 +240,10 @@ DIN1962_RECORD_475_CM = {
 ```
 
 **Kritiskt:** Pre+de-emphasis är **inte** exakta inverser. Mismatchen i 3–8 kHz ger "tape glow". Renormalisera inte bort.
+
+**Manual-verifiering (servicemanual s.2/s.4):** EQ-standarden är bekräftad DIN 1962 — *både* "Einspielkennlinie nach DIN 1962" (record) och "Abspielkurven … nach DIN-Normen 1962" (playback). De två kurvorna är alltså designade att summera till **platt** respons. Den medvetna pre/de-mismatchen ovan är därför en **artistisk** färgnings­val, inte en hårdvaru-artefakt. Äkta resonans-färgning finns dock: record-EQ:n (8004005) kopplar via omkopplarnivå 0854661 in tre kondensatorsatser där **inspelningshuvudets självinduktans ingår** — en verklig LC-resonans per hastighet. Behåll glow:et som effekt, men beskriv det som val, inte som HW-härlett.
+
+**Verkliga induktanser (original-schema TYPE 4119, för framtida SPICE-fit):** inspelningshuvud ≈ 15 mH (8600008), uppspelningshuvud ≈ 30 mH (8600010), raderhuvud ≈ 30 mH (8600011). Playback-EQ-spole 0972129 = **700 mH**, erase-trap 0972163 = 7,5 mH. Uppspelningshuvudets ~30 mH + ingångskapacitansen sätter playback-resonansen; 700 mH-spolen formar de-emphasis-kurvan. Exakta kondensatorvärden i 0854661 (3-hastighets-switchen) återstår att läsa ur ritningen för full härledning.
 
 ## 14. Validerings-protokoll
 

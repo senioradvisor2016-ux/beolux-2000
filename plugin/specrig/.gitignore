@@ -1,0 +1,5 @@
+# Genererade signaler + REAPER/pedalboard-renders — regenereras via gen_signals_full.py
+signals/
+renders/
+*.asd
+.DS_Store

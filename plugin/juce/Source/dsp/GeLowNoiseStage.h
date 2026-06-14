@@ -1,11 +1,12 @@
-/*  GeLowNoiseStage — UW0029 (PNP) eller AC126 (NPN) lågbrus-stage.
+/*  GeLowNoiseStage — UW0029 (kisel-NPN) eller AC126 (germanium-PNP) lågbrus-stage.
 
-    Återanvänder samma soft-clip-matematik som Ge2N2613Stage men med:
-    - Lägre Is (mjukare knee)
-    - Lägre brus (utvald lågbrustyp)
-    - Eventuellt spegelvänd asymmetri (NPN)
+    Delar soft-clip-matematik med Ge2N2613Stage men differentierar per typ:
+    - UW0029 = KISEL-NPN (BC109-ekv, Studio Sound 1968): symmetriskt knä
+      (kAsymmetrySi=0), bredare knä (eff. Vt ×kSiKneeFactor), lägre brus.
+    - AC126  = germanium-PNP: mjukare/asymmetriskt knä (h2-värme), högre brus.
 
-    Plats: plugin/juce/Source/dsp/GeLowNoiseStage.h
+    Germanium-färgningen i kedjan kommer från 2N2613/AC126 nedströms — inte
+    ingångssteget. Se specs.md §12 (✅ LÖST). Plats: GeLowNoiseStage.h
 */
 
 #pragma once
@@ -19,8 +20,8 @@ namespace bc2000dl::dsp
 {
     enum class GeStageType
     {
-        UW0029,   // PNP — för mic / phono / radio input
-        AC126     // NPN — för record / playback amps
+        UW0029,   // KISEL-NPN (BC109-ekv) — mic / phono / radio input
+        AC126     // germanium PNP — record / playback amps (8004005/6)
     };
 
     class GeLowNoiseStage
@@ -48,6 +49,7 @@ namespace bc2000dl::dsp
         double gainLinear { 30.0 };
         double asymmetry  { 0.0 };
         double Is_value   { 0.0 };
+        double kneeVt     { kVT_25C };   // effektiv Vt för knäbredd (kisel = ×kSiKneeFactor)
         double noiseSigma { 0.0 };
         GeStageType type  { GeStageType::UW0029 };
 

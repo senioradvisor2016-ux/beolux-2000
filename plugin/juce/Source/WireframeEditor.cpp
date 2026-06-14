@@ -2243,6 +2243,20 @@ namespace bc2000dl::ui
                          juce::Rectangle<int> (kBrandL, 373, kBrandW, 12),
                          juce::Justification::centred, false);
 
+            // Versions-etikett — diskret, höger om varumärket (före A/B-dividern
+            // @746). Hämtas från bygget så den alltid matchar installerad version.
+           #if defined (JucePlugin_VersionString)
+            const juce::String kVerLabel = "v" JucePlugin_VersionString;
+           #else
+            const juce::String kVerLabel = "v0.63.0";
+           #endif
+            g.setColour (juce::Colour (0xFF5A5A5A));
+            g.setFont (juce::Font (juce::FontOptions (8.0f))
+                            .withExtraKerningFactor (0.2f));
+            g.drawText (kVerLabel,
+                         juce::Rectangle<int> (560, 373, 180, 12),
+                         juce::Justification::centredRight, false);
+
             // ===== Power-on LED — period-correct green dome at top-right of title strip =====
             // 1968 hi-fi convention: small green pilot lamp shows mains power on.
             // 7-layer rendering: well, dark recess, body gradient, outer glow halo,

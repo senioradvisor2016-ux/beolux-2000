@@ -17,17 +17,32 @@ namespace bc2000dl::dsp
     // ---------- Germanium-transistor-konstanter ----------
     constexpr double kVT_25C        = 0.02585;   // V (kT/q vid 25 °C)
 
-    // Saturation currents
+    // Saturation currents (OBS: ej använd av GeLowNoiseStage-shapern — knäet
+    // sätts av Vt·100, se GeSoftClip. Behålls som referens/för ev. framtida fit.)
     constexpr double kIs_2N2613     = 1.0e-7;
-    constexpr double kIs_UW0029     = 0.7e-7;    // utvald lågbrus
-    constexpr double kIs_AC126      = 0.7e-7;    // NPN motsvarighet
+    constexpr double kIs_UW0029     = 0.7e-7;    // (germanium-fit; UW0029 är dock kisel — se nedan)
+    constexpr double kIs_AC126      = 0.7e-7;    // germanium PNP (rec/play-amp, kort 8004005/6)
+
+    // ---- UW0029 = KISEL-NPN (BC109-ekvivalent) ----
+    // Studio Sound aug 1968 (Hellyer, s.354): tidiga Beocord-enheter använde
+    // UW0029, senare BC109 i samma preamp-ingångsposition → samma komponent.
+    // BC109 = kisel-NPN lågbrus. Modelleras därför renare än germanium-stegen:
+    // lägre brus, symmetriskt knä (ingen h2-värme), bredare knä (kisels högre
+    // ledningströskel → linjärt längre). Germanium-färgningen bor i 2N2613/AC126
+    // nedströms — den rörs inte. Se specs.md §12 (✅ LÖST).
+    // Enkel-ändat kisel-klass-A-steg har inneboende 2:a-harmonisk (exponentiell
+    // transferkurva), men mindre än germanium → ~40 % av germaniums asymmetri.
+    // (0.0 = perfekt symmetriskt vore för idealiserat och raderar germanium-
+    //  signaturen i kedjan; verifierat mot specrig h2>h3-grinden @ -12 dBFS.)
+    constexpr double kAsymmetrySi   = 0.002;     // kisel: svag h2 (vs germanium 0.005)
+    constexpr double kSiKneeFactor  = 1.5;       // bredare/renare knä vs germanium (eff. Vt ×1.5)
 
     // Brus (input-refererat, V RMS över 20 Hz–20 kHz).
     // Kalibrerat v56.0 — 2.8× lägre än v55 → chain S/N ≥ 55 dB (servicemanualens spec).
     // Validering: S/N 46 dB → 55 dB uppmätt med −20 dBFS testsignal,
     // full 13-stage pipeline aktiv (inkl. GE-cascade + tape + DC-block).
     constexpr double kNoiseVrms_2N2613 = 2.9e-6;  // ×0.36 — tuned for 55 dB chain S/N
-    constexpr double kNoiseVrms_UW0029 = 1.8e-6;  // ×0.36 — tuned for 55 dB chain S/N
+    constexpr double kNoiseVrms_UW0029 = 1.4e-6;  // kisel-lågbrus (BC109-klass, ~0.78× ger) — sänkt v0.63
     constexpr double kNoiseVrms_AC126  = 2.1e-6;  // ×0.36 — tuned for 55 dB chain S/N
 
     // Asymmetri-bias för waveshaper. Reducerade värden (v62.1) — tidigare
@@ -71,10 +86,15 @@ namespace bc2000dl::dsp
     constexpr double kTapeNoise_dB_Speed475 = -70.0;
 
     // ---------- Bias ----------
-    constexpr double kBiasFreq_Hz       = 100000.0;
-    constexpr double kBiasNominal_mA    = 2.3;
-    constexpr double kEraseFreq_Hz      = 100000.0;
-    constexpr double kEraseNominal_mA   = 45.0;
+    // MANUAL-VERIFIERAT (servicemanual Technische Daten s.2 + schema s.3):
+    //   "Löschfrequenz: 100 kHz", "Formagnetiseringsstrom Bias 2,3 mA".
+    // Endast kBiasFreq_Hz används i DSP:n (TapeSaturation HF-bias). Övriga tre är
+    // dokumentations-konstanter (lästes ingenstans) — hålls korrekta mot original-
+    // schemat (B&O TYPE 4119, Form 5010 10-66).
+    constexpr double kBiasFreq_Hz       = 100000.0;   // manual: exakt 100 kHz  [ANVÄND]
+    constexpr double kBiasNominal_mA    = 2.3;         // manual: exakt 2,3 mA   [doc]
+    constexpr double kEraseFreq_Hz      = 100000.0;   // manual: exakt 100 kHz   [doc]
+    constexpr double kEraseNominal_mA   = 45.0;        // original-schema TYPE 4119: 45 mA [doc]
 
     // ---------- Output ----------
     constexpr double kReferenceLevel_dBu = 0.0;     // 0 dBu = 0.775 V RMS

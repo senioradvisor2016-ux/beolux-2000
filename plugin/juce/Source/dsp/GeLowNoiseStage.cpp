@@ -20,16 +20,18 @@ namespace bc2000dl::dsp
 
         if (t == GeStageType::UW0029)
         {
+            // KISEL-NPN (BC109-ekv) — symmetriskt + bredare knä + lägre brus.
             Is_value   = kIs_UW0029;
-            asymmetry  = kAsymmetryPNP + channelAsym;
-            // Brus
+            asymmetry  = kAsymmetrySi + channelAsym;
+            kneeVt     = kVT_25C * kSiKneeFactor;   // kisel: linjärt längre
             constexpr double bandwidthAudio = 20000.0 - 20.0;
             noiseSigma = kNoiseVrms_UW0029 * std::sqrt ((sr / 2.0) / bandwidthAudio);
         }
-        else // AC126
+        else // AC126 — germanium PNP (rec/play-amp 8004005/6)
         {
             Is_value   = kIs_AC126;
-            asymmetry  = kAsymmetryNPN + channelAsym;
+            asymmetry  = kAsymmetryPNP + channelAsym;
+            kneeVt     = kVT_25C;                   // germanium: mjukare knä
             constexpr double bandwidthAudio = 20000.0 - 20.0;
             noiseSigma = kNoiseVrms_AC126 * std::sqrt ((sr / 2.0) / bandwidthAudio);
         }
@@ -50,7 +52,8 @@ namespace bc2000dl::dsp
 
     void GeLowNoiseStage::setChannelAsymmetry (double offset)
     {
-        const double base = (type == GeStageType::UW0029) ? kAsymmetryPNP : kAsymmetryNPN;
+        // UW0029 = kisel (symmetriskt), AC126 = germanium-PNP (h2-värme).
+        const double base = (type == GeStageType::UW0029) ? kAsymmetrySi : kAsymmetryPNP;
         asymmetry = base + offset;
     }
 
@@ -61,7 +64,7 @@ namespace bc2000dl::dsp
         const double xNoisy = static_cast<double> (x) + noise;
         // Samma Ebers-Moll-fit som Ge2N2613Stage, evaluerad via ADAA1
         // (GeSoftClip.h) — antialiserad i bas-samplerate.
-        const double clipped = shaper.process (xNoisy * gainLinear, asymmetry, kVT_25C);
+        const double clipped = shaper.process (xNoisy * gainLinear, asymmetry, kneeVt);
         return static_cast<float> (clipped);
     }
 

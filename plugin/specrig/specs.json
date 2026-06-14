@@ -1,0 +1,33 @@
+{
+  "_source": "Härlett ur plugin/specs.md §2,4,5,6,8 + B&O servicemanual s.2 + Studio Sound 1968. Trösklar är pass/fail-gränser för mät-riggen; justera fritt.",
+  "reference": {
+    "sr": 48000,
+    "settle_s": 0.5,
+    "tail_trim_s": 0.1
+  },
+  "thd_pct_max": {
+    "-20": 1.0,
+    "-12": 2.0,
+    "-6": 3.0,
+    "0": 8.0,
+    "_note": "specs.md §4: -3 dBFS <3 %, 0 dBFS <8 % (mjuk knee). Servicemanual: tape <3 % vid ref."
+  },
+  "snr_db_min": {
+    "19": 55.0,
+    "9.5": 50.0,
+    "4.75": 45.0,
+    "_note": "Servicemanual s.2: bättre än 55 dB @ 19 cm/s."
+  },
+  "channel_separation_db_min": 45.0,
+  "freq_response": {
+    "19":   { "lo_3db_max_hz": 40.0,  "hi_3db_min_hz": 15000.0, "inband_lo": 60, "inband_hi": 12000, "inband_tol_db": 4.0 },
+    "9.5":  { "lo_3db_max_hz": 50.0,  "hi_3db_min_hz": 10000.0, "inband_lo": 60, "inband_hi": 8000,  "inband_tol_db": 4.0 },
+    "4.75": { "lo_3db_max_hz": 60.0,  "hi_3db_min_hz": 6000.0,  "inband_lo": 80, "inband_hi": 4000,  "inband_tol_db": 5.0 },
+    "_note": "specs.md §6 / servicemanual DIN 1962. +resonans tillåten (tape glow); detta är grova band-edge-grindar."
+  },
+  "harmonic_profile": {
+    "_note": "Germanium-PNP-karaktär = h2-dominans vid NOMINELLA nivåer (<= -12 dBFS). Vid -6/0 dBFS tar tape-mättnaden (Jiles-Atherton, symmetrisk) över med h3-dominans — autentiskt germanium→tape-beteende, inte en bugg. Mät därför h2>h3 vid -12 dBFS.",
+    "test_level_dbfs": -12,
+    "h2_gt_h3": true
+  }
+}
