@@ -1,0 +1,39 @@
+name: Package (ad-hoc, macOS universal)
+
+# Bygger universal-pluginet på GitHubs macOS-runner, ad-hoc-signerar (codesign
+# --sign -) via scripts/package-dist.sh och laddar upp zippen som artifact.
+# Detta är "kompis-distributionen" — INTE en notariserad release.
+#
+# Kör manuellt: Actions → "Package (ad-hoc, macOS universal)" → Run workflow
+# (eller via API/MCP workflow_dispatch på valfri branch).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure (Release, universal arm64+x86_64)
+        run: >
+          cmake -S plugin/juce -B plugin/juce/build
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+
+      - name: Bygg plugin (AU + VST3 + Standalone, alla format)
+        run: cmake --build plugin/juce/build --config Release --target BC2000DL_All --parallel 3
+
+      - name: Paketera (ad-hoc-signering + Install.command + zip)
+        run: DIST_OUT="$GITHUB_WORKSPACE/dist" scripts/package-dist.sh
+
+      - name: Ladda upp zip som artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Germanium-2000-Deluxe-macOS-universal-adhoc
+          path: dist/*.zip
+          if-no-files-found: error
