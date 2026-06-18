@@ -101,9 +101,6 @@ namespace bc2000dl::dsp
         delaySmoothed += (static_cast<float> (delaySamples) - delaySmoothed) * 0.0007f;
 
         const float wowOffset  = echoWowDepth * std::sin (echoWowPhase);
-        const float fracDelay  = delaySmoothed + wowOffset;
-        const int   delayInt   = static_cast<int> (std::floor (fracDelay));
-        const float delayFrac  = fracDelay - static_cast<float> (delayInt);
 
         // v60.5 — Cross-feedback (SoS): läs delay-sample från partner-Echo:s
         // buffer istället för egen.  Resultatet: L:s echo-output har R:s
@@ -111,6 +108,23 @@ namespace bc2000dl::dsp
         const std::vector<float>& readBuf = (feedbackSource != nullptr)
                                           ? feedbackSource->getDelayBuffer()
                                           : buf;
+        const int bufLen = static_cast<int> (readBuf.size());
+
+        // BUGFIX (2026-06): klamra läspositionen till [1, bufLen-2]. Vid lång
+        // eko-tid (TIME-knoben nära max ≈ 350 ms) ligger delaySmoothed redan på
+        // bufLen-1; wow-LFO:ns positiva excursion (echoWowDepth·sin) drev då
+        // fracDelay FÖRBI buffergränsen → delayInt > bufLen. Den gamla
+        // enkelstegs-wrappen (if (r0<0) r0+=bufLen) kunde inte ta tillbaka
+        // indexet i intervall → NEGATIVT index = OOB-läsning ur buf[-1..]
+        // = skräp som återkom i takt med wow-frekvensen (~1,5 Hz) = periodiskt
+        // digitalt sprak. jlimit håller läsningen innanför bufferten (samma
+        // skydd WowFlutter redan har) och bevarar pitch-wandern under taket.
+        const float fracDelay  = juce::jlimit (1.0f,
+                                               static_cast<float> (bufLen) - 2.0f,
+                                               delaySmoothed + wowOffset);
+        const int   delayInt   = static_cast<int> (std::floor (fracDelay));
+        const float delayFrac  = fracDelay - static_cast<float> (delayInt);
+
         // BUGFIX (2026-06): läspekaren MÅSTE avancera per sample. Partnerns
         // writeIdx är FRUSEN under hela detta blocket (partner-kanalen processas
         // vid en annan tidpunkt — L hela blocket, sedan R), så att indexera med
@@ -119,11 +133,10 @@ namespace bc2000dl::dsp
         // (avancerar per sample); båda buffrarna skrivs i lockstep så de är i
         // synk vid blockgräns. Bevarar ping-pong-karaktären, tar bort skräpet.
         const int writeIdxForRead = writeIdx;
-        const int bufLen = static_cast<int> (readBuf.size());
-        int r0 = writeIdxForRead - delayInt;
-        int r1 = writeIdxForRead - delayInt - 1;
-        if (r0 < 0) r0 += bufLen;  if (r0 >= bufLen) r0 -= bufLen;
-        if (r1 < 0) r1 += bufLen;  if (r1 >= bufLen) r1 -= bufLen;
+        // Robust modulo-wrap (full % istället för enkelsteg) — tål godtyckligt
+        // delayInt och kan aldrig ge negativt/OOB-index.
+        const int r0 = ((writeIdxForRead - delayInt    ) % bufLen + bufLen) % bufLen;
+        const int r1 = ((writeIdxForRead - delayInt - 1) % bufLen + bufLen) % bufLen;
         const float delayed = readBuf[static_cast<size_t> (r0)] * (1.0f - delayFrac)
                             + readBuf[static_cast<size_t> (r1)] * delayFrac;
 

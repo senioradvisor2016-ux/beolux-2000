@@ -15,6 +15,7 @@
 #include "../dsp/SignalChain.h"
 #include "../dsp/Multiplay.h"
 #include "../dsp/TapeSaturation.h"
+#include "../dsp/Echo.h"
 
 #include <cmath>
 #include <cstdio>
@@ -303,6 +304,69 @@ static void testMultiplayContinuity()
     report ("Multiplay-filter kontinuerligt över blockgräns", continuous, detail);
 }
 
+// =======================================================================
+//  BUG 4: Echo "digitalt sprak" vid lång eko-tid
+//  Regression: wow-LFO:n modulerar läspositionen i eko-bufferten
+//  (fracDelay = delaySmoothed + echoWowDepth·sin). Vid TIME nära max
+//  (≈350 ms) låg delaySmoothed på bufLen-1; LFO:ns positiva excursion
+//  drev fracDelay förbi buffergränsen → delayInt > bufLen → den gamla
+//  enkelstegs-wrappen gav NEGATIVT läsindex = OOB-läsning ur buf[-1..]
+//  = skräp i takt med wow-frekvensen = periodiskt digitalt sprak.
+//  Verifierar: vid TIME=350 ms + Speed 4.75 (max wow-djup) ska eko-
+//  utsignalen för en len sinus vara ändlig och utan diskontinuitets-
+//  spikar (inga hopp som inte finns i en len signal).
+// =======================================================================
+static void testEchoLongTimeNoCrackle()
+{
+    std::printf ("\n── Bug 4: Echo digitalt sprak vid lång eko-tid ─────────────\n");
+
+    Echo echo;
+    echo.prepare (kSR);
+    echo.setSpeed (TapeSpeed::Speed475);   // störst wow-djup
+    echo.setTimeMs (350.0f);               // TIME-knob på max → delay ≈ bufLen-1
+    echo.setAmount (0.6f);
+    echo.setFeedback (0.5f);
+    echo.setEnabled (true);
+    echo.reset();                          // delaySmoothed = delaySamples (settled)
+
+    double phase = 0.0;
+    const int   blockSize = 256;
+    const int   numBlocks = (static_cast<int> (kSR) * 2) / blockSize;  // ~2 s
+    std::vector<float> block (static_cast<size_t> (blockSize));
+
+    float maxAbs    = 0.0f;
+    float maxDelta  = 0.0f;
+    float prev      = 0.0f;
+    bool  finite    = true;
+    bool  first     = true;
+
+    for (int b = 0; b < numBlocks; ++b)
+    {
+        fillSineMono (block.data(), blockSize, phase, 200.0, 0.3f);
+        for (int i = 0; i < blockSize; ++i)
+        {
+            const float y = echo.processSample (block[static_cast<size_t> (i)]);
+            if (! std::isfinite (y)) finite = false;
+            maxAbs = std::max (maxAbs, std::abs (y));
+            if (! first)
+                maxDelta = std::max (maxDelta, std::abs (y - prev));
+            prev  = y;
+            first = false;
+        }
+    }
+
+    // En len 200 Hz-sinus (+ dess fördröjda eko-kopior) har mycket små
+    // sample-till-sample-hopp. OOB-skräp injicerade spikar upp mot tanh-
+    // klippet (±1.5)·amount. Tröskel 0.10 ligger långt under skräp-spikarna
+    // men långt över den lena signalens deltan (~0.01).
+    const bool ok = finite && maxDelta < 0.10f && maxAbs < 1.6f;
+
+    char detail[128];
+    std::snprintf (detail, sizeof (detail),
+        "maxAbs=%.4f maxDelta=%.4f finite=%d", maxAbs, maxDelta, (int) finite);
+    report ("Echo @TIME=350ms utan diskontinuitets-sprak", ok, detail);
+}
+
 int main()
 {
     std::printf ("═══════════════════════════════════════════════════════════════\n");
@@ -312,6 +376,7 @@ int main()
     testPhonoVariableBlockSize();
     testBiasAudibility();
     testMultiplayContinuity();
+    testEchoLongTimeNoCrackle();
 
     std::printf ("\n═══════════════════════════════════════════════════════════════\n");
     std::printf ("  RESULTAT:  %d godkända   %d underkända\n", gPass, gFail);

@@ -14,7 +14,11 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD="$REPO/plugin/juce/build/BC2000DL_artefacts/Release"
 VST3_SRC="$BUILD/VST3/Germanium 2000 Deluxe.vst3"
 AU_SRC="$BUILD/AU/Germanium 2000 Deluxe.component"
-ZIP="$HOME/Desktop/Germanium 2000 Deluxe (AU + VST3) — macOS14 universal.zip"
+# Utdata-katalog: default ~/Desktop (lokal kompis-paketering), men kan
+# åsidosättas med DIST_OUT (t.ex. CI: DIST_OUT="$GITHUB_WORKSPACE/dist").
+DIST_OUT="${DIST_OUT:-$HOME/Desktop}"
+mkdir -p "$DIST_OUT"
+ZIP="$DIST_OUT/Germanium 2000 Deluxe (AU + VST3) — macOS14 universal.zip"
 
 [ -d "$VST3_SRC" ] || { echo "Saknar VST3: $VST3_SRC — kör bygget först."; exit 1; }
 [ -d "$AU_SRC" ]   || { echo "Saknar AU: $AU_SRC — kör bygget först."; exit 1; }
