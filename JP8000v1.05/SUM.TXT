@@ -1,0 +1,18 @@
+Tempo = 240
+Block1 ( chksum = 49F8 )  => filename : '_00001.mid'.
+Block2 ( chksum = 12E3 )  => filename : '_00002.mid'.
+Block3 ( chksum = A146 )  => filename : '_00003.mid'.
+Block4 ( chksum = E6EB )  => filename : '_00004.mid'.
+Block5 ( chksum = 5455 )  => filename : '_00005.mid'.
+Block6 ( chksum = 672D )  => filename : '_00006.mid'.
+Block7 ( chksum = C131 )  => filename : '_00007.mid'.
+Block8 ( chksum = F294 )  => filename : '_00008.mid'.
+Mon May 19 10:31:46 JST 1997
+/* This file was created automatically. Do not edit. */
+#ifndef	_version_h_
+#define	_version_h_
+#define	VERSION_NUM	105
+#define	BUILD_NUM	138
+extern	const unsigned short	versionNum;
+extern	const unsigned short	buildNum;
+#endif	/* !_version_h_ */
