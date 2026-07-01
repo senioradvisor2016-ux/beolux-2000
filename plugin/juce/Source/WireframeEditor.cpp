@@ -2724,8 +2724,11 @@ namespace bc2000dl::ui
         if (newText != counterText)
         {
             counterText = newText;
-            // Repaint only the counter rect (efficient)
-            repaint (juce::Rectangle<int> (348, 60, 64, 24));
+            // Repaint only the counter rect (efficient). Must match the LCD
+            // bounds painted in paint() — counter (430, 62, 60, 20) — plus a
+            // small margin for the amber glow halo; otherwise the dirty region
+            // misses the display and the digits never refresh.
+            repaint (juce::Rectangle<int> (428, 60, 64, 24));
         }
     }
 } // namespace bc2000dl::ui
